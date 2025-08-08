@@ -6,21 +6,23 @@ import { Product } from "../../types/product";
 
 type WishlistState = {
   items: Product[];
-  add: (product: Product) => void;
-  remove: (productId: string) => void;
-  has: (productId: string) => boolean;
+  addItem: (product: Product) => void;
+  removeItem: (productId: string) => void;
+  isInWishlist: (productId: string) => boolean;
+  clearWishlist: () => void;
 };
 
 export const useWishlistStore = create<WishlistState>()(
   persist(
     (set, get) => ({
       items: [],
-      add: (product) => {
+      addItem: (product) => {
         if (get().items.some((p) => p.id === product.id)) return;
         set({ items: [...get().items, product] });
       },
-      remove: (productId) => set({ items: get().items.filter((p) => p.id !== productId) }),
-      has: (productId) => get().items.some((p) => p.id === productId),
+      removeItem: (productId) => set({ items: get().items.filter((p) => p.id !== productId) }),
+      isInWishlist: (productId) => get().items.some((p) => p.id === productId),
+      clearWishlist: () => set({ items: [] }),
     }),
     { name: "now_wishlist" }
   )

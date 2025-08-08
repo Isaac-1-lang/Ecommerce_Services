@@ -4,45 +4,62 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type ShippingInfo = {
-  name: string;
-  phone: string;
-  address1: string;
-  address2: string;
+  firstName: string;
+  lastName: string;
+  address: string;
   city: string;
-  postalCode: string;
+  state: string;
+  zipCode: string;
+  phone: string;
 };
 
-export type PaymentMethod = "card" | "cod";
+export type PaymentInfo = {
+  cardType: string;
+  cardNumber: string;
+  expiryMonth: string;
+  expiryYear: string;
+  cvv: string;
+  cardholderName: string;
+};
 
 type CheckoutState = {
-  step: "cart" | "address" | "payment" | "review" | "complete";
   shippingInfo: ShippingInfo;
-  paymentMethod: PaymentMethod;
-  setStep: (s: CheckoutState["step"]) => void;
+  paymentInfo: PaymentInfo;
   setShippingInfo: (info: ShippingInfo) => void;
-  setPaymentMethod: (m: PaymentMethod) => void;
-  reset: () => void;
+  setPaymentInfo: (info: PaymentInfo) => void;
+  clearCheckout: () => void;
 };
 
-const initialInfo: ShippingInfo = {
-  name: "",
-  phone: "",
-  address1: "",
-  address2: "",
+const initialShippingInfo: ShippingInfo = {
+  firstName: "",
+  lastName: "",
+  address: "",
   city: "",
-  postalCode: "",
+  state: "",
+  zipCode: "",
+  phone: "",
+};
+
+const initialPaymentInfo: PaymentInfo = {
+  cardType: "",
+  cardNumber: "",
+  expiryMonth: "",
+  expiryYear: "",
+  cvv: "",
+  cardholderName: "",
 };
 
 export const useCheckoutStore = create<CheckoutState>()(
   persist(
     (set) => ({
-      step: "cart",
-      shippingInfo: initialInfo,
-      paymentMethod: "card",
-      setStep: (s) => set({ step: s }),
+      shippingInfo: initialShippingInfo,
+      paymentInfo: initialPaymentInfo,
       setShippingInfo: (info) => set({ shippingInfo: info }),
-      setPaymentMethod: (m) => set({ paymentMethod: m }),
-      reset: () => set({ step: "cart", shippingInfo: initialInfo, paymentMethod: "card" }),
+      setPaymentInfo: (info) => set({ paymentInfo: info }),
+      clearCheckout: () => set({ 
+        shippingInfo: initialShippingInfo, 
+        paymentInfo: initialPaymentInfo 
+      }),
     }),
     { name: "now_checkout" }
   )
