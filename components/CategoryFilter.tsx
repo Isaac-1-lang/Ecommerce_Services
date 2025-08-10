@@ -2,15 +2,33 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function CategoryFilter({ categories }: { categories: string[] }) {
+interface CategoryFilterProps {
+  categories: string[];
+  selectedCategory?: string;
+  onCategoryChange?: (category: string) => void;
+}
+
+export default function CategoryFilter({ 
+  categories, 
+  selectedCategory, 
+  onCategoryChange 
+}: CategoryFilterProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const current = searchParams.get("category") || "";
+  
+  // Use prop if provided, otherwise fall back to URL search params
+  const current = selectedCategory !== undefined ? selectedCategory : (searchParams.get("category") || "");
 
   function setCategory(cat: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (cat) params.set("category", cat); else params.delete("category");
-    router.push(`/products?${params.toString()}`);
+    if (onCategoryChange) {
+      // Use callback if provided
+      onCategoryChange(cat);
+    } else {
+      // Fall back to URL-based navigation
+      const params = new URLSearchParams(searchParams.toString());
+      if (cat) params.set("category", cat); else params.delete("category");
+      router.push(`/products?${params.toString()}`);
+    }
   }
 
   return (
