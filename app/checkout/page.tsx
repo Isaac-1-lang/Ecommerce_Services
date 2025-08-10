@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiCheck, FiArrowRight, FiUser, FiUserPlus } from "react-icons/fi";
-import CheckoutSteps from "../../components/CheckoutSteps";
+import CheckoutSteps, { CheckoutStep } from "../../components/CheckoutSteps";
 import AddressForm from "../../components/AddressForm";
 import PaymentForm from "../../components/PaymentForm";
 import Breadcrumbs from "../../components/Breadcrumbs";
@@ -12,15 +12,9 @@ import { useCheckoutStore } from "../../features/checkout/store";
 import { useAuthStore } from "../../features/auth/store";
 import { formatPrice } from "../../lib/formatPrice";
 
-const steps = [
-  { id: "shipping", name: "Shipping Information" },
-  { id: "payment", name: "Payment Details" },
-  { id: "review", name: "Order Review" },
-];
-
 export default function CheckoutPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState("shipping");
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuestOptions, setShowGuestOptions] = useState(false);
   
@@ -41,7 +35,7 @@ export default function CheckoutPage() {
   }
 
   const handleNext = () => {
-    if (currentStep === "shipping") {
+    if (currentStep === "address") {
       setCurrentStep("payment");
     } else if (currentStep === "payment") {
       setCurrentStep("review");
@@ -50,7 +44,7 @@ export default function CheckoutPage() {
 
   const handleBack = () => {
     if (currentStep === "payment") {
-      setCurrentStep("shipping");
+      setCurrentStep("address");
     } else if (currentStep === "review") {
       setCurrentStep("payment");
     }
@@ -137,13 +131,13 @@ export default function CheckoutPage() {
 
       {(!user && !showGuestOptions) ? null : (
         <>
-          <CheckoutSteps steps={steps} currentStep={currentStep} />
+          <CheckoutSteps step={currentStep} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
-                {currentStep === "shipping" && (
+                {currentStep === "address" && (
                   <div className="p-6">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                       Shipping Information
@@ -302,7 +296,7 @@ export default function CheckoutPage() {
                 {currentStep !== "review" && (
                   <div className="p-6 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between">
-                      {currentStep !== "shipping" && (
+                      {currentStep !== "address" && (
                         <button
                           onClick={handleBack}
                           className="border border-gray-300 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
