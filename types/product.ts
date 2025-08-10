@@ -10,10 +10,14 @@ export type Product = {
   name: string;
   description?: string;
   price: number;
+  originalPrice?: number;
   category: string;
   image?: string;
   images?: string[];
   variants?: Variant[];
   rating?: number;
   reviewCount?: number;
+  stockQuantity?: number;
+  isNew?: boolean;
+  isOnSale?: boolean;
 };

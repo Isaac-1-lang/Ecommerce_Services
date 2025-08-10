@@ -50,12 +50,7 @@ export default function HomePage() {
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
     } else {
-      addToWishlist({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image || "",
-      });
+      addToWishlist(product);
     }
   };
 
