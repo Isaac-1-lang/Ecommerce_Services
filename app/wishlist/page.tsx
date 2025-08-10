@@ -7,6 +7,7 @@ import WishlistItem from "../../components/WishlistItem";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useWishlistStore } from "../../features/wishlist/store";
 import { useCartStore } from "../../features/cart/store";
+import type { Product } from "../../types/product";
 
 export default function WishlistPage() {
   const [isUpdating, setIsUpdating] = useState(false);
