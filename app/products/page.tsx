@@ -106,6 +106,7 @@ export default function ProductsPage() {
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="lg:w-64 flex-shrink-0">
           <FilterSidebar 
+            categories={categories}
             filters={filters}
             onFilterChange={handleFilterChange}
             onClearFilters={clearFilters}
