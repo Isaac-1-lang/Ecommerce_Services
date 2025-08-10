@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                         ) : (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">
-                              You're checking out as a guest. Consider creating an account to track your orders and save your information for future purchases.
+                              You&apos;re checking out as a guest. Consider creating an account to track your orders and save your information for future purchases.
                             </p>
                             <button
                               onClick={() => router.push("/auth/register?redirect=/checkout")}

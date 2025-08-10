@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { Product } from "../../types/product";
 
-interface ProductFilters {
+export interface ProductFilters {
   category: string;
   priceRange: [number, number];
   rating: number;

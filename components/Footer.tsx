@@ -76,7 +76,7 @@ export default function Footer() {
               {SITE_CONFIG.name}
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md">
-              {SITE_CONFIG.tagline}. We're committed to providing you with the best shopping experience, 
+              {SITE_CONFIG.tagline}. We&apos;re committed to providing you with the best shopping experience, 
               quality products, and exceptional customer service.
             </p>
             

@@ -25,9 +25,9 @@ export default function RegisterForm() {
       setName("");
       setEmail("");
       setPassword("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessageType("error");
-      setMessage(err?.message || "Registration failed");
+      setMessage(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }

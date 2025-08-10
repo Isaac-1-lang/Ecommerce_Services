@@ -30,7 +30,7 @@ export default function WishlistPage() {
     }
   };
 
-  const handleAddToCart = async (item: any) => {
+  const handleAddToCart = async (item: Product) => {
     setIsUpdating(true);
     try {
       addItem({

@@ -9,6 +9,7 @@ import CategoryFilter from "../../components/CategoryFilter";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProductsStore } from "../../features/products/store";
 import { getProducts } from "../../services/productService";
+import type { ProductFilters } from "../../features/products/store";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function ProductsPage() {
     loadProducts();
   }, [setProducts]);
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: ProductFilters) => {
     setFilters(newFilters);
     // Update URL params
     const params = new URLSearchParams(searchParams);

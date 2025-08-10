@@ -18,8 +18,8 @@ export default function LoginForm() {
     setError(null);
     try {
       await login({ email, password });
-    } catch (err: any) {
-      setError(err?.message || "Login failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   }
 
@@ -122,7 +122,7 @@ export default function LoginForm() {
         {/* Footer Links */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/auth/register"
               className="font-medium text-primary hover:text-primary/80 transition-colors"

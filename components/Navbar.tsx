@@ -12,7 +12,6 @@ import {
   FiMenu, 
   FiX,
   FiChevronDown,
-  FiSearch,
   FiMapPin
 } from "react-icons/fi";
 import SearchBar from "./SearchBar";
