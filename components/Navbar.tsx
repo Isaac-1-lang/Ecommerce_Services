@@ -3,63 +3,263 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { FiMoon, FiSun, FiShoppingCart, FiHeart, FiUser } from "react-icons/fi";
+import { 
+  FiMoon, 
+  FiSun, 
+  FiShoppingCart, 
+  FiHeart, 
+  FiUser, 
+  FiMenu, 
+  FiX,
+  FiChevronDown,
+  FiSearch,
+  FiMapPin
+} from "react-icons/fi";
 import SearchBar from "./SearchBar";
 import { useCartStore } from "../features/cart/store";
+import { PRODUCT_CATEGORIES, SITE_CONFIG } from "../constants";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const cartItemCount = useCartStore((s) => s.totalQuantity);
 
   useEffect(() => setMounted(true), []);
 
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-900/80 dark:supports-[backdrop-filter]:bg-gray-900/60">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-ecommerce">
+      {/* Top Bar */}
+      <div className="bg-primary text-primary-foreground py-2 text-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <FiMapPin className="h-4 w-4" />
+                <span>Free shipping on orders over ${SITE_CONFIG.freeShippingThreshold}</span>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center gap-4">
+              <Link href="/help" className="hover:text-primary-foreground/80 transition-colors">
+                Help Center
+              </Link>
+              <Link href="/contact" className="hover:text-primary-foreground/80 transition-colors">
+                Contact Us
+              </Link>
+              <span>|</span>
+              <Link href="/auth/login" className="hover:text-primary-foreground/80 transition-colors">
+                Sign In
+              </Link>
+              <Link href="/auth/register" className="hover:text-primary-foreground/80 transition-colors">
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
+          {/* Logo and Categories */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-xl font-bold">Now</Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm">
-              <Link href="/products" className="hover:text-primary">Products</Link>
-              <Link href="/wishlist" className="hover:text-primary">Wishlist</Link>
-              <Link href="/account" className="hover:text-primary">Account</Link>
+            <Link href="/" className="text-2xl font-bold text-primary font-display">
+              {SITE_CONFIG.name}
+            </Link>
+            
+            {/* Categories Dropdown */}
+            <div className="relative hidden lg:block">
+              <button
+                onClick={toggleCategories}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-md hover:bg-muted"
+              >
+                <span>Categories</span>
+                <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isCategoriesOpen && (
+                <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-border rounded-lg shadow-ecommerce-lg p-4 z-50">
+                  <div className="grid grid-cols-2 gap-4">
+                    {PRODUCT_CATEGORIES.filter(cat => cat.featured).map((category) => (
+                      <Link
+                        key={category.id}
+                        href={`/products?category=${category.id}`}
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors group"
+                        onClick={() => setIsCategoriesOpen(false)}
+                      >
+                        <span className="text-2xl">{category.icon}</span>
+                        <div>
+                          <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                            {category.name}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {category.description}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <Link
+                      href="/products"
+                      className="block text-center text-primary hover:text-primary/80 font-medium transition-colors"
+                      onClick={() => setIsCategoriesOpen(false)}
+                    >
+                      View All Categories
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-6 text-sm">
+              <Link href="/products" className="font-medium text-foreground hover:text-primary transition-colors">
+                Products
+              </Link>
+              <Link href="/deals" className="font-medium text-foreground hover:text-primary transition-colors">
+                Deals
+              </Link>
+              <Link href="/new-arrivals" className="font-medium text-foreground hover:text-primary transition-colors">
+                New Arrivals
+              </Link>
+              <Link href="/brands" className="font-medium text-foreground hover:text-primary transition-colors">
+                Brands
+              </Link>
             </nav>
           </div>
 
-          <div className="flex-1 hidden md:block">
+          {/* Search Bar */}
+          <div className="flex-1 hidden md:block max-w-2xl mx-8">
             <SearchBar />
           </div>
 
+          {/* Right Side Actions */}
           <div className="flex items-center gap-3">
-            <Link href="/wishlist" aria-label="Wishlist" className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-              <FiHeart className="h-5 w-5" />
+            {/* Wishlist */}
+            <Link 
+              href="/wishlist" 
+              aria-label="Wishlist" 
+              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+            >
+              <FiHeart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
             </Link>
-            <Link href="/cart" aria-label="Cart" className="relative p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-              <FiShoppingCart className="h-5 w-5" />
+
+            {/* Cart */}
+            <Link 
+              href="/cart" 
+              aria-label="Cart" 
+              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+            >
+              <FiShoppingCart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-price text-xs font-semibold text-white animate-bounce-gentle">
                   {cartItemCount}
                 </span>
               )}
             </Link>
-            <Link href="/auth/login" aria-label="Account" className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-              <FiUser className="h-5 w-5" />
+
+            {/* Account */}
+            <Link 
+              href="/account" 
+              aria-label="Account" 
+              className="p-2 rounded-md hover:bg-muted transition-colors group"
+            >
+              <FiUser className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
             </Link>
+
+            {/* Theme Toggle */}
             <button
               aria-label="Toggle Theme"
-              className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 rounded-md hover:bg-muted transition-colors"
               onClick={() => theme && setTheme(theme === "dark" ? "light" : "dark")}
             >
-              {mounted && theme === "dark" ? <FiSun className="h-5 w-5" /> : <FiMoon className="h-5 w-5" />}
+              {mounted && theme === "dark" ? (
+                <FiSun className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+              ) : (
+                <FiMoon className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+              )}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <FiX className="h-5 w-5" />
+              ) : (
+                <FiMenu className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
 
-        <div className="md:hidden py-2">
+        {/* Mobile Search Bar */}
+        <div className="md:hidden py-3">
           <SearchBar />
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden border-t border-border bg-background">
+          <div className="px-4 py-4 space-y-4">
+            <nav className="space-y-2">
+              <Link
+                href="/products"
+                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link
+                href="/deals"
+                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Deals
+              </Link>
+              <Link
+                href="/new-arrivals"
+                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                New Arrivals
+              </Link>
+              <Link
+                href="/brands"
+                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Brands
+              </Link>
+            </nav>
+            
+            <div className="pt-4 border-t border-border">
+              <div className="text-sm font-medium text-muted-foreground mb-2 px-3">Categories</div>
+              <div className="space-y-1">
+                {PRODUCT_CATEGORIES.slice(0, 6).map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/products?category=${category.id}`}
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="text-lg">{category.icon}</span>
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
