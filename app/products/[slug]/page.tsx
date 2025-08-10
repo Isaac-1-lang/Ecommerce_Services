@@ -9,12 +9,12 @@ import { useCartStore } from "../../../features/cart/store";
 import { useWishlistStore } from "../../../features/wishlist/store";
 import { Product } from "../../../types/product";
 import { formatPrice } from "../../../lib/formatPrice";
+import { useParams } from "next/navigation";
 
-interface ProductDetailPageProps {
-  params: { slug: string };
-}
-
-export default function ProductDetailPage({ params }: ProductDetailPageProps) {
+export default function ProductDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -29,7 +29,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     const loadProduct = async () => {
       setLoading(true);
       try {
-        const productData = await getProductBySlug(params.slug);
+        const productData = await getProductBySlug(slug);
         if (!productData) {
           notFound();
         }
@@ -43,7 +43,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     };
 
     loadProduct();
-  }, [params.slug]);
+  }, [slug]);
 
   const handleAddToCart = () => {
     if (product) {

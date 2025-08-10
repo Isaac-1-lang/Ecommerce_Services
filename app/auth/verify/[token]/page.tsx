@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiCheck, FiX, FiMail } from "react-icons/fi";
 import { useAuthStore } from "../../../../features/auth/store";
+import { useParams } from "next/navigation";
 
-export default function VerifyEmailPage({ params }: { params: { token: string } }) {
+export default function VerifyEmailPage() {
+  const params = useParams();
+  const token = params.token as string;
+  
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
   
@@ -15,7 +19,7 @@ export default function VerifyEmailPage({ params }: { params: { token: string } 
     const verifyToken = async () => {
       try {
         clearError();
-        const result = await verifyEmail(params.token);
+        const result = await verifyEmail(token);
         setMessage(result.message);
         setStatus("success");
       } catch (error) {
@@ -24,7 +28,7 @@ export default function VerifyEmailPage({ params }: { params: { token: string } 
     };
 
     verifyToken();
-  }, [params.token, verifyEmail, clearError]);
+  }, [token, verifyEmail, clearError]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

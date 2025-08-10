@@ -1,8 +1,13 @@
 import { orderService } from "../../services/orderService";
 import { notFound } from "next/navigation";
 
-export default async function OrderDetailPage({ params }: { params: { id: string } }) {
-  const order = await orderService.getOrder(params.id);
+interface OrderDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
+  const { id } = await params;
+  const order = await orderService.getOrder(id);
   if (!order) return notFound();
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
