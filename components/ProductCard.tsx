@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import { FiHeart, FiShoppingCart, FiStar, FiEye, FiShare2 } from "react-icons/fi";
+import { FiHeart, FiShoppingCart, FiStar, FiEye, FiShare2, FiImage } from "react-icons/fi";
 import { Product } from "../types/product";
 import { formatPrice } from "../lib/formatPrice";
 import { useCartStore } from "../features/cart/store";
@@ -11,6 +12,7 @@ import { useWishlistStore } from "../features/wishlist/store";
 export default function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
   
   const addToCart = useCartStore((s) => s.addItem);
   const addToWishlist = useWishlistStore((s) => s.addItem);
@@ -124,19 +126,30 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-muted">
         <Link href={`/products/${product.slug}`}>
-          <img
-            src={product.image || "https://via.placeholder.com/400x400?text=Product+Image"}
-            alt={product.name}
-            className={`h-full w-full object-cover transition-transform duration-300 ${
-              isHovered ? 'scale-110' : 'scale-100'
-            }`}
-            onLoad={() => setIsImageLoading(false)}
-            onError={() => setIsImageLoading(false)}
-          />
+          {product.image && !imageError ? (
+            <Image
+              src={product.image}
+              alt={product.name}
+              width={400}
+              height={400}
+              className={`h-full w-full object-cover transition-transform duration-300 ${
+                isHovered ? 'scale-110' : 'scale-100'
+              }`}
+              onLoad={() => setIsImageLoading(false)}
+              onError={() => {
+                setIsImageLoading(false);
+                setImageError(true);
+              }}
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">
+              <FiImage className="w-16 h-16" />
+            </div>
+          )}
         </Link>
         
         {/* Loading State */}
-        {isImageLoading && (
+        {isImageLoading && !imageError && (
           <div className="absolute inset-0 bg-muted animate-pulse-gentle" />
         )}
 

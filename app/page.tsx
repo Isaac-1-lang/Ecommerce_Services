@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiArrowRight, FiStar, FiShoppingCart, FiHeart } from "react-icons/fi";
+import Image from "next/image";
+import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage } from "react-icons/fi";
 import { getProducts } from "../services/productService";
 import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
@@ -166,12 +167,28 @@ export default function HomePage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {featuredProducts.map((product) => (
                 <div key={product.id} className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100">
-                    <img
-                      src={product.image || "https://via.placeholder.com/400x400?text=Product+Image"}
-                      alt={product.name}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                  <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100 relative">
+                    {product.image ? (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        width={400}
+                        height={400}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        priority={false}
+                        onError={(e) => {
+                          // Fallback to placeholder if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    {/* Fallback placeholder */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-400" style={{ display: product.image ? 'none' : 'flex' }}>
+                      <FiImage className="w-16 h-16" />
+                    </div>
                   </div>
                   
                   <div className="p-4">
@@ -234,30 +251,44 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Shop by Category
             </h2>
-                           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-               Explore our wide range of categories and find exactly what you&apos;re looking for
-               </p>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Explore our wide range of categories and find exactly what you&apos;re looking for
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { name: "Shoes", image: "https://via.placeholder.com/400x300?text=Shoes", href: "/products?category=Shoes" },
-              { name: "Bags", image: "https://via.placeholder.com/400x300?text=Bags", href: "/products?category=Bags" },
-              { name: "Accessories", image: "https://via.placeholder.com/400x300?text=Accessories", href: "/products?category=Accessories" },
+              { 
+                name: "Shoes", 
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&crop=center", 
+                href: "/products?category=Shoes" 
+              },
+              { 
+                name: "Bags", 
+                image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center", 
+                href: "/products?category=Bags" 
+              },
+              { 
+                name: "Accessories", 
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center", 
+                href: "/products?category=Accessories" 
+              },
             ].map((category) => (
               <Link
                 key={category.name}
                 href={category.href}
                 className="group relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
+                <div className="aspect-[4/3] overflow-hidden relative">
+                  <Image
                     src={category.image}
                     alt={category.name}
+                    width={400}
+                    height={300}
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 </div>
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <h3 className="text-2xl font-bold text-white">
                     {category.name}

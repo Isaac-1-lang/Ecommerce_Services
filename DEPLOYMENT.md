@@ -25,7 +25,20 @@ npm run build
 npm start
 ```
 
-### 2. Environment Variables
+### 2. Image Testing
+Test that images are loading correctly:
+
+```bash
+# Start development server
+npm run dev
+
+# Visit the test page
+http://localhost:3000/test-images
+```
+
+This page will show all product images to verify they're loading properly.
+
+### 3. Environment Variables
 Create a `.env.local` file with your production environment variables:
 
 ```bash
@@ -126,6 +139,12 @@ NEXT_PUBLIC_API_URL=https://your-api-domain.com
 - Enable Vercel Edge Functions
 - Optimize images and assets
 - Use Next.js Image component
+
+### Image Issues
+- Verify images are loading in development
+- Check the `/test-images` page locally
+- Ensure image URLs are accessible
+- Check browser console for image errors
 
 ## 📱 Mobile Optimization
 
