@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiCheck, FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuthStore } from "../../../../features/auth/store";
+import { useParams } from "next/navigation";
 
-export default function ResetPasswordPage({ params }: { params: { token: string } }) {
+export default function ResetPasswordPage() {
+  const params = useParams();
+  const token = params.token as string;
+  
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +28,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
     }
     
     try {
-      const result = await resetPassword(params.token, password);
+      const result = await resetPassword(token, password);
       setMessage(result.message);
       setDone(true);
     } catch (error) {
