@@ -9,24 +9,36 @@ const options = [
   { value: "rating_desc", label: "Rating" },
 ];
 
-export default function SortDropdown() {
+interface SortDropdownProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export default function SortDropdown({ value, onChange }: SortDropdownProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  function onChange(value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) params.set("sort", value);
-    else params.delete("sort");
-    router.push(`/products?${params.toString()}`);
-  }
+  // Use prop if provided, otherwise fall back to URL search params
+  const current = value !== undefined ? value : (searchParams.get("sort") || "relevance");
 
-  const current = searchParams.get("sort") || "relevance";
+  function handleChange(newValue: string) {
+    if (onChange) {
+      // Use callback if provided
+      onChange(newValue);
+    } else {
+      // Fall back to URL-based navigation
+      const params = new URLSearchParams(searchParams.toString());
+      if (newValue) params.set("sort", newValue);
+      else params.delete("sort");
+      router.push(`/products?${params.toString()}`);
+    }
+  }
 
   return (
     <select
       className="rounded-md border bg-white px-3 py-2 text-sm dark:bg-gray-900"
       value={current}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => handleChange(e.target.value)}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>

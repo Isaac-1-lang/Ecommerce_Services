@@ -10,6 +10,7 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProductsStore } from "../../features/products/store";
 import { getProducts } from "../../services/productService";
 import type { ProductFilters } from "../../features/products/store";
+import type { Product } from "../../types/product";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -25,6 +26,9 @@ export default function ProductsPage() {
     setSortBy,
     clearFilters
   } = useProductsStore();
+
+  // Extract unique categories from products
+  const categories = [...new Set(products.map((product: Product) => product.category))].filter(Boolean);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -112,6 +116,7 @@ export default function ProductsPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-4">
               <CategoryFilter 
+                categories={categories}
                 selectedCategory={filters.category}
                 onCategoryChange={handleCategoryChange}
               />
