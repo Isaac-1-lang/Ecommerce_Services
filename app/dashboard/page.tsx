@@ -137,7 +137,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
               <p className="font-medium text-gray-900 dark:text-white">
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}
+                Recently
               </p>
             </div>
           </div>
