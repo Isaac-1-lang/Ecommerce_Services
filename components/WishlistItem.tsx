@@ -6,8 +6,8 @@ import { formatPrice } from "../lib/formatPrice";
 interface WishlistItemProps {
   product: Product;
   onRemove: () => void;
-  onAddToCart: () => void; // ✅ added
-  disabled: boolean;       // ✅ added
+  onAddToCart: () => void; 
+  disabled: boolean;       
 }
 
 export default function WishlistItem({

@@ -76,10 +76,10 @@ export default function ProductsContent() {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="h-8 bg-green-200 rounded w-1/4 mb-6"></div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-200 rounded-lg h-64"></div>
+              <div key={i} className="bg-green-200 rounded-lg h-64"></div>
             ))}
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function ProductsContent() {
       
       <div className="mb-6">
         <h1 className="text-3xl font-bold">All Products</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <p className="text-green-600 dark:text-green-400 mt-2">
           Discover our collection of amazing products
         </p>
       </div>
@@ -140,7 +140,7 @@ export default function ProductsContent() {
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 No products found
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-green-600 dark:text-green-400 mb-4">
                 Try adjusting your filters or search terms
               </p>
               <button

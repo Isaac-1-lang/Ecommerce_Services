@@ -16,7 +16,7 @@ export default function CartItem({
 }) {
   return (
     <div className="flex items-center gap-4 rounded-md border p-3">
-      <div className="h-16 w-16 rounded bg-gray-100">
+      <div className="h-16 w-16 rounded bg-green-100">
         {item.image && (
           <Image
             src={item.image} 
@@ -27,12 +27,12 @@ export default function CartItem({
       </div>
       <div className="flex-1">
         <p className="font-medium">{item.name}</p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{formatPrice(item.price)}</p>
+        <p className="text-sm text-green-600 dark:text-green-400">{formatPrice(item.price)}</p>
         <div className="mt-2 flex items-center gap-2 text-sm">
           <button 
             onClick={() => onQuantityChange(Math.max(1, item.quantity - 1))} 
             disabled={disabled}
-            className="rounded border px-2 py-1 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded border px-2 py-1 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             -
           </button>
@@ -40,7 +40,7 @@ export default function CartItem({
           <button 
             onClick={() => onQuantityChange(item.quantity + 1)} 
             disabled={disabled}
-            className="rounded border px-2 py-1 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded border px-2 py-1 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             +
           </button>

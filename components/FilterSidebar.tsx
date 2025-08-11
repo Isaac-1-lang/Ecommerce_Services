@@ -42,20 +42,20 @@ export default function FilterSidebar({
       
       <div>
         <h3 className="mb-2 text-sm font-semibold">Price</h3>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
           <input 
             type="number" 
             placeholder="Min" 
             value={filters.priceRange[0] || ''}
             onChange={(e) => handlePriceChange(Number(e.target.value) || 0, filters.priceRange[1])}
-            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-gray-900" 
+            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-green-900" 
           />
           <input 
             type="number" 
             placeholder="Max" 
             value={filters.priceRange[1] || ''}
             onChange={(e) => handlePriceChange(filters.priceRange[0], Number(e.target.value) || 1000)}
-            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-gray-900" 
+            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-green-900" 
           />
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function FilterSidebar({
       <div>
         <button
           onClick={onClearFilters}
-          className="w-full px-4 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="w-full px-4 py-2 text-sm text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 border border-green-300 dark:border-green-600 rounded-md hover:bg-green-50 dark:hover:bg-green-800 transition-colors"
         >
           Clear All Filters
         </button>

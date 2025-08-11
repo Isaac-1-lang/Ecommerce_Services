@@ -11,7 +11,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
             {item.href ? (
               <Link href={item.href} className="hover:text-primary">{item.label}</Link>
             ) : (
-              <span className="font-medium text-gray-900 dark:text-gray-100">{item.label}</span>
+              <span className="font-medium text-green-900 dark:text-green-100">{item.label}</span>
             )}
             {idx < items.length - 1 && <span className="opacity-50">/</span>}
           </li>
