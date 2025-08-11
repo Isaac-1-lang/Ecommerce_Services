@@ -19,92 +19,92 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-muted border-t border-border mt-auto">
-      {/* Main Footer Content */}
+    <footer className="bg-green-50 border-t border-green-200 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
         {/* Newsletter Section */}
-        <div className="py-12 border-b border-border">
-          <div className="text-center max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4 font-display">
-              Stay Updated with Now Store
+        <div className="py-8 border-b border-green-200">
+          <div className="text-center max-w-xl mx-auto">
+            <h3 className="text-xl font-semibold text-green-800 mb-3">
+              Stay Updated
             </h3>
-            <p className="text-muted-foreground mb-6">
-              Get the latest product updates, exclusive offers, and shopping tips delivered to your inbox.
+            <p className="text-green-600 mb-4 text-sm">
+              Get updates and exclusive offers delivered to your inbox.
             </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
               <input
                 type="email"
-                placeholder="Enter your email address"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                className="flex-1 px-3 py-2 rounded-lg border border-green-300 bg-white text-green-800 placeholder:text-green-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 text-sm"
                 required
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-1 text-sm"
               >
                 Subscribe
                 <FiArrowRight className="h-4 w-4" />
               </button>
             </form>
             {isSubscribed && (
-              <p className="text-success text-sm mt-3">Thank you for subscribing!</p>
+              <p className="text-green-700 text-sm mt-2">Thank you for subscribing!</p>
             )}
           </div>
         </div>
 
         {/* Trust Indicators */}
-        <div className="py-8 border-b border-border">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="py-6 border-b border-green-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {TRUST_INDICATORS.map((indicator) => (
               <div key={indicator.id} className="text-center">
-                <div className="text-3xl mb-2">{indicator.icon}</div>
-                <h4 className="font-medium text-foreground mb-1">{indicator.name}</h4>
-                <p className="text-sm text-muted-foreground">{indicator.description}</p>
+                <div className="text-2xl mb-1">{indicator.icon}</div>
+                <h4 className="font-medium text-green-800 text-sm mb-1">{indicator.name}</h4>
+                <p className="text-xs text-green-600">{indicator.description}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Main Footer Links */}
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <Link href="/" className="text-2xl font-bold text-primary font-display mb-4 block">
+            <Link href="/" className="text-xl font-bold text-green-700 mb-3 block">
               {SITE_CONFIG.name}
             </Link>
-            <p className="text-muted-foreground mb-6 max-w-md">
-              {SITE_CONFIG.tagline}. We&apos;re committed to providing you with the best shopping experience, 
-              quality products, and exceptional customer service.
+            <p className="text-green-600 mb-4 text-sm leading-relaxed max-w-sm">
+              {SITE_CONFIG.tagline}. Quality products and exceptional customer service.
             </p>
             
             {/* Contact Info */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <FiMapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{SITE_CONFIG.address}</span>
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center gap-2">
+                <FiMapPin className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-green-700">{SITE_CONFIG.address}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <FiPhone className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{SITE_CONFIG.phone}</span>
+              <div className="flex items-center gap-2">
+                <FiPhone className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-green-700">{SITE_CONFIG.phone}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <FiEmail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{SITE_CONFIG.email}</span>
+              <div className="flex items-center gap-2">
+                <FiEmail className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-green-700">{SITE_CONFIG.email}</span>
               </div>
             </div>
 
             {/* Social Media */}
-            <div className="flex items-center gap-4 mt-6">
+            <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (
                 <Link
                   key={social.name}
                   href={social.url}
-                  className="p-2 rounded-full bg-muted-foreground/20 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="p-2 rounded-lg bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white transition-colors"
                   aria-label={social.name}
                 >
-                  <span className="text-lg">{social.icon}</span>
+                  <span className="text-base">{social.icon}</span>
                 </Link>
               ))}
             </div>
@@ -112,13 +112,13 @@ export default function Footer() {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Company</h4>
+            <h4 className="font-semibold text-green-800 mb-3 text-sm">Company</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -129,13 +129,13 @@ export default function Footer() {
 
           {/* Support Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Support</h4>
+            <h4 className="font-semibold text-green-800 mb-3 text-sm">Support</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -146,13 +146,13 @@ export default function Footer() {
 
           {/* Business Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Business</h4>
+            <h4 className="font-semibold text-green-800 mb-3 text-sm">Business</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.business.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -163,25 +163,25 @@ export default function Footer() {
         </div>
 
         {/* Bottom Footer */}
-        <div className="py-6 border-t border-border">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+        <div className="py-4 border-t border-green-200">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-2 text-green-600">
               <span>© {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.</span>
-              <span>•</span>
-              <span>Business Hours: {SITE_CONFIG.businessHours}</span>
+              <span className="hidden sm:inline text-green-300">•</span>
+              <span>Hours: {SITE_CONFIG.businessHours}</span>
             </div>
             
-            <nav className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-4">
               {FOOTER_LINKS.legal.map((link) => (
                 <Link
                   key={link.name}
                   href={link.url}
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-green-600 hover:text-green-800 transition-colors"
                 >
                   {link.name}
                 </Link>
               ))}
-            </nav>
+            </div>
           </div>
         </div>
       </div>
