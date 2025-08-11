@@ -31,9 +31,9 @@ export default function Navbar() {
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-ecommerce">
+    <header className="sticky top-0 z-50 w-full border-b border-green-200 bg-white shadow-sm">
       {/* Top Bar */}
-      <div className="bg-primary text-primary-foreground py-2 text-sm">
+      <div className="bg-green-600 text-white py-2 text-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -42,18 +42,18 @@ export default function Navbar() {
                 <span>Free shipping on orders over ${SITE_CONFIG.freeShippingThreshold}</span>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-4">
-              <Link href="/help" className="hover:text-primary-foreground/80 transition-colors">
+            <div className="hidden md:flex items-center gap-4 text-sm">
+              <Link href="/help" className="hover:text-green-100 transition-colors">
                 Help Center
               </Link>
-              <Link href="/contact" className="hover:text-primary-foreground/80 transition-colors">
+              <Link href="/contact" className="hover:text-green-100 transition-colors">
                 Contact Us
               </Link>
-              <span>|</span>
-              <Link href="/auth/login" className="hover:text-primary-foreground/80 transition-colors">
+              <span className="text-green-300">|</span>
+              <Link href="/auth/login" className="hover:text-green-100 transition-colors">
                 Sign In
               </Link>
-              <Link href="/auth/register" className="hover:text-primary-foreground/80 transition-colors">
+              <Link href="/auth/register" className="hover:text-green-100 transition-colors">
                 Sign Up
               </Link>
             </div>
@@ -66,7 +66,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo and Categories */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-2xl font-bold text-primary font-display">
+            <Link href="/" className="text-2xl font-bold text-green-700">
               {SITE_CONFIG.name}
             </Link>
             
@@ -74,38 +74,38 @@ export default function Navbar() {
             <div className="relative hidden lg:block">
               <button
                 onClick={toggleCategories}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-md hover:bg-muted"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-green-50 rounded-md transition-colors"
               >
                 <span>Categories</span>
                 <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isCategoriesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-border rounded-lg shadow-ecommerce-lg p-4 z-50">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-green-200 rounded-lg shadow-lg p-4 z-50">
+                  <div className="grid grid-cols-2 gap-3">
                     {PRODUCT_CATEGORIES.filter(cat => cat.featured).map((category) => (
                       <Link
                         key={category.id}
                         href={`/products?category=${category.id}`}
-                        className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors group"
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-green-50 transition-colors group"
                         onClick={() => setIsCategoriesOpen(false)}
                       >
-                        <span className="text-2xl">{category.icon}</span>
+                        <span className="text-xl">{category.icon}</span>
                         <div>
-                          <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                          <div className="font-medium text-green-800 group-hover:text-green-700 text-sm">
                             {category.name}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-xs text-green-600">
                             {category.description}
                           </div>
                         </div>
                       </Link>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border">
+                  <div className="mt-4 pt-3 border-t border-green-200">
                     <Link
                       href="/products"
-                      className="block text-center text-primary hover:text-primary/80 font-medium transition-colors"
+                      className="block text-center text-green-700 hover:text-green-800 font-medium transition-colors text-sm"
                       onClick={() => setIsCategoriesOpen(false)}
                     >
                       View All Categories
@@ -117,46 +117,46 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <Link href="/products" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/products" className="font-medium text-green-700 hover:text-green-800 transition-colors">
                 Products
               </Link>
-              <Link href="/deals" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/deals" className="font-medium text-green-700 hover:text-green-800 transition-colors">
                 Deals
               </Link>
-              <Link href="/new-arrivals" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/new-arrivals" className="font-medium text-green-700 hover:text-green-800 transition-colors">
                 New Arrivals
               </Link>
-              <Link href="/brands" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/brands" className="font-medium text-green-700 hover:text-green-800 transition-colors">
                 Brands
               </Link>
             </nav>
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 hidden md:block max-w-2xl mx-8">
+          <div className="flex-1 hidden md:block max-w-2xl mx-6">
             <SearchBar />
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Wishlist */}
             <Link 
               href="/wishlist" 
               aria-label="Wishlist" 
-              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+              className="relative p-2 rounded-md hover:bg-green-50 transition-colors group"
             >
-              <FiHeart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiHeart className="h-5 w-5 text-green-700 group-hover:text-green-800 transition-colors" />
             </Link>
 
             {/* Cart */}
             <Link 
               href="/cart" 
               aria-label="Cart" 
-              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+              className="relative p-2 rounded-md hover:bg-green-50 transition-colors group"
             >
-              <FiShoppingCart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiShoppingCart className="h-5 w-5 text-green-700 group-hover:text-green-800 transition-colors" />
               {cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-price text-xs font-semibold text-white animate-bounce-gentle">
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-green-600 text-xs font-semibold text-white">
                   {cartItemCount}
                 </span>
               )}
@@ -166,91 +166,91 @@ export default function Navbar() {
             <Link 
               href="/account" 
               aria-label="Account" 
-              className="p-2 rounded-md hover:bg-muted transition-colors group"
+              className="p-2 rounded-md hover:bg-green-50 transition-colors group"
             >
-              <FiUser className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiUser className="h-5 w-5 text-green-700 group-hover:text-green-800 transition-colors" />
             </Link>
 
             {/* Theme Toggle */}
             <button
               aria-label="Toggle Theme"
-              className="p-2 rounded-md hover:bg-muted transition-colors"
+              className="p-2 rounded-md hover:bg-green-50 transition-colors"
               onClick={() => theme && setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted && theme === "dark" ? (
-                <FiSun className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+                <FiSun className="h-5 w-5 text-green-700 hover:text-green-800 transition-colors" />
               ) : (
-                <FiMoon className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+                <FiMoon className="h-5 w-5 text-green-700 hover:text-green-800 transition-colors" />
               )}
             </button>
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              className="lg:hidden p-2 rounded-md hover:bg-green-50 transition-colors"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
-                <FiX className="h-5 w-5" />
+                <FiX className="h-5 w-5 text-green-700" />
               ) : (
-                <FiMenu className="h-5 w-5" />
+                <FiMenu className="h-5 w-5 text-green-700" />
               )}
             </button>
           </div>
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden py-3">
+        <div className="md:hidden py-3 border-t border-green-100">
           <SearchBar />
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background">
-          <div className="px-4 py-4 space-y-4">
-            <nav className="space-y-2">
+        <div className="lg:hidden border-t border-green-200 bg-green-50">
+          <div className="px-4 py-4 space-y-3">
+            <nav className="space-y-1">
               <Link
                 href="/products"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-white rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Products
               </Link>
               <Link
                 href="/deals"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-white rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Deals
               </Link>
               <Link
                 href="/new-arrivals"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-white rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Arrivals
               </Link>
               <Link
                 href="/brands"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-white rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Brands
               </Link>
             </nav>
             
-            <div className="pt-4 border-t border-border">
-              <div className="text-sm font-medium text-muted-foreground mb-2 px-3">Categories</div>
+            <div className="pt-3 border-t border-green-200">
+              <div className="text-sm font-medium text-green-600 mb-2 px-3">Categories</div>
               <div className="space-y-1">
                 {PRODUCT_CATEGORIES.slice(0, 6).map((category) => (
                   <Link
                     key={category.id}
                     href={`/products?category=${category.id}`}
-                    className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-green-700 hover:text-green-800 hover:bg-white rounded-md transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span className="text-lg">{category.icon}</span>
+                    <span className="text-base">{category.icon}</span>
                     {category.name}
                   </Link>
                 ))}
