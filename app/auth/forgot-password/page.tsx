@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
       setMessage(result.message);
       setSent(true);
     } catch (err) {
-      // Error is handled by the store
+      console.error(err);
     }
   }
 

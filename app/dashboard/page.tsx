@@ -35,7 +35,7 @@ export default function DashboardPage() {
           Welcome back, {user.name || user.email}!
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Here's an overview of your account and recent activity.
+          Here&lsquo;s an overview of your account and recent activity.
         </p>
       </div>
 

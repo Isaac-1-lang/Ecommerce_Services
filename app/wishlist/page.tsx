@@ -38,7 +38,7 @@ export default function WishlistPage() {
         id: item.id,
         name: item.name,
         price: item.price,
-        image: item.image,
+        image: item.image ?? '/',
         quantity: 1,
       });
     } finally {
@@ -116,7 +116,7 @@ export default function WishlistPage() {
         {items.map((item) => (
           <WishlistItem
             key={item.id}
-            item={item}
+            product={item}
             onRemove={() => handleRemoveItem(item.id)}
             onAddToCart={() => handleAddToCart(item)}
             disabled={isUpdating}

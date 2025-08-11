@@ -10,6 +10,7 @@ import { useWishlistStore } from "../../../features/wishlist/store";
 import { Product } from "../../../types/product";
 import { formatPrice } from "../../../lib/formatPrice";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -110,10 +111,12 @@ export default function ProductDetailPage() {
         {/* Product Images */}
         <div className="space-y-4">
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-            <img
+            <Image
               src={mockImages[selectedImage]}
               alt={product.name}
               className="h-full w-full object-cover"
+              width={100}
+              height={100}
             />
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -125,10 +128,12 @@ export default function ProductDetailPage() {
                   selectedImage === index ? "border-primary" : "border-gray-200"
                 }`}
               >
-                <img
+                <Image
                   src={image}
                   alt={`${product.name} ${index + 1}`}
                   className="h-full w-full object-cover"
+                  width={100}
+                  height={100}
                 />
               </button>
             ))}

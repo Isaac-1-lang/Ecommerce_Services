@@ -1,6 +1,7 @@
 "use client";
 
 import { formatPrice } from "../lib/formatPrice";
+import Image from "next/image";
 
 export default function CartItem({
   item,
@@ -17,7 +18,7 @@ export default function CartItem({
     <div className="flex items-center gap-4 rounded-md border p-3">
       <div className="h-16 w-16 rounded bg-gray-100">
         {item.image && (
-          <img 
+          <Image
             src={item.image} 
             alt={item.name} 
             className="h-full w-full object-cover rounded"

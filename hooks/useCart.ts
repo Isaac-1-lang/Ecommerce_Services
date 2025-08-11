@@ -10,7 +10,16 @@ export function useCart() {
   const increase = useCartStore((s) => s.increase);
   const decrease = useCartStore((s) => s.decrease);
   const removeItem = useCartStore((s) => s.removeItem);
-  const clear = useCartStore((s) => s.clear);
+  const clearCart = useCartStore((s) => s.clearCart);
 
-  return { items, totalQuantity, totalPrice, addItem, increase, decrease, removeItem, clear };
+  return {
+    items,
+    totalQuantity,
+    totalPrice,
+    addItem,
+    increase,
+    decrease,
+    removeItem,
+    clearCart,
+  };
 }

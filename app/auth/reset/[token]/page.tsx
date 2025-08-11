@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { FiCheck, FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuthStore } from "../../../../features/auth/store";
@@ -32,7 +32,7 @@ export default function ResetPasswordPage() {
       setMessage(result.message);
       setDone(true);
     } catch (error) {
-      // Error is handled by the store
+      console.error(error)
     }
   }
 

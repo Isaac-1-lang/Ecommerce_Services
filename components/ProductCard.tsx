@@ -55,7 +55,6 @@ export default function ProductCard({ product }: { product: Product }) {
       navigator.share({
         title: product.name,
         text: `Check out this amazing product: ${product.name}`,
-        url: window.location.href,
       });
     } else {
       // Fallback: copy to clipboard

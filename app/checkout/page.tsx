@@ -27,7 +27,7 @@ export default function CheckoutPage() {
     clearCheckout 
   } = useCheckoutStore();
   
-  const { user, loading: authLoading } = useAuthStore();
+  const { user } = useAuthStore();
 
   if (items.length === 0) {
     router.push("/cart");

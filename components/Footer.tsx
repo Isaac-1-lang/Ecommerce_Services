@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FiMail, FiArrowRight, FiMapPin, FiPhone, FiMail as FiEmail } from "react-icons/fi";
+import { FiArrowRight, FiMapPin, FiPhone, FiMail as FiEmail } from "react-icons/fi";
 import { FOOTER_LINKS, SOCIAL_LINKS, SITE_CONFIG, TRUST_INDICATORS } from "../constants";
 
 export default function Footer() {
@@ -12,7 +12,6 @@ export default function Footer() {
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      // TODO: Implement newsletter subscription
       setIsSubscribed(true);
       setEmail("");
       setTimeout(() => setIsSubscribed(false), 3000);

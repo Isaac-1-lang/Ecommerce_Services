@@ -19,6 +19,8 @@ type CartState = {
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  increase: (itemId: string) => void;
+  decrease: (itemId: string) => void;
 };
 
 function calculateTotals(items: CartItem[]) {
@@ -51,6 +53,22 @@ export const useCartStore = create<CartState>()(
         const items = get().items.map((item) => 
           item.id === itemId ? { ...item, quantity: Math.max(1, quantity) } : item
         );
+        set({ items, ...calculateTotals(items) });
+      },
+      increase: (itemId) => {
+        const items = get().items;
+        const index = items.findIndex((item) => item.id === itemId);
+        if (index >= 0) {
+          items[index].quantity += 1;
+        }
+        set({ items, ...calculateTotals(items) });
+      },
+      decrease: (itemId) => {
+        const items = get().items;
+        const index = items.findIndex((item) => item.id === itemId);
+        if (index >= 0 && items[index].quantity > 1) {
+          items[index].quantity -= 1;
+        }
         set({ items, ...calculateTotals(items) });
       },
       clearCart: () => set({ items: [], totalQuantity: 0, totalPrice: 0 }),

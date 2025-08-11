@@ -1,42 +1,39 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Optimize for production
-  swcMinify: true,
-  
-  // Enable static optimization
-  output: 'standalone',
-  
+  // Enable standalone output for deployment
+  output: "standalone",
+
   // Image optimization
   images: {
-    domains: ['images.unsplash.com'],
-    formats: ['image/webp', 'image/avif'],
+    domains: ["images.unsplash.com"],
+    formats: ["image/webp", "image/avif"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  
+
   // Performance optimizations
   experimental: {
     optimizeCss: true,
   },
-  
+
   // Security headers
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "origin-when-cross-origin",
           },
         ],
       },
