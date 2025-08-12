@@ -12,7 +12,7 @@ export default function ProductActions({ product }: { product: Product }) {
   const isFav = wishlistHas(product.id);
 
   return (
-    <div className="mt-4 flex items-center gap-3">
+    <div className="mt-6 flex items-center gap-3">
       <button
         onClick={() =>
           addToCart({
@@ -22,7 +22,7 @@ export default function ProductActions({ product }: { product: Product }) {
             name: product.name ?? "",
           })
         }
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white"
+        className="rounded-lg bg-primary hover:bg-primary-600 px-6 py-3 text-sm font-medium text-white transition-colors shadow-soft"
       >
         Add to cart
       </button>
@@ -30,14 +30,14 @@ export default function ProductActions({ product }: { product: Product }) {
       {isFav ? (
         <button
           onClick={() => wishlistRemove(product.id)}
-          className="rounded-md border px-4 py-2 text-sm"
+          className="rounded-lg border border-neutral-300 px-6 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
         >
           Remove from wishlist
         </button>
       ) : (
         <button
           onClick={() => wishlistAdd(product)}
-          className="rounded-md border px-4 py-2 text-sm"
+          className="rounded-lg border border-neutral-300 px-6 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
         >
           Add to wishlist
         </button>

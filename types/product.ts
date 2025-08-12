@@ -4,20 +4,58 @@ export type Variant = {
   options: string[];
 };
 
-export type Product = {
+export interface Product {
   id: string;
-  slug: string;
   name: string;
-  description?: string;
+  slug: string;
+  description: string;
+  shortDescription: string;
   price: number;
   originalPrice?: number;
   category: string;
-  image?: string;
+  subcategory?: string;
+  brand: string;
+  image: string;
   images?: string[];
-  variants?: Variant[];
-  rating?: number;
-  reviewCount?: number;
-  stockQuantity?: number;
+  rating: number;
+  reviewCount: number;
+  stockQuantity: number;
   isNew?: boolean;
   isOnSale?: boolean;
-};
+  isFeatured?: boolean;
+  tags: string[];
+  specifications?: Record<string, string>;
+  weight?: number;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  colors?: string[];
+  sizes?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  featured: boolean;
+  image?: string;
+  productCount: number;
+  subcategories?: string[];
+}
+
+export interface ProductFilters {
+  category: string;
+  priceRange: [number, number];
+  rating: number;
+  brand: string[];
+  tags: string[];
+  inStock: boolean;
+  onSale: boolean;
+  isNew: boolean;
+}

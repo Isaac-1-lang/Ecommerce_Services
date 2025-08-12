@@ -40,14 +40,45 @@ export const useCartStore = create<CartState>()(
         const index = items.findIndex((item) => item.id === newItem.id);
         if (index >= 0) {
           items[index].quantity += newItem.quantity;
+          // Show toast for quantity update
+          if (typeof window !== 'undefined' && (window as any).showToast) {
+            (window as any).showToast(
+              'success',
+              'Cart Updated',
+              `${newItem.name} quantity increased to ${items[index].quantity}`,
+              3000
+            );
+          }
         } else {
           items.push(newItem);
+          // Show toast for new item added
+          if (typeof window !== 'undefined' && (window as any).showToast) {
+            (window as any).showToast(
+              'success',
+              'Added to Cart',
+              `${newItem.name} has been added to your cart`,
+              3000
+            );
+          }
         }
         set({ items, ...calculateTotals(items) });
       },
       removeItem: (itemId) => {
-        const items = get().items.filter((item) => item.id !== itemId);
-        set({ items, ...calculateTotals(items) });
+        const items = get().items;
+        const removedItem = items.find(item => item.id === itemId);
+        const filteredItems = items.filter((item) => item.id !== itemId);
+        
+        // Show toast for item removal
+        if (removedItem && typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast(
+            'info',
+            'Removed from Cart',
+            `${removedItem.name} has been removed from your cart`,
+            3000
+          );
+        }
+        
+        set({ items: filteredItems, ...calculateTotals(filteredItems) });
       },
       updateQuantity: (itemId, quantity) => {
         const items = get().items.map((item) => 
@@ -60,6 +91,15 @@ export const useCartStore = create<CartState>()(
         const index = items.findIndex((item) => item.id === itemId);
         if (index >= 0) {
           items[index].quantity += 1;
+          // Show toast for quantity increase
+          if (typeof window !== 'undefined' && (window as any).showToast) {
+            (window as any).showToast(
+              'success',
+              'Quantity Updated',
+              `${items[index].name} quantity increased to ${items[index].quantity}`,
+              2000
+            );
+          }
         }
         set({ items, ...calculateTotals(items) });
       },
@@ -68,10 +108,30 @@ export const useCartStore = create<CartState>()(
         const index = items.findIndex((item) => item.id === itemId);
         if (index >= 0 && items[index].quantity > 1) {
           items[index].quantity -= 1;
+          // Show toast for quantity decrease
+          if (typeof window !== 'undefined' && (window as any).showToast) {
+            (window as any).showToast(
+              'info',
+              'Quantity Updated',
+              `${items[index].name} quantity decreased to ${items[index].quantity}`,
+              2000
+            );
+          }
         }
         set({ items, ...calculateTotals(items) });
       },
-      clearCart: () => set({ items: [], totalQuantity: 0, totalPrice: 0 }),
+      clearCart: () => {
+        // Show toast for cart cleared
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast(
+            'warning',
+            'Cart Cleared',
+            'All items have been removed from your cart',
+            3000
+          );
+        }
+        set({ items: [], totalQuantity: 0, totalPrice: 0 });
+      },
     }),
     { name: "now_cart" }
   )

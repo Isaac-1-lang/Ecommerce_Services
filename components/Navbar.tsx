@@ -31,9 +31,9 @@ export default function Navbar() {
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-ecommerce">
+    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-soft">
       {/* Top Bar */}
-      <div className="bg-primary text-primary-foreground py-2 text-sm">
+      <div className="bg-primary text-white py-2 text-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -43,17 +43,27 @@ export default function Navbar() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/help" className="hover:text-primary-foreground/80 transition-colors">
+              <Link href="/help" className="hover:text-primary-50 transition-colors">
                 Help Center
               </Link>
-              <Link href="/contact" className="hover:text-primary-foreground/80 transition-colors">
+              <Link href="/contact" className="hover:text-primary-50 transition-colors">
                 Contact Us
               </Link>
-              <span>|</span>
-              <Link href="/auth/login" className="hover:text-primary-foreground/80 transition-colors">
+              <span className="text-primary-200">|</span>
+              <Link href="/admin" className="hover:text-primary-50 transition-colors">
+                Admin
+              </Link>
+              <Link href="/employee" className="hover:text-primary-50 transition-colors">
+                Employee
+              </Link>
+              <Link href="/delivery" className="hover:text-primary-50 transition-colors">
+                Delivery
+              </Link>
+              <span className="text-primary-200">|</span>
+              <Link href="/auth/login" className="hover:text-primary-50 transition-colors">
                 Sign In
               </Link>
-              <Link href="/auth/register" className="hover:text-primary-foreground/80 transition-colors">
+              <Link href="/auth/register" className="hover:text-primary-50 transition-colors">
                 Sign Up
               </Link>
             </div>
@@ -74,38 +84,38 @@ export default function Navbar() {
             <div className="relative hidden lg:block">
               <button
                 onClick={toggleCategories}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-md hover:bg-muted"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary transition-colors rounded-md hover:bg-highlight"
               >
                 <span>Categories</span>
                 <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isCategoriesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-border rounded-lg shadow-ecommerce-lg p-4 z-50">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-neutral-200 rounded-lg shadow-soft-lg p-4 z-50">
                   <div className="grid grid-cols-2 gap-4">
                     {PRODUCT_CATEGORIES.filter(cat => cat.featured).map((category) => (
                       <Link
                         key={category.id}
                         href={`/products?category=${category.id}`}
-                        className="flex items-center gap-3 p-3 rounded-md hover:bg-muted transition-colors group"
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-highlight transition-colors group"
                         onClick={() => setIsCategoriesOpen(false)}
                       >
                         <span className="text-2xl">{category.icon}</span>
                         <div>
-                          <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                          <div className="font-medium text-neutral-800 group-hover:text-primary transition-colors">
                             {category.name}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-neutral-600">
                             {category.description}
                           </div>
                         </div>
                       </Link>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border">
+                  <div className="mt-4 pt-4 border-t border-neutral-200">
                     <Link
                       href="/products"
-                      className="block text-center text-primary hover:text-primary/80 font-medium transition-colors"
+                      className="block text-center text-primary hover:text-primary-600 font-medium transition-colors"
                       onClick={() => setIsCategoriesOpen(false)}
                     >
                       View All Categories
@@ -117,16 +127,16 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <Link href="/products" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/products" className="font-medium text-neutral-700 hover:text-primary transition-colors">
                 Products
               </Link>
-              <Link href="/deals" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/deals" className="font-medium text-neutral-700 hover:text-primary transition-colors">
                 Deals
               </Link>
-              <Link href="/new-arrivals" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/new-arrivals" className="font-medium text-neutral-700 hover:text-primary transition-colors">
                 New Arrivals
               </Link>
-              <Link href="/brands" className="font-medium text-foreground hover:text-primary transition-colors">
+              <Link href="/brands" className="font-medium text-neutral-700 hover:text-primary transition-colors">
                 Brands
               </Link>
             </nav>
@@ -143,20 +153,20 @@ export default function Navbar() {
             <Link 
               href="/wishlist" 
               aria-label="Wishlist" 
-              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+              className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiHeart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiHeart className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
             </Link>
 
             {/* Cart */}
             <Link 
               href="/cart" 
               aria-label="Cart" 
-              className="relative p-2 rounded-md hover:bg-muted transition-colors group"
+              className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiShoppingCart className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiShoppingCart className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-price text-xs font-semibold text-white animate-bounce-gentle">
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-secondary text-xs font-semibold text-white animate-bounce-gentle">
                   {cartItemCount}
                 </span>
               )}
@@ -166,34 +176,34 @@ export default function Navbar() {
             <Link 
               href="/account" 
               aria-label="Account" 
-              className="p-2 rounded-md hover:bg-muted transition-colors group"
+              className="p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiUser className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+              <FiUser className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
             </Link>
 
             {/* Theme Toggle */}
             <button
               aria-label="Toggle Theme"
-              className="p-2 rounded-md hover:bg-muted transition-colors"
+              className="p-2 rounded-md hover:bg-highlight transition-colors"
               onClick={() => theme && setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted && theme === "dark" ? (
-                <FiSun className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+                <FiSun className="h-5 w-5 text-neutral-600 hover:text-primary transition-colors" />
               ) : (
-                <FiMoon className="h-5 w-5 text-foreground hover:text-primary transition-colors" />
+                <FiMoon className="h-5 w-5 text-neutral-600 hover:text-primary transition-colors" />
               )}
             </button>
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              className="lg:hidden p-2 rounded-md hover:bg-highlight transition-colors"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
-                <FiX className="h-5 w-5" />
+                <FiX className="h-5 w-5 text-neutral-600" />
               ) : (
-                <FiMenu className="h-5 w-5" />
+                <FiMenu className="h-5 w-5 text-neutral-600" />
               )}
             </button>
           </div>
@@ -207,47 +217,47 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-neutral-200 bg-white">
           <div className="px-4 py-4 space-y-4">
             <nav className="space-y-2">
               <Link
                 href="/products"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Products
               </Link>
               <Link
                 href="/deals"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Deals
               </Link>
               <Link
                 href="/new-arrivals"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Arrivals
               </Link>
               <Link
                 href="/brands"
-                className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Brands
               </Link>
             </nav>
             
-            <div className="pt-4 border-t border-border">
-              <div className="text-sm font-medium text-muted-foreground mb-2 px-3">Categories</div>
+            <div className="pt-4 border-t border-neutral-200">
+              <div className="text-sm font-medium text-neutral-600 mb-2 px-3">Categories</div>
               <div className="space-y-1">
                 {PRODUCT_CATEGORIES.slice(0, 6).map((category) => (
                   <Link
                     key={category.id}
                     href={`/products?category=${category.id}`}
-                    className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <span className="text-lg">{category.icon}</span>

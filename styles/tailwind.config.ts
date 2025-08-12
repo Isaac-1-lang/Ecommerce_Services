@@ -9,98 +9,101 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors (Amazon-inspired)
+        // Modern Primary - Deep Teal (trustworthy, professional)
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Main primary
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6', // Main primary - modern teal
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+          950: '#042f2e',
         },
-        // Secondary accent colors (eBay-inspired)
+        // Secondary - Warm Coral (friendly, engaging)
         secondary: {
-          50: '#fef7ee',
-          100: '#fdedd6',
-          200: '#fbd7ac',
-          300: '#f8bb77',
-          400: '#f5953a',
-          500: '#f37412', // Main secondary
-          600: '#e45a08',
-          700: '#bc4209',
-          800: '#95350e',
-          900: '#782e0f',
-          950: '#411505',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316', // Main secondary - warm coral
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          950: '#431407',
         },
-        // Success colors (trust and confidence)
+        // Success - Soft Emerald (trust and confidence)
         success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981', // Main success - soft emerald
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+          950: '#022c22',
         },
-        // Warning colors (deals and urgency)
+        // Warning - Gentle Amber (attention without harshness)
         warning: {
           50: '#fffbeb',
           100: '#fef3c7',
           200: '#fde68a',
           300: '#fcd34d',
           400: '#fbbf24',
-          500: '#f59e0b',
+          500: '#f59e0b', // Main warning - gentle amber
           600: '#d97706',
           700: '#b45309',
           800: '#92400e',
           900: '#78350f',
           950: '#451a03',
         },
-        // Error colors (clear feedback)
+        // Error - Muted Red (clear feedback without aggression)
         error: {
           50: '#fef2f2',
           100: '#fee2e2',
           200: '#fecaca',
           300: '#fca5a5',
           400: '#f87171',
-          500: '#ef4444',
+          500: '#ef4444', // Main error - muted red
           600: '#dc2626',
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
           950: '#450a0a',
         },
-        // Neutral colors (text and backgrounds)
+        // Neutral - Warm Grays (softer than pure grays)
         neutral: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
-          950: '#0a0a0a',
+          50: '#fafaf9',
+          100: '#f5f5f4',
+          200: '#e7e5e4',
+          300: '#d6d3d1',
+          400: '#a8a29e',
+          500: '#78716c',
+          600: '#57534e',
+          700: '#44403c',
+          800: '#292524',
+          900: '#1c1917',
+          950: '#0c0a09',
         },
-        // Ecommerce-specific colors
-        'price': '#dc2626', // Red for prices (like Amazon)
-        'deal': '#f59e0b', // Orange for deals
-        'sale': '#ef4444', // Bright red for sales
-        'new': '#10b981', // Green for new items
-        'rating': '#fbbf24', // Gold for ratings
-        'shipping': '#3b82f6', // Blue for shipping info
-        'trust': '#059669', // Green for trust indicators
+        // Ecommerce-specific colors - Refined and user-friendly
+        'price': '#dc2626', // Muted red for prices (less aggressive)
+        'deal': '#f59e0b', // Warm amber for deals
+        'sale': '#ef4444', // Muted red for sales
+        'new': '#10b981', // Soft emerald for new items
+        'rating': '#fbbf24', // Warm gold for ratings
+        'shipping': '#14b8a6', // Teal for shipping info
+        'trust': '#059669', // Emerald for trust indicators
+        'accent': '#f97316', // Coral for highlights
+        'highlight': '#f0fdfa', // Very light teal for backgrounds
+        'subtle': '#f8fafc', // Very light blue-gray for subtle backgrounds
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -130,12 +133,15 @@ const config: Config = {
         'ecommerce': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'ecommerce-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'ecommerce-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.12)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'bounce-gentle': 'bounceGentle 0.6s ease-in-out',
         'pulse-gentle': 'pulseGentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -153,6 +159,10 @@ const config: Config = {
         pulseGentle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '.8' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
       },
     },

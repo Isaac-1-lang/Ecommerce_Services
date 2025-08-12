@@ -197,7 +197,19 @@ export default function CartPage() {
                   placeholder="Enter code"
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
-                <button className="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
+                <button 
+                  onClick={() => {
+                    if (typeof window !== 'undefined' && (window as any).showToast) {
+                      (window as any).showToast(
+                        'success',
+                        'Promo Code Applied',
+                        'Your discount has been applied successfully!',
+                        3000
+                      );
+                    }
+                  }}
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
+                >
                   Apply
                 </button>
               </div>

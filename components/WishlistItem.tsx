@@ -17,12 +17,12 @@ export default function WishlistItem({
   disabled
 }: WishlistItemProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-md border p-3">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-neutral-200 p-4 bg-white shadow-soft">
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded bg-gray-100" />
+        <div className="h-16 w-16 rounded-lg bg-neutral-100" />
         <div>
-          <p className="font-medium">{product.name}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="font-medium text-neutral-800">{product.name}</p>
+          <p className="text-sm text-primary font-semibold">
             {formatPrice(product.price)}
           </p>
         </div>
@@ -30,20 +30,20 @@ export default function WishlistItem({
       <div className="flex items-center gap-2">
         <a
           href={`/products/${product.slug}`}
-          className="rounded-md border px-3 py-2 text-sm"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
         >
           View
         </a>
         <button
           onClick={onRemove}
-          className="rounded-md border px-3 py-2 text-sm text-red-600"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-error hover:bg-error-50 transition-colors"
           disabled={disabled}
         >
           Remove
         </button>
         <button
           onClick={onAddToCart}
-          className="rounded-md border px-3 py-2 text-sm text-green-600"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-primary hover:bg-highlight transition-colors"
           disabled={disabled}
         >
           Add to Cart

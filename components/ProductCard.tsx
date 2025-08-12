@@ -77,12 +77,12 @@ export default function ProductCard({ product }: { product: Product }) {
                   ? "text-rating fill-current"
                   : i < rating
                   ? "text-rating fill-current opacity-50"
-                  : "text-muted-foreground"
+                  : "text-neutral-400"
               }`}
             />
           ))}
         </div>
-        <span className="text-xs text-muted-foreground ml-1">
+        <span className="text-xs text-neutral-500 ml-1">
           ({reviewCount})
         </span>
       </div>
@@ -99,10 +99,10 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
         {hasDiscount && (
           <>
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-sm text-neutral-500 line-through">
               {formatPrice(product.originalPrice!)}
             </span>
-            <span className="text-xs bg-sale text-white px-2 py-1 rounded-full">
+            <span className="text-xs bg-sale text-white px-2 py-1 rounded-full font-medium">
               {Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}% OFF
             </span>
           </>
@@ -113,12 +113,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div 
-      className="group relative bg-background border border-border rounded-xl shadow-ecommerce hover:shadow-ecommerce-lg transition-all duration-300 overflow-hidden"
+      className="group relative bg-white border border-neutral-200 rounded-xl shadow-soft hover:shadow-soft-lg transition-all duration-300 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-muted">
+      <div className="relative aspect-square overflow-hidden bg-neutral-100">
         <Link href={`/products/${product.slug}`}>
           {product.image && !imageError ? (
             <Image
@@ -136,7 +136,7 @@ export default function ProductCard({ product }: { product: Product }) {
               }}
             />
           ) : (
-            <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">
+            <div className="h-full w-full flex items-center justify-center bg-neutral-200 text-neutral-400">
               <FiImage className="w-16 h-16" />
             </div>
           )}
@@ -144,7 +144,7 @@ export default function ProductCard({ product }: { product: Product }) {
         
         {/* Loading State */}
         {isImageLoading && !imageError && (
-          <div className="absolute inset-0 bg-muted animate-pulse-gentle" />
+          <div className="absolute inset-0 bg-neutral-200 animate-pulse-gentle" />
         )}
 
         {/* Quick Actions Overlay */}
@@ -153,10 +153,10 @@ export default function ProductCard({ product }: { product: Product }) {
         }`}>
           <button
             onClick={handleWishlistToggle}
-            className={`p-2 rounded-full shadow-ecommerce transition-all ${
+            className={`p-2 rounded-full shadow-soft transition-all ${
               isInWishlist(product.id)
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background text-foreground hover:bg-primary hover:text-primary-foreground'
+                ? 'bg-primary text-white'
+                : 'bg-white text-neutral-600 hover:bg-primary hover:text-white'
             }`}
           >
             <FiHeart className="h-4 w-4" />
@@ -164,14 +164,14 @@ export default function ProductCard({ product }: { product: Product }) {
           
           <button
             onClick={handleQuickView}
-            className="p-2 rounded-full bg-background text-foreground shadow-ecommerce hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors"
           >
             <FiEye className="h-4 w-4" />
           </button>
           
           <button
             onClick={handleShare}
-            className="p-2 rounded-full bg-background text-foreground shadow-ecommerce hover:bg-primary hover:text-primary-foreground transition-colors"
+            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors"
           >
             <FiShare2 className="h-4 w-4" />
           </button>
@@ -190,7 +190,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
           {product.stockQuantity === 0 && (
-            <span className="bg-muted-foreground text-white text-xs px-2 py-1 rounded-full font-medium">
+            <span className="bg-neutral-500 text-white text-xs px-2 py-1 rounded-full font-medium">
               OUT OF STOCK
             </span>
           )}
@@ -200,13 +200,13 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Product Info */}
       <div className="p-4">
         {/* Category */}
-        <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+        <div className="text-xs text-neutral-500 mb-2 uppercase tracking-wide">
           {product.category}
         </div>
 
         {/* Product Name */}
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="text-sm font-medium text-neutral-800 mb-2 line-clamp-2 hover:text-primary transition-colors">
             {product.name}
           </h3>
         </Link>
@@ -219,7 +219,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Stock Status */}
         {product.stockQuantity !== undefined && product.stockQuantity > 0 && (
-          <div className="text-xs text-muted-foreground mb-3">
+          <div className="text-xs text-neutral-500 mb-3">
             {product.stockQuantity < 10 ? (
               <span className="text-warning">Only {product.stockQuantity} left!</span>
             ) : (
@@ -233,7 +233,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <button
             onClick={handleAddToCart}
             disabled={product.stockQuantity === 0}
-            className="flex-1 bg-primary text-primary-foreground py-2 px-4 rounded-lg font-medium hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-600 disabled:bg-neutral-300 disabled:text-neutral-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
             <FiShoppingCart className="h-4 w-4" />
             {product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}

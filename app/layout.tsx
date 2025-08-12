@@ -4,6 +4,7 @@ import { Inter, Poppins } from 'next/font/google';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Providers from './providers';
+import { ToastContainer } from '../components/ui/ToastContainer';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -43,15 +44,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      <body className="min-h-screen bg-white text-neutral-800 font-sans antialiased">
         <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <ToastContainer>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </ToastContainer>
         </Providers>
       </body>
     </html>

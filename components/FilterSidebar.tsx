@@ -32,7 +32,7 @@ export default function FilterSidebar({
   return (
     <aside className="w-full md:w-64 shrink-0 space-y-6">
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Categories</h3>
+        <h3 className="mb-2 text-sm font-semibold text-neutral-800">Categories</h3>
         <CategoryFilter 
           categories={categories}
           selectedCategory={filters.category}
@@ -41,35 +41,35 @@ export default function FilterSidebar({
       </div>
       
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Price</h3>
-        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+        <h3 className="mb-2 text-sm font-semibold text-neutral-800">Price</h3>
+        <div className="flex items-center gap-2 text-sm text-neutral-600">
           <input 
             type="number" 
             placeholder="Min" 
             value={filters.priceRange[0] || ''}
             onChange={(e) => handlePriceChange(Number(e.target.value) || 0, filters.priceRange[1])}
-            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-green-900" 
+            className="w-24 rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" 
           />
           <input 
             type="number" 
             placeholder="Max" 
             value={filters.priceRange[1] || ''}
             onChange={(e) => handlePriceChange(filters.priceRange[0], Number(e.target.value) || 1000)}
-            className="w-24 rounded-md border bg-white px-2 py-1 dark:bg-green-900" 
+            className="w-24 rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" 
           />
         </div>
       </div>
       
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Rating</h3>
+        <h3 className="mb-2 text-sm font-semibold text-neutral-800">Rating</h3>
         <div className="flex gap-2">
           {[4, 3, 2, 1].map((r) => (
-            <label key={r} className="text-sm">
+            <label key={r} className="text-sm text-neutral-700 cursor-pointer">
               <input 
                 type="checkbox" 
                 checked={filters.rating === r}
                 onChange={() => handleRatingChange(filters.rating === r ? 0 : r)}
-                className="mr-1"
+                className="mr-2 text-primary focus:ring-primary"
               /> 
               {r}+
             </label>
@@ -80,7 +80,7 @@ export default function FilterSidebar({
       <div>
         <button
           onClick={onClearFilters}
-          className="w-full px-4 py-2 text-sm text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 border border-green-300 dark:border-green-600 rounded-md hover:bg-green-50 dark:hover:bg-green-800 transition-colors"
+          className="w-full px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors"
         >
           Clear All Filters
         </button>
