@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FiCheck, FiX, FiShoppingCart, FiHeart, FiAlertCircle } from 'react-icons/fi';
+import { FiCheck, FiX, FiShoppingCart,FiAlertCircle } from 'react-icons/fi';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 

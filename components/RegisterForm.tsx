@@ -5,6 +5,7 @@ import { useAuthStore } from "../features/auth/store";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX } from "react-icons/fi";
 import Link from "next/link";
 import EmailVerificationModal from "./EmailVerificationModal";
+import Image from "next/image";
 
 export default function RegisterForm() {
   const register = useAuthStore((s) => s.register);
@@ -103,7 +104,7 @@ export default function RegisterForm() {
               <div className="relative inline-block">
                 <div className="w-24 h-24 rounded-full border-2 border-neutral-200 overflow-hidden bg-neutral-100 flex items-center justify-center">
                   {previewUrl ? (
-                    <img 
+                    <Image
                       src={previewUrl} 
                       alt="Profile preview" 
                       className="w-full h-full object-cover"

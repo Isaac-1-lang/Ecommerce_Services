@@ -76,7 +76,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo and Categories */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-2xl font-bold text-primary font-display">
+            <Link href="/" className="text-2xl font-bold text-green-700">
               {SITE_CONFIG.name}
             </Link>
             
@@ -100,7 +100,7 @@ export default function Navbar() {
                         className="flex items-center gap-3 p-3 rounded-md hover:bg-highlight transition-colors group"
                         onClick={() => setIsCategoriesOpen(false)}
                       >
-                        <span className="text-2xl">{category.icon}</span>
+                        <span className="text-xl">{category.icon}</span>
                         <div>
                           <div className="font-medium text-neutral-800 dark:text-neutral-100 group-hover:text-primary transition-colors">
                             {category.name}
@@ -143,12 +143,12 @@ export default function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 hidden md:block max-w-2xl mx-8">
+          <div className="flex-1 hidden md:block max-w-2xl mx-6">
             <SearchBar />
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Wishlist */}
             <Link 
               href="/wishlist" 
@@ -210,7 +210,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden py-3">
+        <div className="md:hidden py-3 border-t border-green-100">
           <SearchBar />
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function Navbar() {
                     className="flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span className="text-lg">{category.icon}</span>
+                    <span className="text-base">{category.icon}</span>
                     {category.name}
                   </Link>
                 ))}

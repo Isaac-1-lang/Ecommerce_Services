@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">Admin Dashboard</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-1">Welcome back! Here's what's happening with your store.</p>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-1">Welcome back! Here is what is happening with your store.</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-neutral-500 dark:text-neutral-400">Last updated: {new Date().toLocaleString()}</span>

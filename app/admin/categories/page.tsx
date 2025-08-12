@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiGrid, FiEye } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { PRODUCT_CATEGORIES } from '../../../data/dummyProducts';
 
 export default function CategoriesPage() {

@@ -43,6 +43,10 @@ const mockProducts: Product[] = Array.from({ length: 16 }).map((_, i) => ({
   id: String(i + 1),
   slug: `product-${i + 1}`,
   name: productNames[i],
+  description: "This is a placeholder description.",
+  shortDescription: "Short description here.",
+  brand: "Generic Brand",
+  tags: ["tag1", "tag2"],
   price: 29.99 + (i * 15.50),
   originalPrice: Math.random() > 0.7 ? 29.99 + (i * 15.50) + 20 : undefined,
   category: ["Shoes", "Bags", "Accessories"][i % 3],
@@ -52,6 +56,8 @@ const mockProducts: Product[] = Array.from({ length: 16 }).map((_, i) => ({
   stockQuantity: Math.floor(Math.random() * 50) + 5,
   isNew: i < 3,
   isOnSale: Math.random() > 0.7,
+  createdAt:new Date().toISOString(),
+  updatedAt:new Date().toISOString(),
 }));
 
 async function wait(ms = 300) {

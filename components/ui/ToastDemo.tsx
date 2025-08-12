@@ -1,6 +1,6 @@
 "use client";
 
-import { FiBell, FiCheck, FiAlertCircle, FiInfo } from 'react-icons/fi';
+import { FiCheck, FiAlertCircle, FiInfo } from 'react-icons/fi';
 
 export default function ToastDemo() {
   const showToast = (type: 'success' | 'error' | 'warning' | 'info', title: string, message?: string) => {
