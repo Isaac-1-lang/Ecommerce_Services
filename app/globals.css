@@ -1,34 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Primary brand colors */
+  
   --background: #ffffff;
-  --foreground: #171717;
-  --primary: #3b82f6;
+  --foreground: #1c1917;
+  --primary: #14b8a6;
   --primary-foreground: #ffffff;
   
-  /* Secondary colors */
-  --secondary: #f37412;
+ 
+  --secondary: #f97316;
   --secondary-foreground: #ffffff;
   
-  /* Ecommerce-specific colors */
+  
   --price: #dc2626;
   --deal: #f59e0b;
   --sale: #ef4444;
   --new: #10b981;
   --rating: #fbbf24;
-  --shipping: #3b82f6;
+  --shipping: #14b8a6;
   --trust: #059669;
+  --accent: #f97316;
+  --highlight: #f0fdfa;
+  --subtle: #f8fafc;
   
-  /* Neutral colors */
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --border: #e5e5e5;
+  
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --border: #e7e5e4;
   --input: #ffffff;
-  --ring: #3b82f6;
+  --ring: #14b8a6;
   
-  /* Status colors */
-  --success: #22c55e;
+ 
+  --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
 }
@@ -47,6 +50,9 @@
   --color-rating: var(--rating);
   --color-shipping: var(--shipping);
   --color-trust: var(--trust);
+  --color-accent: var(--accent);
+  --color-highlight: var(--highlight);
+  --color-subtle: var(--subtle);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
@@ -61,12 +67,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --muted: #262626;
-    --muted-foreground: #a3a3a3;
-    --border: #404040;
-    --input: #262626;
+    --background: #0c0a09;
+    --foreground: #fafaf9;
+    --muted: #292524;
+    --muted-foreground: #a8a29e;
+    --border: #44403c;
+    --input: #292524;
   }
 }
 
@@ -118,4 +124,42 @@ body {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* Admin Dark Mode Styles */
+body.admin-dark-mode {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+body.admin-dark-mode .dark\:bg-neutral-900 {
+  background-color: #0f172a;
+}
+
+body.admin-dark-mode .dark\:bg-neutral-800 {
+  background-color: #1e293b;
+}
+
+body.admin-dark-mode .dark\:border-neutral-700 {
+  border-color: #334155;
+}
+
+body.admin-dark-mode .dark\:text-neutral-200 {
+  color: #e2e8f0;
+}
+
+body.admin-dark-mode .dark\:text-neutral-300 {
+  color: #cbd5e1;
+}
+
+body.admin-dark-mode .dark\:text-neutral-400 {
+  color: #94a3b8;
+}
+
+body.admin-dark-mode .dark\:hover\:bg-neutral-700 {
+  background-color: #334155;
+}
+
+body.admin-dark-mode .dark\:hover\:bg-neutral-800 {
+  background-color: #1e293b;
 }

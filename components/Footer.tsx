@@ -19,16 +19,16 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-green-50 border-t border-green-200 mt-auto">
+    <footer className="bg-highlight border-t border-neutral-200 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Newsletter Section */}
-        <div className="py-8 border-b border-green-200">
+        <div className="py-8 border-b border-neutral-200">
           <div className="text-center max-w-xl mx-auto">
-            <h3 className="text-xl font-semibold text-green-800 mb-3">
+            <h3 className="text-xl font-semibold text-neutral-800 mb-3">
               Stay Updated
             </h3>
-            <p className="text-green-600 mb-4 text-sm">
+            <p className="text-neutral-600 mb-4 text-sm">
               Get updates and exclusive offers delivered to your inbox.
             </p>
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
@@ -37,31 +37,31 @@ export default function Footer() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg border border-green-300 bg-white text-green-800 placeholder:text-green-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 text-sm"
+                className="flex-1 px-3 py-2 rounded-lg border border-neutral-300 bg-white text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                 required
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-1 text-sm"
+                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-1 text-sm"
               >
                 Subscribe
                 <FiArrowRight className="h-4 w-4" />
               </button>
             </form>
             {isSubscribed && (
-              <p className="text-green-700 text-sm mt-2">Thank you for subscribing!</p>
+              <p className="text-success text-sm mt-2">Thank you for subscribing!</p>
             )}
           </div>
         </div>
 
         {/* Trust Indicators */}
-        <div className="py-6 border-b border-green-200">
+        <div className="py-6 border-b border-neutral-200">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {TRUST_INDICATORS.map((indicator) => (
               <div key={indicator.id} className="text-center">
                 <div className="text-2xl mb-1">{indicator.icon}</div>
-                <h4 className="font-medium text-green-800 text-sm mb-1">{indicator.name}</h4>
-                <p className="text-xs text-green-600">{indicator.description}</p>
+                <h4 className="font-medium text-neutral-800 text-sm mb-1">{indicator.name}</h4>
+                <p className="text-xs text-neutral-600">{indicator.description}</p>
               </div>
             ))}
           </div>
@@ -72,26 +72,26 @@ export default function Footer() {
           
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <Link href="/" className="text-xl font-bold text-green-700 mb-3 block">
+            <Link href="/" className="text-xl font-bold text-primary mb-3 block">
               {SITE_CONFIG.name}
             </Link>
-            <p className="text-green-600 mb-4 text-sm leading-relaxed max-w-sm">
+            <p className="text-neutral-600 mb-4 text-sm leading-relaxed max-w-sm">
               {SITE_CONFIG.tagline}. Quality products and exceptional customer service.
             </p>
             
             {/* Contact Info */}
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2">
-                <FiMapPin className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-700">{SITE_CONFIG.address}</span>
+                <FiMapPin className="h-4 w-4 text-primary" />
+                <span className="text-sm text-neutral-700">{SITE_CONFIG.address}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FiPhone className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-700">{SITE_CONFIG.phone}</span>
+                <FiPhone className="h-4 w-4 text-primary" />
+                <span className="text-sm text-neutral-700">{SITE_CONFIG.phone}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FiEmail className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-700">{SITE_CONFIG.email}</span>
+                <FiEmail className="h-4 w-4 text-primary" />
+                <span className="text-sm text-neutral-700">{SITE_CONFIG.email}</span>
               </div>
             </div>
 
@@ -101,7 +101,7 @@ export default function Footer() {
                 <Link
                   key={social.name}
                   href={social.url}
-                  className="p-2 rounded-lg bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white transition-colors"
+                  className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-600 hover:bg-primary hover:text-white transition-colors"
                   aria-label={social.name}
                 >
                   <span className="text-base">{social.icon}</span>
@@ -112,13 +112,13 @@ export default function Footer() {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-semibold text-green-800 mb-3 text-sm">Company</h4>
+            <h4 className="font-semibold text-neutral-800 mb-3 text-sm">Company</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
+                    className="text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -129,13 +129,13 @@ export default function Footer() {
 
           {/* Support Links */}
           <div>
-            <h4 className="font-semibold text-green-800 mb-3 text-sm">Support</h4>
+            <h4 className="font-semibold text-neutral-800 mb-3 text-sm">Support</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
+                    className="text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -146,13 +146,13 @@ export default function Footer() {
 
           {/* Business Links */}
           <div>
-            <h4 className="font-semibold text-green-800 mb-3 text-sm">Business</h4>
+            <h4 className="font-semibold text-neutral-800 mb-3 text-sm">Business</h4>
             <ul className="space-y-2">
               {FOOTER_LINKS.business.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.url}
-                    className="text-sm text-green-600 hover:text-green-800 transition-colors"
+                    className="text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -163,11 +163,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Footer */}
-        <div className="py-4 border-t border-green-200">
+        <div className="py-4 border-t border-neutral-200">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <div className="flex flex-col sm:flex-row items-center gap-2 text-green-600">
+            <div className="flex flex-col sm:flex-row items-center gap-2 text-neutral-600">
               <span>© {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.</span>
-              <span className="hidden sm:inline text-green-300">•</span>
+              <span className="hidden sm:inline text-neutral-400">•</span>
               <span>Hours: {SITE_CONFIG.businessHours}</span>
             </div>
             
@@ -176,7 +176,7 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.url}
-                  className="text-green-600 hover:text-green-800 transition-colors"
+                  className="text-neutral-600 hover:text-neutral-800 transition-colors"
                 >
                   {link.name}
                 </Link>

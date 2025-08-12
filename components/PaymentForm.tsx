@@ -23,12 +23,12 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <input
           placeholder="Cardholder Name"
-          className="rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.cardholderName}
           onChange={(e) => handleChange('cardholderName', e.target.value)}
         />
         <select
-          className="rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.cardType}
           onChange={(e) => handleChange('cardType', e.target.value)}
         >
@@ -42,7 +42,7 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
       
       <input
         placeholder="Card Number"
-        className="w-full rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+        className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
         value={data.cardNumber}
         onChange={(e) => handleChange('cardNumber', e.target.value)}
         maxLength={19}
@@ -50,7 +50,7 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
       
       <div className="grid grid-cols-3 gap-4">
         <select
-          className="rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.expiryMonth}
           onChange={(e) => handleChange('expiryMonth', e.target.value)}
         >
@@ -63,7 +63,7 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
         </select>
         
         <select
-          className="rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.expiryYear}
           onChange={(e) => handleChange('expiryYear', e.target.value)}
         >
@@ -77,7 +77,7 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
         
         <input
           placeholder="CVV"
-          className="rounded-md border bg-white px-3 py-2 dark:bg-gray-900"
+          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.cvv}
           onChange={(e) => handleChange('cvv', e.target.value)}
           maxLength={4}
@@ -86,7 +86,7 @@ export default function PaymentForm({ data, onChange, onSubmit }: PaymentFormPro
       
       <button
         type="submit"
-        className="w-full rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
+        className="w-full rounded-lg bg-primary hover:bg-primary-600 px-4 py-3 text-sm font-medium text-white transition-colors shadow-soft"
       >
         Continue to Review
       </button>

@@ -15,39 +15,39 @@ export default function CartItem({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-md border p-3">
-      <div className="h-16 w-16 rounded bg-green-100">
+    <div className="flex items-center gap-4 rounded-lg border border-neutral-200 p-4 bg-white shadow-soft">
+      <div className="h-16 w-16 rounded-lg bg-neutral-100 overflow-hidden">
         {item.image && (
           <Image
             src={item.image} 
             alt={item.name} 
-            className="h-full w-full object-cover rounded"
+            className="h-full w-full object-cover rounded-lg"
           />
         )}
       </div>
       <div className="flex-1">
-        <p className="font-medium">{item.name}</p>
-        <p className="text-sm text-green-600 dark:text-green-400">{formatPrice(item.price)}</p>
-        <div className="mt-2 flex items-center gap-2 text-sm">
+        <p className="font-medium text-neutral-800">{item.name}</p>
+        <p className="text-sm text-primary font-semibold">{formatPrice(item.price)}</p>
+        <div className="mt-3 flex items-center gap-2 text-sm">
           <button 
             onClick={() => onQuantityChange(Math.max(1, item.quantity - 1))} 
             disabled={disabled}
-            className="rounded border px-2 py-1 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md border border-neutral-300 px-3 py-1 hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             -
           </button>
-          <span>{item.quantity}</span>
+          <span className="px-3 py-1 bg-neutral-100 rounded-md font-medium">{item.quantity}</span>
           <button 
             onClick={() => onQuantityChange(item.quantity + 1)} 
             disabled={disabled}
-            className="rounded border px-2 py-1 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md border border-neutral-300 px-3 py-1 hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             +
           </button>
           <button 
             onClick={onRemove} 
             disabled={disabled}
-            className="ml-4 text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="ml-4 text-error hover:text-error-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
             Remove
           </button>

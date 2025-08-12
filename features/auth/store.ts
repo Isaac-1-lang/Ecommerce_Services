@@ -4,10 +4,22 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { authService } from "../../services/authService";
 
-export type AuthUser = { id: string; name: string; email: string } | null;
+export type AuthUser = { 
+  id: string; 
+  name: string; 
+  username: string;
+  email: string; 
+  profilePicture?: string;
+} | null;
 
-type Credentials = { email: string; password: string };
-type RegisterData = { name: string; email: string; password: string };
+type Credentials = { emailOrUsername: string; password: string };
+type RegisterData = { 
+  name: string; 
+  username: string;
+  email: string; 
+  password: string;
+  profilePicture?: File;
+};
 
 type AuthState = {
   user: AuthUser;
@@ -22,6 +34,7 @@ type AuthState = {
   resetPassword: (token: string, password: string) => Promise<{ message: string }>;
   verifyEmail: (token: string) => Promise<{ message: string }>;
   resendVerification: (email: string) => Promise<{ message: string }>;
+  socialLogin: (provider: 'google' | 'github') => Promise<void>;
   setUser: (user: AuthUser) => void;
   clearError: () => void;
   validateToken: () => Promise<boolean>;
@@ -106,6 +119,16 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ error: error instanceof Error ? error.message : "Failed to resend verification", loading: false });
           throw error;
+        }
+      },
+
+      socialLogin: async (provider) => {
+        set({ loading: true, error: null });
+        try {
+          const res = await authService.socialLogin(provider);
+          set({ user: res.user, token: res.token, loading: false, isEmailVerified: true });
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : `${provider} login failed`, loading: false });
         }
       },
 

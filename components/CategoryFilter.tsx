@@ -34,11 +34,29 @@ export default function CategoryFilter({
   return (
     <ul className="space-y-2 text-sm">
       <li>
-        <button onClick={() => setCategory("")} className={`hover:underline ${current === "" ? "font-semibold" : ""}`}>All</button>
+        <button 
+          onClick={() => setCategory("")} 
+          className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
+            current === "" 
+              ? "bg-primary text-white font-semibold" 
+              : "text-neutral-700 hover:bg-highlight hover:text-neutral-800"
+          }`}
+        >
+          All Categories
+        </button>
       </li>
       {categories.map((c) => (
         <li key={c}>
-          <button onClick={() => setCategory(c)} className={`hover:underline ${current === c ? "font-semibold" : ""}`}>{c}</button>
+          <button 
+            onClick={() => setCategory(c)} 
+            className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
+              current === c 
+                ? "bg-primary text-white font-semibold" 
+                : "text-neutral-700 hover:bg-highlight hover:text-neutral-800"
+            }`}
+          >
+            {c}
+          </button>
         </li>
       ))}
     </ul>

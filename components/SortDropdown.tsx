@@ -36,7 +36,7 @@ export default function SortDropdown({ value, onChange }: SortDropdownProps) {
 
   return (
     <select
-      className="rounded-md border bg-white px-3 py-2 text-sm dark:bg-gray-900"
+      className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
       value={current}
       onChange={(e) => handleChange(e.target.value)}
     >

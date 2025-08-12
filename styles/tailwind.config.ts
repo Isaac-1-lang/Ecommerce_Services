@@ -9,98 +9,101 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors (green scale)
+        // Modern Primary - Deep Teal (trustworthy, professional)
         primary: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e', // Main primary green
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6', // Main primary - modern teal
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+          950: '#042f2e',
         },
-        // Secondary accent colors (lighter green / white blend)
+        // Secondary - Warm Coral (friendly, engaging)
         secondary: {
-          50:  '#ffffff', // white
-          100: '#f9faf9',
-          200: '#e6f0e6',
-          300: '#cde1cd',
-          400: '#a8cba8',
-          500: '#7fbf7f', // medium green
-          600: '#599559',
-          700: '#3b6f3b',
-          800: '#2c522c',
-          900: '#1e3a1e',
-          950: '#0f1f0f',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316', // Main secondary - warm coral
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          950: '#431407',
         },
-        // Success colors (strong green)
+        // Success - Soft Emerald (trust and confidence)
         success: {
-          50:  '#e6f9e6',
-          100: '#c7f0c7',
-          200: '#a3e5a3',
-          300: '#7fd97f',
-          400: '#59cd59',
-          500: '#3bb43b', // main success green
-          600: '#2f8e2f',
-          700: '#226622',
-          800: '#174417',
-          900: '#0d260d',
-          950: '#041104',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981', // Main success - soft emerald
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+          950: '#022c22',
         },
-        // Warning colors (soft green-yellow, leaning white)
+        // Warning - Gentle Amber (attention without harshness)
         warning: {
-          50:  '#f7fef7',
-          100: '#e9fce9',
-          200: '#d6f5d6',
-          300: '#bce9bc',
-          400: '#9ddf9d',
-          500: '#7fd57f', // soft warning green
-          600: '#61b761',
-          700: '#4a8f4a',
-          800: '#356735',
-          900: '#223922',
-          950: '#111d11',
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b', // Main warning - gentle amber
+          600: '#d97706',
+          700: '#b45309',
+          800: '#92400e',
+          900: '#78350f',
+          950: '#451a03',
         },
-        // Error colors (very light green to white)
+        // Error - Muted Red (clear feedback without aggression)
         error: {
-          50:  '#f7f9f7',
-          100: '#ebf2eb',
-          200: '#d9e4d9',
-          300: '#bdd0bd',
-          400: '#a4c2a4',
-          500: '#8ab98a', // muted green error
-          600: '#6d8d6d',
-          700: '#516651',
-          800: '#364336',
-          900: '#1c221c',
-          950: '#0a100a',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444', // Main error - muted red
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+          950: '#450a0a',
         },
-        // Neutral colors (white to very light green)
+        // Neutral - Warm Grays (softer than pure grays)
         neutral: {
-          50:  '#ffffff',
-          100: '#f9faf9',
-          200: '#f0f5f0',
-          300: '#e6eee6',
-          400: '#d1ddd1',
-          500: '#b8cbb8',
-          600: '#97a897',
-          700: '#6d7e6d',
-          800: '#4a594a',
-          900: '#2b332b',
-          950: '#161916',
+          50: '#fafaf9',
+          100: '#f5f5f4',
+          200: '#e7e5e4',
+          300: '#d6d3d1',
+          400: '#a8a29e',
+          500: '#78716c',
+          600: '#57534e',
+          700: '#44403c',
+          800: '#292524',
+          900: '#1c1917',
+          950: '#0c0a09',
         },
-        // Ecommerce-specific colors updated to green & white tones
-        price: '#14532d',    // dark green for prices
-        deal: '#4ade80',     // bright green for deals
-        sale: '#22c55e',     // main primary green for sales
-        new: '#86efac',      // lighter green for new items
-        rating: '#a8cba8',   // soft green for ratings
-        shipping: '#7fbf7f', // medium green for shipping info
-        trust: '#3bb43b',    // success green for trust indicators
+        // Ecommerce-specific colors - Refined and user-friendly
+        'price': '#dc2626', // Muted red for prices (less aggressive)
+        'deal': '#f59e0b', // Warm amber for deals
+        'sale': '#ef4444', // Muted red for sales
+        'new': '#10b981', // Soft emerald for new items
+        'rating': '#fbbf24', // Warm gold for ratings
+        'shipping': '#14b8a6', // Teal for shipping info
+        'trust': '#059669', // Emerald for trust indicators
+        'accent': '#f97316', // Coral for highlights
+        'highlight': '#f0fdfa', // Very light teal for backgrounds
+        'subtle': '#f8fafc', // Very light blue-gray for subtle backgrounds
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -130,12 +133,15 @@ const config: Config = {
         ecommerce: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'ecommerce-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'ecommerce-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.12)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'bounce-gentle': 'bounceGentle 0.6s ease-in-out',
         'pulse-gentle': 'pulseGentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -153,6 +159,10 @@ const config: Config = {
         pulseGentle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '.8' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
       },
     },
