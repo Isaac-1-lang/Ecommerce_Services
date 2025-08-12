@@ -6,49 +6,81 @@ export const PRODUCT_CATEGORIES = [
     id: 'electronics',
     name: 'Electronics',
     description: 'Latest gadgets and electronic devices',
-    icon: '📱',
+    icon: 'FiSmartphone',
     featured: true,
-    subcategories: ['Smartphones', 'Laptops', 'Tablets', 'Audio', 'Cameras', 'Gaming']
+    subcategories: ['Smartphones', 'Laptops', 'Tablets', 'Audio & Headphones', 'Cameras', 'Gaming', 'Smart Home', 'Wearables']
   },
   {
     id: 'fashion',
-    name: 'Fashion',
+    name: 'Fashion & Apparel',
     description: 'Trendy clothing and accessories',
-    icon: '👕',
+    icon: 'FiShoppingBag',
     featured: true,
-    subcategories: ['Men', 'Women', 'Kids', 'Shoes', 'Bags', 'Jewelry']
+    subcategories: ['Men\'s Clothing', 'Women\'s Clothing', 'Kids & Baby', 'Shoes & Sneakers', 'Bags & Wallets', 'Jewelry & Watches', 'Accessories', 'Sportswear']
   },
   {
     id: 'home-garden',
     name: 'Home & Garden',
     description: 'Everything for your home and outdoor space',
-    icon: '🏠',
+    icon: 'FiHome',
     featured: true,
-    subcategories: ['Furniture', 'Decor', 'Kitchen', 'Garden', 'Tools', 'Lighting']
+    subcategories: ['Furniture', 'Home Decor', 'Kitchen & Dining', 'Garden & Outdoor', 'Tools & Hardware', 'Lighting', 'Bedding', 'Bath']
   },
   {
-    id: 'sports',
+    id: 'sports-outdoors',
     name: 'Sports & Outdoors',
     description: 'Equipment and gear for active lifestyles',
-    icon: '⚽',
-    featured: false,
-    subcategories: ['Fitness', 'Running', 'Cycling', 'Camping', 'Swimming', 'Team Sports']
+    icon: 'FiActivity',
+    featured: true,
+    subcategories: ['Fitness & Exercise', 'Running & Walking', 'Cycling', 'Camping & Hiking', 'Swimming', 'Team Sports', 'Yoga & Pilates', 'Fishing & Hunting']
   },
   {
-    id: 'books',
-    name: 'Books & Media',
-    description: 'Books, movies, music and more',
-    icon: '📚',
-    featured: false,
-    subcategories: ['Fiction', 'Non-Fiction', 'Academic', 'Children', 'Audio Books', 'E-books']
-  },
-  {
-    id: 'beauty',
+    id: 'beauty-health',
     name: 'Beauty & Health',
     description: 'Personal care and wellness products',
-    icon: '💄',
+    icon: 'FiHeart',
+    featured: true,
+    subcategories: ['Skincare', 'Makeup', 'Haircare', 'Fragrances', 'Vitamins & Supplements', 'Personal Care', 'Health & Wellness', 'Men\'s Grooming']
+  },
+  {
+    id: 'automotive',
+    name: 'Automotive',
+    description: 'Car accessories and maintenance',
+    icon: 'FiTruck',
     featured: false,
-    subcategories: ['Skincare', 'Makeup', 'Haircare', 'Fragrances', 'Vitamins', 'Personal Care']
+    subcategories: ['Car Accessories', 'Car Care', 'Motorcycle Gear', 'Truck Parts', 'RV & Camping', 'Tools & Equipment']
+  },
+  {
+    id: 'toys-games',
+    name: 'Toys & Games',
+    description: 'Fun for all ages',
+    icon: 'FiSmile',
+    featured: false,
+    subcategories: ['Action Figures', 'Board Games', 'Building Sets', 'Educational Toys', 'Outdoor Toys', 'Video Games', 'Arts & Crafts', 'Collectibles']
+  },
+  {
+    id: 'books-media',
+    name: 'Books & Media',
+    description: 'Books, movies, music and more',
+    icon: 'FiBook',
+    featured: false,
+    subcategories: ['Fiction', 'Non-Fiction', 'Academic & Textbooks', 'Children\'s Books', 'Audio Books', 'E-books', 'Movies & TV', 'Music & Vinyl']
+  },
+  {
+    id: 'pet-supplies',
+    name: 'Pet Supplies',
+    description: 'Everything for your furry friends',
+    icon: 'FiHeart',
+    featured: false,
+    subcategories: ['Dog Supplies', 'Cat Supplies', 'Fish & Aquarium', 'Bird Supplies', 'Small Pets', 'Pet Health', 'Pet Toys', 'Pet Food']
+  },
+  {
+    id: 'office-supplies',
+    name: 'Office & Business',
+    description: 'Professional and office essentials',
+    icon: 'FiBriefcase',
+    featured: false,
+    subcategories: ['Office Furniture', 'Paper & Notebooks', 'Writing Supplies', 'Technology', 'Organization', 'Business Cards', 'Printing', 'Shipping Supplies']
   }
 ];
 

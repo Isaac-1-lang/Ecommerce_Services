@@ -31,9 +31,9 @@ export default function Navbar() {
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-soft">
+    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 dark:border-neutral-700 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-soft">
       {/* Top Bar */}
-      <div className="bg-primary text-white py-2 text-sm">
+      <div className="bg-primary text-primary-foreground py-2 text-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -49,7 +49,7 @@ export default function Navbar() {
               <Link href="/contact" className="hover:text-primary-50 transition-colors">
                 Contact Us
               </Link>
-              <span className="text-primary-200">|</span>
+               <span className="text-primary-200">|</span>
               <Link href="/admin" className="hover:text-primary-50 transition-colors">
                 Admin
               </Link>
@@ -84,14 +84,14 @@ export default function Navbar() {
             <div className="relative hidden lg:block">
               <button
                 onClick={toggleCategories}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary transition-colors rounded-md hover:bg-highlight"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors rounded-md hover:bg-highlight"
               >
                 <span>Categories</span>
                 <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isCategoriesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-neutral-200 rounded-lg shadow-soft-lg p-4 z-50">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-soft-lg p-4 z-50">
                   <div className="grid grid-cols-2 gap-4">
                     {PRODUCT_CATEGORIES.filter(cat => cat.featured).map((category) => (
                       <Link
@@ -102,17 +102,17 @@ export default function Navbar() {
                       >
                         <span className="text-2xl">{category.icon}</span>
                         <div>
-                          <div className="font-medium text-neutral-800 group-hover:text-primary transition-colors">
+                          <div className="font-medium text-neutral-800 dark:text-neutral-100 group-hover:text-primary transition-colors">
                             {category.name}
                           </div>
-                          <div className="text-sm text-neutral-600">
+                           <div className="text-sm text-neutral-600 dark:text-neutral-400">
                             {category.description}
                           </div>
                         </div>
                       </Link>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-neutral-200">
+                   <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                     <Link
                       href="/products"
                       className="block text-center text-primary hover:text-primary-600 font-medium transition-colors"
@@ -127,16 +127,16 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <Link href="/products" className="font-medium text-neutral-700 hover:text-primary transition-colors">
+              <Link href="/products" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
                 Products
               </Link>
-              <Link href="/deals" className="font-medium text-neutral-700 hover:text-primary transition-colors">
+              <Link href="/deals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
                 Deals
               </Link>
-              <Link href="/new-arrivals" className="font-medium text-neutral-700 hover:text-primary transition-colors">
+              <Link href="/new-arrivals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
                 New Arrivals
               </Link>
-              <Link href="/brands" className="font-medium text-neutral-700 hover:text-primary transition-colors">
+              <Link href="/brands" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
                 Brands
               </Link>
             </nav>
@@ -155,7 +155,7 @@ export default function Navbar() {
               aria-label="Wishlist" 
               className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiHeart className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
+              <FiHeart className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
             </Link>
 
             {/* Cart */}
@@ -164,7 +164,7 @@ export default function Navbar() {
               aria-label="Cart" 
               className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiShoppingCart className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
+              <FiShoppingCart className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
                 <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-secondary text-xs font-semibold text-white animate-bounce-gentle">
                   {cartItemCount}
@@ -178,7 +178,7 @@ export default function Navbar() {
               aria-label="Account" 
               className="p-2 rounded-md hover:bg-highlight transition-colors group"
             >
-              <FiUser className="h-5 w-5 text-neutral-600 group-hover:text-primary transition-colors" />
+              <FiUser className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
             </Link>
 
             {/* Theme Toggle */}
@@ -188,9 +188,9 @@ export default function Navbar() {
               onClick={() => theme && setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted && theme === "dark" ? (
-                <FiSun className="h-5 w-5 text-neutral-600 hover:text-primary transition-colors" />
+                <FiSun className="h-5 w-5 text-neutral-600 dark:text-neutral-300 hover:text-primary transition-colors" />
               ) : (
-                <FiMoon className="h-5 w-5 text-neutral-600 hover:text-primary transition-colors" />
+                <FiMoon className="h-5 w-5 text-neutral-600 dark:text-neutral-300 hover:text-primary transition-colors" />
               )}
             </button>
 
@@ -217,33 +217,33 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-neutral-200 bg-white">
+        <div className="lg:hidden border-t border-neutral-200 dark:border-neutral-700 bg-background">
           <div className="px-4 py-4 space-y-4">
             <nav className="space-y-2">
               <Link
                 href="/products"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Products
               </Link>
               <Link
                 href="/deals"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Deals
               </Link>
               <Link
                 href="/new-arrivals"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Arrivals
               </Link>
               <Link
                 href="/brands"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Brands

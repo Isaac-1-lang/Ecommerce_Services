@@ -1,44 +1,25 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export default function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    // Check if dark mode is enabled in localStorage
-    const darkMode = localStorage.getItem('admin-dark-mode') === 'true';
-    setIsDark(darkMode);
-    
-    // Apply dark mode to body
-    if (darkMode) {
-      document.body.classList.add('admin-dark-mode');
-    }
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDark;
-    setIsDark(newDarkMode);
-    
-    // Save to localStorage
-    localStorage.setItem('admin-dark-mode', newDarkMode.toString());
-    
-    // Apply to body
-    if (newDarkMode) {
-      document.body.classList.add('admin-dark-mode');
-    } else {
-      document.body.classList.remove('admin-dark-mode');
-    }
-  };
+  const isDark = (theme === 'dark') || (theme === 'system' && resolvedTheme === 'dark');
 
   return (
     <button
-      onClick={toggleDarkMode}
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label="Toggle dark mode"
     >
-      {isDark ? (
+      {mounted && isDark ? (
         <FiSun className="h-5 w-5 text-yellow-500" />
       ) : (
         <FiMoon className="h-5 w-5 text-neutral-600" />

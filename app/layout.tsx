@@ -44,7 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-white text-neutral-800 font-sans antialiased">
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <Providers>
           <ToastContainer>
             <div className="flex min-h-screen flex-col">
