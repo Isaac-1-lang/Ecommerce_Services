@@ -4,12 +4,6 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "devCommand": "npm run dev",
-  "regions": ["iad1"],
-  "functions": {
-    "app/**/*.tsx": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",
@@ -24,7 +18,7 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
+          "value": "Content-Type, Authorization, X-Requested-With"
         }
       ]
     }

@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FiArrowRight, FiMapPin, FiPhone, FiMail, FiTwitter, FiFacebook, FiInstagram, FiLinkedin } from "react-icons/fi";
+import { FiArrowRight, FiMapPin, FiPhone, FiMail, FiTwitter, FiFacebook, FiInstagram, FiLinkedin, FiHeart, FiShield, FiTruck, FiClock } from "react-icons/fi";
 import { SITE_CONFIG } from "../constants";
 
-export default function Footer() {
+interface FooterProps {
+  variant?: 'default' | 'admin' | 'delivery' | 'employee';
+}
+
+export default function Footer({ variant = 'default' }: FooterProps) {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -34,9 +38,82 @@ export default function Footer() {
     { name: 'Shipping Info', url: '/shipping' },
   ];
 
+  // Different footer styles based on variant
+  const getFooterStyle = () => {
+    switch (variant) {
+      case 'admin':
+        return 'bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 ml-64';
+      case 'delivery':
+        return 'bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 ml-64';
+      case 'employee':
+        return 'bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 ml-64';
+      default:
+        return 'bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700';
+    }
+  };
+
+  const getContainerStyle = () => {
+    switch (variant) {
+      case 'admin':
+      case 'delivery':
+      case 'employee':
+        return 'max-w-full px-6';
+      default:
+        return 'max-w-6xl px-4 sm:px-6 lg:px-8';
+    }
+  };
+
+  // Simplified footer for admin/delivery/employee pages
+  if (variant !== 'default') {
+    return (
+      <footer className={`${getFooterStyle()} mt-auto`}>
+        <div className={`mx-auto ${getContainerStyle()} py-6`}>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Company Info */}
+            <div className="flex items-center gap-3">
+              <Link href="/" className="text-lg font-bold text-primary">
+                {SITE_CONFIG.name}
+              </Link>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                Professional Dashboard
+              </span>
+            </div>
+
+            {/* Quick Links */}
+            <div className="flex items-center gap-6 text-xs">
+              <Link href="/help" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+                Help
+              </Link>
+              <Link href="/contact" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+                Contact
+              </Link>
+              <Link href="/privacy" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+                Privacy
+              </Link>
+            </div>
+
+            {/* Status */}
+            <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+              <div className="w-2 h-2 bg-success rounded-full"></div>
+              <span>System Online</span>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700 text-center">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              © {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // Full footer for main pages
   return (
-    <footer className="bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 mt-auto">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <footer className={`${getFooterStyle()} mt-auto`}>
+      <div className={`mx-auto ${getContainerStyle()}`}>
         
         {/* Newsletter Section */}
         <div className="py-8 border-b border-neutral-200 dark:border-neutral-700">
