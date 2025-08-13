@@ -81,7 +81,9 @@ Ecommerce_Services/
 │   ├── checkout/          # Checkout process
 │   ├── products/          # Product pages
 │   ├── account/           # User account
-│   └── admin/             # Admin dashboard
+│   ├── admin/             # Admin dashboard (no footer)
+│   ├── employee/          # Employee portal (no footer)
+│   └── delivery/          # Delivery portal (no footer)
 ├── components/            # Reusable components
 │   ├── ui/               # Base UI components
 │   ├── admin/            # Admin components
@@ -102,6 +104,10 @@ Ecommerce_Services/
 ├── types/              # TypeScript types
 └── styles/             # Global styles
 ```
+
+### 🎯 Layout Behavior
+- **Main Pages**: Include navbar and footer (home, products, cart, checkout, account, auth)
+- **Portal Pages**: Include only portal-specific header and sidebar, no footer (/admin, /employee, /delivery)
 
 ## 🔗 Backend Integration
 
@@ -196,7 +202,9 @@ The application can be deployed to any platform that supports Next.js:
 
 ## 📚 Documentation
 
+- [Backend Setup Guide](./BACKEND_SETUP_GUIDE.md) 🚀 **START HERE**
 - [Java Integration Guide](./JAVA_INTEGRATION_GUIDE.md)
+- [Missing Backend Implementations](./MISSING_BACKEND_IMPLEMENTATIONS.md) ⚠️ **CRITICAL**
 - [API Documentation](./Ecommerce_Backend_Services/README.md)
 - [Component Documentation](./components/README.md)
 - [Deployment Guide](./DEPLOYMENT.md)

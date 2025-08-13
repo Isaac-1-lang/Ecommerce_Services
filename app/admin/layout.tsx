@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import AdminHeader from '../../components/admin/AdminHeader';
-import Footer from '../../components/Footer';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (

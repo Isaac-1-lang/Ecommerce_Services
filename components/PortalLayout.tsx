@@ -9,10 +9,13 @@ interface PortalLayoutProps {
 
 export default function PortalLayout({ children }: PortalLayoutProps) {
   const pathname = usePathname();
-  const isPortal = pathname?.startsWith("/admin") || pathname?.startsWith("/employee") || pathname?.startsWith("/delivery");
+  
+  // Define portal paths that should hide the footer
+  const portalPaths = ["/admin", "/employee", "/delivery"];
+  const isPortal = portalPaths.some(path => pathname?.startsWith(path));
 
   if (isPortal) {
-    // For portal pages, render without footer
+    // For portal pages, render without footer and navbar
     return (
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">
@@ -22,6 +25,6 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     );
   }
 
-  // For regular pages, render normally with footer
+  // For regular pages, render normally with footer and navbar
   return <>{children}</>;
 }
