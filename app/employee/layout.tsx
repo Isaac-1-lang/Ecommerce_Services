@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import EmployeeSidebar from '../../components/employee/EmployeeSidebar';
 import EmployeeHeader from '../../components/employee/EmployeeHeader';
-import Footer from '../../components/Footer';
 
 export default function EmployeeLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +12,6 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
-      <Footer variant="employee" />
     </div>
   );
 }

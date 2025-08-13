@@ -22,7 +22,10 @@ export function ToastContainer({ children }: ToastContainerProps) {
 
   // Expose addToast function globally
   if (typeof window !== 'undefined') {
-    (window as any).showToast = addToast;
+    (window as any).showToast = (type: ToastType, title: string, message?: string, duration?: number) => {
+      console.log('Toast called with:', { type, title, message, duration });
+      addToast({ type, title, message, duration });
+    };
   }
 
   return (

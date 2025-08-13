@@ -94,10 +94,32 @@ body {
 .dark .text-neutral-700, .dark .text-neutral-600 { color: var(--muted-foreground); }
 .dark .border-neutral-200, .dark .border-neutral-300 { border-color: var(--border); }
 
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 /* Global cursor styles for better UX */
 button, 
 [role="button"], 
-input[type="submit"], 
+input[type="submit"],
 input[type="button"], 
 input[type="reset"],
 select,

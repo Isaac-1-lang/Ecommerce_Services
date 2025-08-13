@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import DeliverySidebar from '../../components/delivery/DeliverySidebar';
 import DeliveryHeader from '../../components/delivery/DeliveryHeader';
-import Footer from '../../components/Footer';
 
 export default function DeliveryLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +12,6 @@ export default function DeliveryLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
-      <Footer variant="delivery" />
     </div>
   );
 }

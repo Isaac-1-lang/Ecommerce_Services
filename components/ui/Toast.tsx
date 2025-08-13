@@ -66,6 +66,7 @@ export function Toast({ toast, onRemove }: ToastProps) {
       className={`${getBgColor()} border rounded-lg p-4 shadow-soft-lg transition-all duration-300 ${
         isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
       }`}
+      style={{ minWidth: '300px' }}
     >
       <div className="flex items-start gap-3">
         {getIcon()}
