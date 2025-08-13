@@ -10,6 +10,7 @@ export type AuthUser = {
   username: string;
   email: string; 
   profilePicture?: string;
+  role?: 'user' | 'admin' | 'employee' | 'delivery';
 } | null;
 
 type Credentials = { emailOrUsername: string; password: string };

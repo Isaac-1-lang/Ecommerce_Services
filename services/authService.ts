@@ -17,7 +17,8 @@ export const authService = {
       name: isEmail ? emailOrUsername.split("@")[0] || "User" : emailOrUsername,
       username: isEmail ? emailOrUsername.split("@")[0] || "user" : emailOrUsername,
       email: isEmail ? emailOrUsername : `${emailOrUsername}@example.com`,
-      profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+      profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      role: 'user' // Default role, can be overridden for testing
     };
     
     return {
