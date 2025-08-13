@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage } from "react-icons/fi";
+import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { getProducts } from "../services/productService";
 import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
@@ -11,9 +11,46 @@ import { formatPrice } from "../lib/formatPrice";
 import { Product } from "../types/product";
 import ToastDemo from "../components/ui/ToastDemo";
 
+// Hero slider data
+const heroSlides = [
+  {
+    id: 1,
+    title: "Premium Electronics",
+    subtitle: "Discover the latest gadgets and smart devices",
+    image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=1200&h=600&fit=crop&crop=center",
+    cta: "Shop Electronics",
+    link: "/products?category=electronics"
+  },
+  {
+    id: 2,
+    title: "Fashion & Style",
+    subtitle: "Trendy clothing and accessories for every occasion",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=600&fit=crop&crop=center",
+    cta: "Shop Fashion",
+    link: "/products?category=fashion"
+  },
+  {
+    id: 3,
+    title: "Home & Garden",
+    subtitle: "Transform your living space with quality home essentials",
+    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop&crop=center",
+    cta: "Shop Home",
+    link: "/products?category=home-garden"
+  },
+  {
+    id: 4,
+    title: "Sports & Fitness",
+    subtitle: "Equipment and gear for your active lifestyle",
+    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=600&fit=crop&crop=center",
+    cta: "Shop Sports",
+    link: "/products?category=sports-outdoors"
+  }
+];
+
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const addToCart = useCartStore((s) => s.addItem);
   const addToWishlist = useWishlistStore((s) => s.addItem);
@@ -37,6 +74,27 @@ export default function HomePage() {
     loadFeaturedProducts();
   }, []);
 
+  // Auto-advance slider
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
   const handleAddToCart = (product: Product) => {
     addToCart({
       id: product.id,
@@ -57,33 +115,83 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-green-600 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-              Welcome to Now
-            </h1>
-            <p className="mt-6 text-xl max-w-3xl mx-auto">
-              Discover amazing products at unbeatable prices. Shop the latest trends 
-              and find everything you need in one place.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <Link
-                href="/products"
-                className="bg-white text-primary px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors flex items-center gap-2"
-              >
-                Shop Now
-                <FiArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/auth/register"
-                className="border border-white text-white px-8 py-3 rounded-md font-medium hover:bg-white hover:text-primary transition-colors"
-              >
-                Sign Up
-              </Link>
+      {/* Hero Slider Section */}
+      <section className="relative h-[600px] overflow-hidden">
+        {/* Slides */}
+        <div className="relative h-full">
+          {heroSlides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  sizes="100vw"
+                />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/40" />
+              </div>
+              
+              {/* Content */}
+              <div className="relative h-full flex items-center">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-white">
+                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
+                    {slide.title}
+                  </h1>
+                  <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 animate-fade-in-delay">
+                    {slide.subtitle}
+                  </p>
+                  <div className="animate-fade-in-delay-2">
+                    <Link
+                      href={slide.link}
+                      className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-lg"
+                    >
+                      {slide.cta}
+                      <FiArrowRight className="h-5 w-5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
+          aria-label="Previous slide"
+        >
+          <FiChevronLeft className="h-6 w-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
+          aria-label="Next slide"
+        >
+          <FiChevronRight className="h-6 w-6" />
+        </button>
+
+        {/* Dots Indicator */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
+                index === currentSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </section>
 
@@ -216,7 +324,7 @@ export default function HomePage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleWishlistToggle(product)}
-                          className={`p-2 rounded-full transition-colors ${
+                          className={`p-2 rounded-full transition-colors cursor-pointer ${
                             isInWishlist(product.id)
                               ? "text-primary bg-primary/10"
                               : "text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -226,7 +334,7 @@ export default function HomePage() {
                         </button>
                         <button
                           onClick={() => handleAddToCart(product)}
-                          className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
+                          className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
                         >
                           <FiShoppingCart className="h-5 w-5" />
                         </button>
@@ -273,7 +381,7 @@ export default function HomePage() {
               <Link
                 key={category.name}
                 href={category.href}
-                className="group relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
+                className="group relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <Image

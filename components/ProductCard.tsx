@@ -153,7 +153,7 @@ export default function ProductCard({ product }: { product: Product }) {
         }`}>
           <button
             onClick={handleWishlistToggle}
-            className={`p-2 rounded-full shadow-soft transition-all ${
+            className={`p-2 rounded-full shadow-soft transition-all cursor-pointer ${
               isInWishlist(product.id)
                 ? 'bg-primary text-white'
                 : 'bg-white text-neutral-600 hover:bg-primary hover:text-white'
@@ -164,14 +164,14 @@ export default function ProductCard({ product }: { product: Product }) {
           
           <button
             onClick={handleQuickView}
-            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors"
+            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors cursor-pointer"
           >
             <FiEye className="h-4 w-4" />
           </button>
           
           <button
             onClick={handleShare}
-            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors"
+            className="p-2 rounded-full bg-white text-neutral-600 shadow-soft hover:bg-primary hover:text-white transition-colors cursor-pointer"
           >
             <FiShare2 className="h-4 w-4" />
           </button>
@@ -205,7 +205,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Product Name */}
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/products/${product.slug}`} className="cursor-pointer">
           <h3 className="text-sm font-medium text-neutral-800 mb-2 line-clamp-2 hover:text-primary transition-colors">
             {product.name}
           </h3>
@@ -233,7 +233,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <button
             onClick={handleAddToCart}
             disabled={product.stockQuantity === 0}
-            className="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-600 disabled:bg-neutral-300 disabled:text-neutral-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-600 disabled:bg-neutral-300 disabled:text-neutral-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             <FiShoppingCart className="h-4 w-4" />
             {product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}

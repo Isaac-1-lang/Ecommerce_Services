@@ -43,27 +43,27 @@ export default function Navbar() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/help" className="hover:text-primary-50 transition-colors">
+              <Link href="/help" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Help Center
               </Link>
-              <Link href="/contact" className="hover:text-primary-50 transition-colors">
+              <Link href="/contact" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Contact Us
               </Link>
                <span className="text-primary-200">|</span>
-              <Link href="/admin" className="hover:text-primary-50 transition-colors">
+              <Link href="/admin" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Admin
               </Link>
-              <Link href="/employee" className="hover:text-primary-50 transition-colors">
+              <Link href="/employee" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Employee
               </Link>
-              <Link href="/delivery" className="hover:text-primary-50 transition-colors">
+              <Link href="/delivery" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Delivery
               </Link>
               <span className="text-primary-200">|</span>
-              <Link href="/auth/login" className="hover:text-primary-50 transition-colors">
+              <Link href="/auth/login" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Sign In
               </Link>
-              <Link href="/auth/register" className="hover:text-primary-50 transition-colors">
+              <Link href="/auth/register" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Sign Up
               </Link>
             </div>
@@ -76,7 +76,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo and Categories */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-2xl font-bold text-green-700">
+            <Link href="/" className="text-2xl font-bold text-neutral-800 dark:text-white hover:text-primary transition-colors">
               {SITE_CONFIG.name}
             </Link>
             
@@ -84,7 +84,7 @@ export default function Navbar() {
             <div className="relative hidden lg:block">
               <button
                 onClick={toggleCategories}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors rounded-md hover:bg-highlight"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors rounded-md hover:bg-highlight cursor-pointer"
               >
                 <span>Categories</span>
                 <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
@@ -97,7 +97,7 @@ export default function Navbar() {
                       <Link
                         key={category.id}
                         href={`/products?category=${category.id}`}
-                        className="flex items-center gap-3 p-3 rounded-md hover:bg-highlight transition-colors group"
+                        className="flex items-center gap-3 p-3 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
                         onClick={() => setIsCategoriesOpen(false)}
                       >
                         <span className="text-xl">{category.icon}</span>
@@ -115,7 +115,7 @@ export default function Navbar() {
                    <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
                     <Link
                       href="/products"
-                      className="block text-center text-primary hover:text-primary-600 font-medium transition-colors"
+                      className="block text-center text-primary hover:text-primary-600 font-medium transition-colors cursor-pointer"
                       onClick={() => setIsCategoriesOpen(false)}
                     >
                       View All Categories
@@ -127,16 +127,16 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <Link href="/products" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
+              <Link href="/products" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors cursor-pointer">
                 Products
               </Link>
-              <Link href="/deals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
+              <Link href="/deals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors cursor-pointer">
                 Deals
               </Link>
-              <Link href="/new-arrivals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
+              <Link href="/new-arrivals" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors cursor-pointer">
                 New Arrivals
               </Link>
-              <Link href="/brands" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors">
+              <Link href="/brands" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors cursor-pointer">
                 Brands
               </Link>
             </nav>
@@ -153,7 +153,7 @@ export default function Navbar() {
             <Link 
               href="/wishlist" 
               aria-label="Wishlist" 
-              className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
+              className="relative p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
             >
               <FiHeart className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
             </Link>
@@ -162,7 +162,7 @@ export default function Navbar() {
             <Link 
               href="/cart" 
               aria-label="Cart" 
-              className="relative p-2 rounded-md hover:bg-highlight transition-colors group"
+              className="relative p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
             >
               <FiShoppingCart className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
@@ -176,7 +176,7 @@ export default function Navbar() {
             <Link 
               href="/account" 
               aria-label="Account" 
-              className="p-2 rounded-md hover:bg-highlight transition-colors group"
+              className="p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
             >
               <FiUser className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
             </Link>
@@ -184,7 +184,7 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               aria-label="Toggle Theme"
-              className="p-2 rounded-md hover:bg-highlight transition-colors"
+              className="p-2 rounded-md hover:bg-highlight transition-colors cursor-pointer"
               onClick={() => theme && setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted && theme === "dark" ? (
@@ -196,7 +196,7 @@ export default function Navbar() {
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2 rounded-md hover:bg-highlight transition-colors"
+              className="lg:hidden p-2 rounded-md hover:bg-highlight transition-colors cursor-pointer"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
@@ -210,7 +210,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden py-3 border-t border-green-100">
+        <div className="md:hidden py-3 border-t border-neutral-200 dark:border-neutral-700">
           <SearchBar />
         </div>
       </div>
@@ -222,42 +222,42 @@ export default function Navbar() {
             <nav className="space-y-2">
               <Link
                 href="/products"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Products
               </Link>
               <Link
                 href="/deals"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Deals
               </Link>
               <Link
                 href="/new-arrivals"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Arrivals
               </Link>
               <Link
                 href="/brands"
-                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                className="block px-3 py-2 text-base font-medium text-neutral-800 dark:text-neutral-200 hover:text-primary hover:bg-highlight rounded-md transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Brands
               </Link>
             </nav>
             
-            <div className="pt-4 border-t border-neutral-200">
+            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-700">
               <div className="text-sm font-medium text-neutral-600 mb-2 px-3">Categories</div>
               <div className="space-y-1">
                 {PRODUCT_CATEGORIES.slice(0, 6).map((category) => (
                   <Link
                     key={category.id}
                     href={`/products?category=${category.id}`}
-                    className="flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 hover:text-primary hover:bg-highlight rounded-md transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 text-sm text-neutral-700 hover:text-primary hover:bg-highlight rounded-md transition-colors cursor-pointer"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <span className="text-base">{category.icon}</span>

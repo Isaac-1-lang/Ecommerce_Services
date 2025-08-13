@@ -94,6 +94,88 @@ body {
 .dark .text-neutral-700, .dark .text-neutral-600 { color: var(--muted-foreground); }
 .dark .border-neutral-200, .dark .border-neutral-300 { border-color: var(--border); }
 
+/* Global cursor styles for better UX */
+button, 
+[role="button"], 
+input[type="submit"], 
+input[type="button"], 
+input[type="reset"],
+select,
+summary {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea {
+  cursor: text;
+}
+
+a, 
+[href], 
+[onclick], 
+[tabindex]:not([tabindex="-1"]) {
+  cursor: pointer;
+}
+
+/* Disabled state cursor */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed !important;
+}
+
+/* Loading state cursor */
+.loading,
+[data-loading="true"] {
+  cursor: wait;
+}
+
+/* Resize cursors */
+.resizable-horizontal { cursor: ew-resize; }
+.resizable-vertical { cursor: ns-resize; }
+.resizable-both { cursor: nwse-resize; }
+
+/* Text selection cursor */
+.text-selectable { cursor: text; }
+
+/* Move cursor for draggable elements */
+.draggable { cursor: move; }
+
+/* Help cursor for help text */
+.help { cursor: help; }
+
+/* Hero Slider Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-fade-in-delay {
+  animation: fadeIn 0.8s ease-out 0.2s both;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fadeIn 0.8s ease-out 0.4s both;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

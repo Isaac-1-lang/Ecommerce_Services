@@ -81,13 +81,13 @@ export default function Footer({ variant = 'default' }: FooterProps) {
 
             {/* Quick Links */}
             <div className="flex items-center gap-6 text-xs">
-              <Link href="/help" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+              <Link href="/help" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors cursor-pointer">
                 Help
               </Link>
-              <Link href="/contact" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+              <Link href="/contact" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors cursor-pointer">
                 Contact
               </Link>
-              <Link href="/privacy" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors">
+              <Link href="/privacy" className="text-neutral-600 dark:text-neutral-400 hover:text-primary transition-colors cursor-pointer">
                 Privacy
               </Link>
             </div>
@@ -130,12 +130,12 @@ export default function Footer({ variant = 'default' }: FooterProps) {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+                className="flex-1 px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm cursor-text"
                 required
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-1 text-sm"
+                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-1 text-sm cursor-pointer"
               >
                 Subscribe
                 <FiArrowRight className="h-3 w-3" />
@@ -181,7 +181,7 @@ export default function Footer({ variant = 'default' }: FooterProps) {
                 <Link
                   key={social.name}
                   href={social.url}
-                  className="p-2 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-primary hover:text-white transition-colors"
+                  className="p-2 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-primary hover:text-white transition-colors cursor-pointer"
                   aria-label={social.name}
                 >
                   <social.icon className="h-4 w-4" />
@@ -198,7 +198,7 @@ export default function Footer({ variant = 'default' }: FooterProps) {
                 <Link
                   key={link.name}
                   href={link.url}
-                  className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors block py-1"
+                  className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors block py-1 cursor-pointer"
                 >
                   {link.name}
                 </Link>

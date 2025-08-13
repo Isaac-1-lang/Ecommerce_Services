@@ -290,7 +290,7 @@ export default function DealsPage() {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-center group ${
+                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-center group cursor-pointer ${
                     isSelected
                       ? 'border-primary bg-primary text-white shadow-soft'
                       : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-primary/50 hover:shadow-soft'
@@ -321,7 +321,7 @@ export default function DealsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+              className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm cursor-pointer"
             >
               <option value="discount">Highest Discount</option>
               <option value="price">Lowest Price</option>
@@ -338,7 +338,7 @@ export default function DealsPage() {
             return (
               <div
                 key={deal.id}
-                className="bg-white dark:bg-neutral-800 rounded-xl shadow-soft overflow-hidden hover:shadow-soft-lg transition-all duration-300 group"
+                className="bg-white dark:bg-neutral-800 rounded-xl shadow-soft overflow-hidden hover:shadow-soft-lg transition-all duration-300 group cursor-pointer"
               >
                 {/* Product Image */}
                 <div className="relative">
@@ -368,7 +368,7 @@ export default function DealsPage() {
                   {/* Wishlist Button */}
                   <button
                     onClick={() => toggleWishlist(deal.id)}
-                    className="absolute top-3 right-3 p-2 bg-white/90 dark:bg-neutral-800/90 rounded-full hover:bg-white dark:hover:bg-neutral-800 transition-colors"
+                    className="absolute top-3 right-3 p-2 bg-white/90 dark:bg-neutral-800/90 rounded-full hover:bg-white dark:hover:bg-neutral-800 transition-colors cursor-pointer"
                   >
                     <FiHeart className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                   </button>
@@ -420,14 +420,14 @@ export default function DealsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => addToCart(deal.id)}
-                      className="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 bg-primary text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <FiShoppingCart className="h-4 w-4" />
                       Add to Cart
                     </button>
                     <Link
                       href={`/products/${deal.id}`}
-                      className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                      className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
                     >
                       View
                     </Link>
@@ -453,7 +453,7 @@ export default function DealsPage() {
                 setSelectedCategory('all');
                 setSortBy('discount');
               }}
-              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors"
+              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
@@ -473,9 +473,9 @@ export default function DealsPage() {
             <input
               type="email"
               placeholder="Enter your email address"
-              className="flex-1 px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="flex-1 px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer"
             />
-            <button className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors">
+            <button className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors cursor-pointer">
               Subscribe
             </button>
           </div>
