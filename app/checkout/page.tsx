@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FiCheck, FiArrowRight, FiUser, FiUserPlus } from "react-icons/fi";
+import { FiCheck, FiArrowRight, FiUser, FiUserPlus, FiCreditCard, FiShield } from "react-icons/fi";
 import CheckoutSteps, { CheckoutStep } from "../../components/CheckoutSteps";
 import AddressForm from "../../components/AddressForm";
-import PaymentForm from "../../components/PaymentForm";
+import StripePaymentForm from "../../components/StripePaymentForm";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useCartStore } from "../../features/cart/store";
 import { useCheckoutStore } from "../../features/checkout/store";
@@ -17,17 +17,30 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showGuestOptions, setShowGuestOptions] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   
-  const { items, totalPrice, totalQuantity } = useCartStore();
+  const { items, totalPrice, totalQuantity, clearCart } = useCartStore();
   const { 
     shippingInfo, 
     paymentInfo, 
+    orderSummary,
     setShippingInfo, 
     setPaymentInfo,
-    clearCheckout 
+    setOrderSummary,
+    clearCheckout,
+    calculateTax,
+    updateShippingCost
   } = useCheckoutStore();
   
   const { user } = useAuthStore();
+
+  // Calculate order summary when items change
+  useEffect(() => {
+    const subtotal = totalPrice;
+    const shipping = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
+    calculateTax(subtotal);
+    updateShippingCost(shipping);
+  }, [totalPrice, calculateTax, updateShippingCost]);
 
   if (items.length === 0) {
     router.push("/cart");
@@ -50,6 +63,16 @@ export default function CheckoutPage() {
     }
   };
 
+  const handlePaymentSuccess = (paymentIntentId: string) => {
+    setPaymentInfo({ ...paymentInfo, stripePaymentIntentId: paymentIntentId });
+    setPaymentError(null);
+    handleNext();
+  };
+
+  const handlePaymentError = (error: string) => {
+    setPaymentError(error);
+  };
+
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     try {
@@ -57,322 +80,253 @@ export default function CheckoutPage() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Clear cart and checkout data
+      clearCart();
       clearCheckout();
       
       // Redirect to success page
       router.push("/checkout/success");
     } catch (error) {
-      console.error("Order failed:", error);
-      router.push("/checkout/failure");
+      console.error("Order placement failed:", error);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const shippingCost = totalPrice >= 50 ? 0 : 5.99;
-  const tax = totalPrice * 0.08;
-  const total = totalPrice + shippingCost + tax;
+  const breadcrumbs = [
+    { name: "Home", href: "/" },
+    { name: "Cart", href: "/cart" },
+    { name: "Checkout", href: "/checkout" },
+  ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <Breadcrumbs 
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Cart", href: "/cart" },
-          { label: "Checkout", href: "/checkout" }
-        ]} 
-      />
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumbs items={breadcrumbs} />
+        
+        <div className="mt-8">
+          <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
+            Checkout
+          </h1>
+          <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+            Complete your purchase securely
+          </p>
+        </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Checkout
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Complete your purchase
-        </p>
-      </div>
-
-      {/* Guest vs Authenticated User Section */}
-      {!user && !showGuestOptions && (
-        <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-6">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              How would you like to checkout?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button
-                onClick={() => setShowGuestOptions(true)}
-                className="p-6 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-primary transition-colors text-left"
-              >
-                <FiUser className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+        {/* Guest Checkout Options */}
+        {!user && !showGuestOptions && (
+          <div className="mt-8 bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
+                How would you like to checkout?
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => router.push("/auth/login?redirect=/checkout")}
+                  className="flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors"
+                >
+                  <FiUser className="h-5 w-5" />
+                  Sign In to Checkout
+                </button>
+                <button
+                  onClick={() => setShowGuestOptions(true)}
+                  className="flex items-center justify-center gap-2 bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 px-6 py-3 rounded-lg font-medium hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+                >
+                  <FiUserPlus className="h-5 w-5" />
                   Continue as Guest
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Checkout without creating an account. You can create an account later to track your orders.
-                </p>
-              </button>
-              <button
-                onClick={() => router.push("/auth/login?redirect=/checkout")}
-                className="p-6 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-primary transition-colors text-left"
-              >
-                <FiUserPlus className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                  Sign In / Create Account
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Sign in to your account or create a new one to save your information and track orders.
-                </p>
-              </button>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {(!user && !showGuestOptions) ? null : (
-        <>
-          <CheckoutSteps step={currentStep} />
+        {(!user && !showGuestOptions) ? null : (
+          <>
+            <CheckoutSteps step={currentStep} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
-                {currentStep === "address" && (
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                      Shipping Information
-                    </h2>
-                    <AddressForm
-                      data={shippingInfo}
-                      onChange={setShippingInfo}
-                      onSubmit={handleNext}
-                    />
-                  </div>
-                )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700">
+                  {currentStep === "address" && (
+                    <div className="p-6">
+                      <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-6">
+                        Shipping Information
+                      </h2>
+                      <AddressForm
+                        data={shippingInfo}
+                        onChange={setShippingInfo}
+                        onSubmit={handleNext}
+                      />
+                    </div>
+                  )}
 
-                {currentStep === "payment" && (
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                      Payment Details
-                    </h2>
-                    <PaymentForm
-                      data={paymentInfo}
-                      onChange={setPaymentInfo}
-                      onSubmit={handleNext}
-                    />
-                  </div>
-                )}
+                  {currentStep === "payment" && (
+                    <div className="p-6">
+                      <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-6">
+                        Payment Details
+                      </h2>
+                      <StripePaymentForm
+                        amount={orderSummary.total}
+                        currency="usd"
+                        onSuccess={handlePaymentSuccess}
+                        onError={handlePaymentError}
+                      />
+                      {paymentError && (
+                        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                          <p className="text-red-700 dark:text-red-300">{paymentError}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                {currentStep === "review" && (
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                      Order Review
-                    </h2>
-                    
-                    {/* User Information */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                        {user ? "Account Information" : "Guest Checkout"}
-                      </h3>
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        {user ? (
-                          <div>
-                            <p className="text-gray-900 dark:text-white">
-                              <strong>Name:</strong> {user.name}
-                            </p>
-                            <p className="text-gray-600 dark:text-gray-400">
-                              <strong>Email:</strong> {user.email}
-                            </p>
+                  {currentStep === "review" && (
+                    <div className="p-6">
+                      <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-6">
+                        Order Review
+                      </h2>
+                      
+                      {/* Shipping Information */}
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-3">
+                          Shipping Address
+                        </h3>
+                        <div className="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                          <p className="text-neutral-800 dark:text-neutral-200">
+                            {shippingInfo.firstName} {shippingInfo.lastName}
+                          </p>
+                          <p className="text-neutral-600 dark:text-neutral-400">
+                            {shippingInfo.address}
+                          </p>
+                          <p className="text-neutral-600 dark:text-neutral-400">
+                            {shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}
+                          </p>
+                          <p className="text-neutral-600 dark:text-neutral-400">
+                            {shippingInfo.country}
+                          </p>
+                          <p className="text-neutral-600 dark:text-neutral-400">
+                            {shippingInfo.phone}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Payment Information */}
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-3">
+                          Payment Method
+                        </h3>
+                        <div className="bg-neutral-50 dark:bg-neutral-700 rounded-lg p-4">
+                          <div className="flex items-center gap-2">
+                            <FiCreditCard className="h-5 w-5 text-primary" />
+                            <span className="text-neutral-800 dark:text-neutral-200">
+                              Stripe Payment
+                            </span>
                           </div>
-                        ) : (
-                          <div>
-                            <p className="text-gray-600 dark:text-gray-400">
-                              You&apos;re checking out as a guest. Consider creating an account to track your orders and save your information for future purchases.
-                            </p>
-                            <button
-                              onClick={() => router.push("/auth/register?redirect=/checkout")}
-                              className="mt-3 text-primary hover:text-primary/80 font-medium"
-                            >
-                              Create Account
-                            </button>
-                          </div>
-                        )}
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                            Payment ID: {paymentInfo.stripePaymentIntentId}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    {/* Shipping Information Review */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                        Shipping Address
-                      </h3>
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <p className="text-gray-900 dark:text-white">
-                          {shippingInfo.firstName} {shippingInfo.lastName}
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-400">
-                          {shippingInfo.address}
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-400">
-                          {shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-400">
-                          {shippingInfo.phone}
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* Payment Information Review */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                        Payment Method
-                      </h3>
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <p className="text-gray-900 dark:text-white">
-                          {paymentInfo.cardType} ending in {paymentInfo.cardNumber.slice(-4)}
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-400">
-                          Expires {paymentInfo.expiryMonth}/{paymentInfo.expiryYear}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Order Items Review */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                        Order Items
-                      </h3>
-                      <div className="space-y-3">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-600">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gray-100 rounded-md"></div>
-                              <div>
-                                <p className="text-gray-900 dark:text-white font-medium">
-                                  {item.name}
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  Qty: {item.quantity}
-                                </p>
+                      {/* Order Items */}
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-3">
+                          Order Items
+                        </h3>
+                        <div className="space-y-3">
+                          {items.map((item) => (
+                            <div key={item.id} className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                                <div>
+                                  <p className="font-medium text-neutral-800 dark:text-neutral-200">
+                                    {item.name}
+                                  </p>
+                                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                    Qty: {item.quantity}
+                                  </p>
+                                </div>
                               </div>
+                              <p className="font-medium text-neutral-800 dark:text-neutral-200">
+                                {formatPrice(item.price * item.quantity)}
+                              </p>
                             </div>
-                            <p className="text-gray-900 dark:text-white font-medium">
-                              {formatPrice(item.price * item.quantity)}
-                            </p>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleBack}
-                        className="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        Back
-                      </button>
+                      {/* Place Order Button */}
                       <button
                         onClick={handlePlaceOrder}
                         disabled={isProcessing}
-                        className="flex-1 bg-primary text-white py-3 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                       >
                         {isProcessing ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            Processing...
+                            Processing Order...
                           </>
                         ) : (
                           <>
+                            <FiCheck className="h-5 w-5" />
                             Place Order
-                            <FiArrowRight className="h-4 w-4" />
                           </>
                         )}
                       </button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
 
-                {/* Navigation Buttons */}
-                {currentStep !== "review" && (
-                  <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between">
-                      {currentStep !== "address" && (
-                        <button
-                          onClick={handleBack}
-                          className="border border-gray-300 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          Back
-                        </button>
-                      )}
-                      <div className="ml-auto">
-                        <button
-                          onClick={handleNext}
-                          className="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2"
-                        >
-                          Continue
-                          <FiArrowRight className="h-4 w-4" />
-                        </button>
+              {/* Order Summary Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 sticky top-8">
+                  <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
+                    Order Summary
+                  </h3>
+                  
+                  <div className="space-y-3 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-neutral-600 dark:text-neutral-400">Subtotal</span>
+                      <span className="text-neutral-800 dark:text-neutral-200">
+                        {formatPrice(orderSummary.subtotal)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-neutral-600 dark:text-neutral-400">Shipping</span>
+                      <span className="text-neutral-800 dark:text-neutral-200">
+                        {orderSummary.shipping === 0 ? "Free" : formatPrice(orderSummary.shipping)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-neutral-600 dark:text-neutral-400">Tax</span>
+                      <span className="text-neutral-800 dark:text-neutral-200">
+                        {formatPrice(orderSummary.tax)}
+                      </span>
+                    </div>
+                    <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
+                      <div className="flex justify-between font-semibold">
+                        <span className="text-neutral-800 dark:text-neutral-200">Total</span>
+                        <span className="text-primary text-lg">
+                          {formatPrice(orderSummary.total)}
+                        </span>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-6 sticky top-4">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                  Order Summary
-                </h2>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      Subtotal ({totalQuantity} {totalQuantity === 1 ? "item" : "items"})
-                    </span>
-                    <span className="text-gray-900 dark:text-white">
-                      {formatPrice(totalPrice)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Shipping</span>
-                    <span className="text-gray-900 dark:text-white">
-                      {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                    <span className="text-gray-900 dark:text-white">
-                      {formatPrice(tax)}
-                    </span>
-                  </div>
-
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between text-base font-medium">
-                      <span className="text-gray-900 dark:text-white">Total</span>
-                      <span className="text-gray-900 dark:text-white">
-                        {formatPrice(total)}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                    <FiShield className="h-4 w-4" />
+                    <span>Secure checkout powered by Stripe</span>
                   </div>
                 </div>
-
-                {shippingCost === 0 && (
-                  <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      <FiCheck className="inline h-4 w-4 mr-1" />
-                      Free shipping on orders over $50
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

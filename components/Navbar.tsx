@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { 
   FiMoon, 
   FiSun, 
@@ -12,23 +13,35 @@ import {
   FiMenu, 
   FiX,
   FiChevronDown,
-  FiMapPin
+  FiMapPin,
+  FiLogOut
 } from "react-icons/fi";
 import SearchBar from "./SearchBar";
 import { useCartStore } from "../features/cart/store";
+import { useAuthStore } from "../features/auth/store";
 import { PRODUCT_CATEGORIES, SITE_CONFIG } from "../constants";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isPortal = pathname?.startsWith("/admin") || pathname?.startsWith("/employee") || pathname?.startsWith("/delivery");
+  if (isPortal) return null;
+
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const cartItemCount = useCartStore((s) => s.totalQuantity);
+  const { user, logout } = useAuthStore();
 
   useEffect(() => setMounted(true), []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
+
+  const handleLogout = () => {
+    logout();
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-200 dark:border-neutral-700 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-soft">
@@ -49,23 +62,48 @@ export default function Navbar() {
               <Link href="/contact" className="hover:text-primary-50 transition-colors cursor-pointer">
                 Contact Us
               </Link>
-               <span className="text-primary-200">|</span>
-              <Link href="/admin" className="hover:text-primary-50 transition-colors cursor-pointer">
-                Admin
-              </Link>
-              <Link href="/employee" className="hover:text-primary-50 transition-colors cursor-pointer">
-                Employee
-              </Link>
-              <Link href="/delivery" className="hover:text-primary-50 transition-colors cursor-pointer">
-                Delivery
-              </Link>
+              {user && (
+                <>
+                  <span className="text-primary-200">|</span>
+                  {user.role === 'admin' && (
+                    <Link href="/admin" className="hover:text-primary-50 transition-colors cursor-pointer">
+                      Admin Panel
+                    </Link>
+                  )}
+                  {user.role === 'employee' && (
+                    <Link href="/employee" className="hover:text-primary-50 transition-colors cursor-pointer">
+                      Employee Portal
+                    </Link>
+                  )}
+                  {user.role === 'delivery' && (
+                    <Link href="/delivery" className="hover:text-primary-50 transition-colors cursor-pointer">
+                      Delivery Portal
+                    </Link>
+                  )}
+                </>
+              )}
               <span className="text-primary-200">|</span>
-              <Link href="/auth/login" className="hover:text-primary-50 transition-colors cursor-pointer">
-                Sign In
-              </Link>
-              <Link href="/auth/register" className="hover:text-primary-50 transition-colors cursor-pointer">
-                Sign Up
-              </Link>
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-primary-100">Welcome, {user.name}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="hover:text-primary-50 transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <FiLogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="hover:text-primary-50 transition-colors cursor-pointer">
+                    Sign In
+                  </Link>
+                  <Link href="/auth/register" className="hover:text-primary-50 transition-colors cursor-pointer">
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -174,7 +212,7 @@ export default function Navbar() {
 
             {/* Account */}
             <Link 
-              href="/account" 
+              href={user ? "/account" : "/auth/login"} 
               aria-label="Account" 
               className="p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
             >
@@ -219,6 +257,52 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-neutral-200 dark:border-neutral-700 bg-background">
           <div className="px-4 py-4 space-y-4">
+            {/* User Info */}
+            {user && (
+              <div className="pb-4 border-b border-neutral-200 dark:border-neutral-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-neutral-800 dark:text-neutral-200">{user.name}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary"
+                  >
+                    <FiLogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+                {user.role === 'admin' && (
+                  <Link
+                    href="/admin"
+                    className="block mt-2 text-sm text-primary hover:text-primary-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                {user.role === 'employee' && (
+                  <Link
+                    href="/employee"
+                    className="block mt-2 text-sm text-primary hover:text-primary-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Employee Portal
+                  </Link>
+                )}
+                {user.role === 'delivery' && (
+                  <Link
+                    href="/delivery"
+                    className="block mt-2 text-sm text-primary hover:text-primary-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Delivery Portal
+                  </Link>
+                )}
+              </div>
+            )}
+
             <nav className="space-y-2">
               <Link
                 href="/products"

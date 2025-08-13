@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Providers from './providers';
 import { ToastContainer } from '../components/ui/ToastContainer';
+import PortalLayout from '../components/PortalLayout';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -47,13 +48,15 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <Providers>
           <ToastContainer>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer variant="default" />
-            </div>
+            <PortalLayout>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer variant="default" />
+              </div>
+            </PortalLayout>
           </ToastContainer>
         </Providers>
       </body>
