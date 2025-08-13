@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FiArrowRight, FiMapPin, FiPhone, FiMail, FiTwitter, FiFacebook, FiInstagram, FiLinkedin, FiHeart, FiShield, FiTruck, FiClock } from "react-icons/fi";
+import { FiArrowRight, FiMapPin, FiPhone, FiMail, FiTwitter, FiFacebook, FiInstagram, FiLinkedin } from "react-icons/fi";
 import { SITE_CONFIG } from "../constants";
 
 interface FooterProps {
@@ -35,6 +35,16 @@ export default function Footer({ variant = 'default' }: FooterProps) {
     { name: 'Help Center', url: '/help' },
     { name: 'Privacy Policy', url: '/privacy' },
     { name: 'Terms of Service', url: '/terms' },
+    { name: 'Shipping Info', url: '/shipping' },
+    { name: 'Deals', url: '/deals' },
+    { name: 'New Arrivals', url: '/new-arrivals' },
+    { name: 'Brands', url: '/brands' },
+  ];
+
+  const customerServiceLinks = [
+    { name: 'Help Center', url: '/help' },
+    { name: 'Contact Us', url: '/contact' },
+    { name: 'Returns', url: '/returns' },
     { name: 'Shipping Info', url: '/shipping' },
   ];
 
@@ -112,43 +122,10 @@ export default function Footer({ variant = 'default' }: FooterProps) {
 
   // Full footer for main pages
   return (
-    <footer className={`${getFooterStyle()} mt-auto`}>
-      <div className={`mx-auto ${getContainerStyle()}`}>
-        
-        {/* Newsletter Section */}
-        <div className="py-8 border-b border-neutral-200 dark:border-neutral-700">
-          <div className="text-center max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100 mb-2">
-              Stay Updated
-            </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-              Get updates and exclusive offers delivered to your inbox.
-            </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm cursor-text"
-                required
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-1 text-sm cursor-pointer"
-              >
-                Subscribe
-                <FiArrowRight className="h-3 w-3" />
-              </button>
-            </form>
-            {isSubscribed && (
-              <p className="text-success text-xs mt-2">Thank you for subscribing!</p>
-            )}
-          </div>
-        </div>
-
+    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t border-neutral-200 dark:border-neutral-700">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         {/* Main Footer Content */}
-        <div className="py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           {/* Company Info */}
           <div className="text-center md:text-left">
@@ -206,30 +183,52 @@ export default function Footer({ variant = 'default' }: FooterProps) {
             </div>
           </div>
 
-          {/* Business Hours & Status */}
+          {/* Customer Service */}
           <div className="text-center md:text-left">
-            <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-4 text-sm">Store Info</h4>
-            <div className="space-y-2">
-              <div>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Business Hours</p>
-                <p className="text-xs text-neutral-700 dark:text-neutral-300">{SITE_CONFIG.businessHours}</p>
-              </div>
-              <div>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">Status</p>
-                <div className="flex items-center justify-center md:justify-start gap-2">
-                  <div className="w-2 h-2 bg-success rounded-full"></div>
-                  <span className="text-xs text-neutral-700 dark:text-neutral-300">Open</span>
-                </div>
-              </div>
-            </div>
+            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4">
+              Customer Service
+            </h4>
+            <ul className="space-y-2 text-neutral-700 dark:text-neutral-300">
+              {customerServiceLinks.map((link) => (
+                <li key={link.name}>
+                  <Link href={link.url} className="hover:text-primary transition-colors text-sm">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div className="text-center md:text-left">
+            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4">
+              Subscribe
+            </h4>
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-600 bg-background text-neutral-800 dark:text-neutral-200 text-sm"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-primary text-primary-foreground px-3 py-2 rounded-md font-semibold hover:opacity-90 transition text-sm"
+              >
+                Subscribe
+              </button>
+            </form>
+            {isSubscribed && (
+              <p className="text-success text-xs mt-2">Thank you for subscribing!</p>
+            )}
           </div>
         </div>
 
-        {/* Bottom Footer */}
-        <div className="py-4 border-t border-neutral-200 dark:border-neutral-700">
-          <div className="text-center text-xs text-neutral-600 dark:text-neutral-400">
-            © {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
-          </div>
+        {/* Bottom Bar */}
+        <div className="mt-8 border-t border-neutral-200 dark:border-neutral-700 pt-6 text-sm text-center text-neutral-500 dark:text-neutral-400">
+          &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
         </div>
       </div>
     </footer>
