@@ -21,6 +21,8 @@ export default function CartItem({
           <Image
             src={item.image} 
             alt={item.name} 
+            width={64}
+            height={64}
             className="h-full w-full object-cover rounded-lg"
           />
         )}

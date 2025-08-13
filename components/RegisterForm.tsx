@@ -107,6 +107,8 @@ export default function RegisterForm() {
                     <Image
                       src={previewUrl} 
                       alt="Profile preview" 
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
                     />
                   ) : (

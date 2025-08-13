@@ -231,8 +231,8 @@ export default function HomePage() {
             />
           ))}
         </div>
-      </div>
-    </section>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
