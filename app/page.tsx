@@ -115,86 +115,40 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Slider Section */}
-      <section className="relative h-[600px] overflow-hidden">
-        {/* Slides */}
-        <div className="relative h-full">
-          {heroSlides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  className="object-cover"
-                  priority={index === 0}
-                  sizes="100vw"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/40" />
-              </div>
-              
-              {/* Content */}
-              <div className="relative h-full flex items-center">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-white">
-                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-                    {slide.title}
-                  </h1>
-                  <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 animate-fade-in-delay">
-                    {slide.subtitle}
-                  </p>
-                  <div className="animate-fade-in-delay-2">
-                    <Link
-                      href={slide.link}
-                      className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-lg"
-                    >
-                      {slide.cta}
-                      <FiArrowRight className="h-5 w-5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation Arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
-          aria-label="Previous slide"
+      {/* Hero Section */}
+      <section
+  className="relative text-white bg-cover bg-center bg-no-repeat"
+  style={{
+    backgroundImage: "url('/back.png')"
+  }}
+>
+  <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+        Welcome to Now
+      </h1>
+      <p className="mt-6 text-xl max-w-3xl mx-auto">
+        Discover amazing products at unbeatable prices. Shop the latest trends
+        and find everything you need in one place.
+      </p>
+      <div className="mt-10 flex items-center justify-center gap-4">
+        <Link
+          href="/products"
+          className="bg-white text-primary px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors flex items-center gap-2"
         >
-          <FiChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
-          aria-label="Next slide"
+          Shop Now
+          <FiArrowRight className="h-4 w-4" />
+        </Link>
+        <Link
+          href="/auth/register"
+          className="border border-white text-white px-8 py-3 rounded-md font-medium hover:bg-white hover:text-primary transition-colors"
         >
-          <FiChevronRight className="h-6 w-6" />
-        </button>
-
-        {/* Dots Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
-                index === currentSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </section>
-
+          Sign Up
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
