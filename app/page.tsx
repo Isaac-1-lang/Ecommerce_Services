@@ -178,22 +178,22 @@ export default function HomePage() {
               
               {/* Content */}
               <div className="relative h-full flex items-center">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center text-white">
-                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in text-white drop-shadow-lg">
                     {slide.title}
                   </h1>
-                  <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 animate-fade-in-delay">
+                  <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 animate-fade-in-delay text-white drop-shadow-md">
                     {slide.subtitle}
                   </p>
-                  <div className="animate-fade-in-delay-2">
-                    <Link
-                      href={slide.link}
-                      className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-lg"
-                    >
-                      {slide.cta}
-                      <FiArrowRight className="h-5 w-5" />
-                    </Link>
-                  </div>
+                                     <div className="animate-fade-in-delay-2">
+                     <Link
+                       href={slide.link}
+                       className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 text-lg shadow-2xl border-2 border-white/20 backdrop-blur-sm"
+                     >
+                       {slide.cta}
+                       <FiArrowRight className="h-5 w-5" />
+                     </Link>
+                   </div>
                 </div>
               </div>
             </div>
