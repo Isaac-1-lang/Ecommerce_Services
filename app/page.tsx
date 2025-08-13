@@ -54,7 +54,7 @@ const testimonials = [
     role: "Fashion Enthusiast",
     content: "Amazing quality products and fast delivery. I love shopping here!",
     rating: 5,
-    avatar: "https://unsplash.com/photos/a-woman-stands-with-luggage-ready-to-travel-4j8j6h7YV2g"
+    avatar: ""
   },
   {
     id: 2,
@@ -62,7 +62,7 @@ const testimonials = [
     role: "Tech Reviewer",
     content: "Best prices for electronics and excellent customer service. Highly recommended!",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+    avatar: ""
   },
   {
     id: 3,
@@ -70,18 +70,18 @@ const testimonials = [
     role: "Home Decor Blogger",
     content: "Found perfect items for my home renovation. The quality exceeded my expectations.",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face"
+    avatar: ""
   }
 ];
 
 // Brands data
 const brands = [
-  { name: "Nike", logo: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&h=60&fit=crop&crop=center" },
-  { name: "Apple", logo: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=120&h=60&fit=crop&crop=center" },
-  { name: "Samsung", logo: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=120&h=60&fit=crop&crop=center" },
-  { name: "Adidas", logo: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=120&h=60&fit=crop&crop=center" },
-  { name: "Sony", logo: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=120&h=60&fit=crop&crop=center" },
-  { name: "LG", logo: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=120&h=60&fit=crop&crop=center" }
+  { name: "Nike", logo: "" },
+  { name: "Apple", logo: "" },
+  { name: "Samsung", logo: "" },
+  { name: "Adidas", logo: "" },
+  { name: "Sony", logo: "" },
+  { name: "LG", logo: "" }
 ];
 
 export default function HomePage() {
@@ -400,17 +400,17 @@ export default function HomePage() {
             {[
               { 
                 name: "Electronics", 
-                image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&crop=center", 
+                image: "", 
                 href: "/products?category=electronics" 
               },
               { 
                 name: "Fashion", 
-                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop&crop=center", 
+                image: "", 
                 href: "/products?category=fashion" 
               },
               { 
                 name: "Home & Garden", 
-                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop&crop=center", 
+                image: "", 
                 href: "/products?category=home-garden" 
               },
             ].map((category) => (

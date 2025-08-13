@@ -13,7 +13,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
-      <Footer variant="admin" />
     </div>
   );
 }
