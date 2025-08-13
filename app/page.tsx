@@ -206,31 +206,33 @@ export default function HomePage() {
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
           aria-label="Previous slide"
         >
-          <FiChevronLeft className="h-6 w-6" />
+          <FiChevronLeft className="h-4 w-4" />
         </button>
         <button
           onClick={nextSlide}
           className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-colors cursor-pointer"
           aria-label="Next slide"
         >
-          <FiChevronRight className="h-6 w-6" />
+          <FiChevronRight className="h-4 w-4" />
         </button>
 
-        {/* Dots Indicator */}
+        {/* Slide Indicators */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
-                index === currentSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentSlide
+                  ? 'bg-white'
+                  : 'bg-white/50 hover:bg-white/75'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
-      </section>
-
+      </div>
+    </section>
       {/* Features Section */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
