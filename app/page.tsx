@@ -54,7 +54,7 @@ const testimonials = [
     role: "Fashion Enthusiast",
     content: "Amazing quality products and fast delivery. I love shopping here!",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face"
+    avatar: "https://unsplash.com/photos/a-woman-stands-with-luggage-ready-to-travel-4j8j6h7YV2g"
   },
   {
     id: 2,
