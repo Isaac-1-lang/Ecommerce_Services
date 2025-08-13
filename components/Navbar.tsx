@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { 
   FiMoon, 
   FiSun, 
@@ -21,6 +22,10 @@ import { useAuthStore } from "../features/auth/store";
 import { PRODUCT_CATEGORIES, SITE_CONFIG } from "../constants";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isPortal = pathname?.startsWith("/admin") || pathname?.startsWith("/employee") || pathname?.startsWith("/delivery");
+  if (isPortal) return null;
+
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
