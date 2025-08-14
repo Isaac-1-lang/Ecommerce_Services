@@ -117,52 +117,6 @@ export default function Navbar() {
             <Link href="/" className="text-2xl font-bold text-neutral-800 dark:text-white hover:text-primary transition-colors">
               {SITE_CONFIG.name}
             </Link>
-            
-            {/* Categories Dropdown */}
-            <div className="relative hidden lg:block">
-              <button
-                onClick={toggleCategories}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors rounded-md hover:bg-highlight cursor-pointer"
-              >
-                <span>Categories</span>
-                <FiChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isCategoriesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-soft-lg p-4 z-50">
-                  <div className="grid grid-cols-2 gap-4">
-                    {PRODUCT_CATEGORIES.filter(cat => cat.featured).map((category) => (
-                      <Link
-                        key={category.id}
-                        href={`/products?category=${category.id}`}
-                        className="flex items-center gap-3 p-3 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
-                        onClick={() => setIsCategoriesOpen(false)}
-                      >
-                        <span className="text-xl">{category.icon}</span>
-                        <div>
-                          <div className="font-medium text-neutral-800 dark:text-neutral-100 group-hover:text-primary transition-colors">
-                            {category.name}
-                          </div>
-                           <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                            {category.description}
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                   <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-                    <Link
-                      href="/products"
-                      className="block text-center text-primary hover:text-primary-600 font-medium transition-colors cursor-pointer"
-                      onClick={() => setIsCategoriesOpen(false)}
-                    >
-                      View All Categories
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm">
               <Link href="/products" className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary transition-colors cursor-pointer">
