@@ -31,18 +31,21 @@ export interface ResetPasswordRequest {
 
 export interface JavaAuthResponse {
   success: boolean;
+  data?: any;
+  message?: string;
+  error?: string;
+}
+
+export interface JavaLoginResponse {
+  success: boolean;
   data?: {
-    user: {
-      id: string;
-      name: string;
-      username: string;
-      email: string;
-      profilePicture?: string;
-      role: string;
-      createdAt: string;
-      updatedAt: string;
-    };
     token: string;
+    userName: string;
+    userEmail: string;
+    message: string;
+    userId: string;
+    userPhone: string;
+    role: string;
   };
   message?: string;
   error?: string;
@@ -51,28 +54,28 @@ export interface JavaAuthResponse {
 export const authService = {
   async login({ email, password }: LoginRequest): Promise<{ user: AuthUser; token: string }> {
     try {
-      const response = await api.post<JavaAuthResponse>('/v1/auth/users/login', {
+      const response = await api.post<JavaLoginResponse>('/v1/auth/users/login', {
         email,
         password
       });
 
       if (response.data.success && response.data.data) {
-        const { user, token } = response.data.data;
+        const loginData = response.data.data;
         
         const authUser: AuthUser = {
-          id: user.id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          profilePicture: user.profilePicture || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-          role: user.role as any
+          id: loginData.userId,
+          name: loginData.userName,
+          username: loginData.userName.split(' ')[0], // Use first name as username
+          email: loginData.userEmail,
+          profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          role: loginData.role as any
         };
 
         // Store token and user data
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('authToken', loginData.token);
         localStorage.setItem('user', JSON.stringify(authUser));
 
-        return { user: authUser, token };
+        return { user: authUser, token: loginData.token };
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
@@ -189,8 +192,8 @@ export const authService = {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (response.data.success && response.data.data?.user) {
-        const user = response.data.data.user;
+      if (response.data.success && response.data.data) {
+        const user = response.data.data;
         const authUser: AuthUser = {
           id: user.id,
           name: user.name,

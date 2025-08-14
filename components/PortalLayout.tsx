@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 interface PortalLayoutProps {
   children: ReactNode;
@@ -10,7 +12,7 @@ interface PortalLayoutProps {
 export default function PortalLayout({ children }: PortalLayoutProps) {
   const pathname = usePathname();
   
-  // Define portal paths that should hide the footer
+  // Define portal paths that should hide the footer and navbar
   const portalPaths = ["/admin", "/employee", "/delivery"];
   const isPortal = portalPaths.some(path => pathname?.startsWith(path));
 
@@ -25,6 +27,14 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     );
   }
 
-  // For regular pages, render normally with footer and navbar
-  return <>{children}</>;
+  // For regular pages, render with navbar and footer
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer variant="default" />
+    </div>
+  );
 }
