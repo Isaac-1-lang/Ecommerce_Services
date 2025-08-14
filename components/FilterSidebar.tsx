@@ -98,16 +98,16 @@ export default function FilterSidebar({
   };
 
   return (
-    <aside className={`w-full md:w-64 shrink-0 space-y-6 bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700 ${className}`}>
+    <aside className={`w-full lg:w-64 shrink-0 space-y-4 lg:space-y-6 bg-white dark:bg-neutral-800 p-4 lg:p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
-          <FiFilter className="h-5 w-5" />
+        <h3 className="text-base lg:text-lg font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
+          <FiFilter className="h-4 w-4 lg:h-5 lg:w-5" />
           Filters
         </h3>
         <button
           onClick={handleClearFilters}
-          className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
+          className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors mobile-touch-target"
         >
           Clear All
         </button>
@@ -115,19 +115,19 @@ export default function FilterSidebar({
 
       {/* Search */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Search</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Search</h4>
         <input
           type="text"
           placeholder="Search products..."
           value={localFilters.searchKeyword}
           onChange={(e) => handleFilterChange({ searchKeyword: e.target.value })}
-          className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400"
+          className="w-full px-3 py-2 lg:py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400 mobile-touch-target"
         />
       </div>
 
       {/* Categories */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Categories</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Categories</h4>
         <CategoryFilter 
           categories={categories}
           selectedCategory={localFilters.category}
@@ -137,7 +137,7 @@ export default function FilterSidebar({
 
       {/* Price Range */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Price Range</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Price Range</h4>
         <div className="flex items-center gap-2">
           <input 
             type="number" 
@@ -146,9 +146,9 @@ export default function FilterSidebar({
             onChange={(e) => handleFilterChange({ 
               priceRange: [Number(e.target.value) || 0, localFilters.priceRange[1]] 
             })}
-            className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200" 
+            className="flex-1 lg:w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 mobile-touch-target" 
           />
-          <span className="text-neutral-500">-</span>
+          <span className="text-neutral-500 text-sm">-</span>
           <input 
             type="number" 
             placeholder="Max" 
@@ -156,17 +156,17 @@ export default function FilterSidebar({
             onChange={(e) => handleFilterChange({ 
               priceRange: [localFilters.priceRange[0], Number(e.target.value) || 1000] 
             })}
-            className="w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200" 
+            className="flex-1 lg:w-20 px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 mobile-touch-target" 
           />
         </div>
       </div>
 
       {/* Rating */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Rating</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Rating</h4>
         <div className="space-y-2">
           {[4, 3, 2, 1].map((rating) => (
-            <label key={rating} className="flex items-center gap-2 cursor-pointer">
+            <label key={rating} className="flex items-center gap-2 cursor-pointer mobile-touch-target">
               <input 
                 type="radio" 
                 name="rating"
@@ -178,11 +178,11 @@ export default function FilterSidebar({
                 {[...Array(5)].map((_, i) => (
                   <FiStar 
                     key={i} 
-                    className={`h-4 w-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-neutral-300'}`} 
+                    className={`h-3 w-3 lg:h-4 lg:w-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-neutral-300'}`} 
                   />
                 ))}
               </div>
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">{rating}+</span>
+              <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">{rating}+</span>
             </label>
           ))}
         </div>
@@ -190,17 +190,17 @@ export default function FilterSidebar({
 
       {/* Brands */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Brands</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Brands</h4>
         <div className="space-y-2 max-h-32 overflow-y-auto">
           {mockBrands.map((brand) => (
-            <label key={brand} className="flex items-center gap-2 cursor-pointer">
+            <label key={brand} className="flex items-center gap-2 cursor-pointer mobile-touch-target">
               <input 
                 type="checkbox" 
                 checked={localFilters.brand.includes(brand)}
                 onChange={() => handleBrandToggle(brand)}
                 className="text-primary focus:ring-primary" 
               />
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">{brand}</span>
+              <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400 mobile-text-truncate">{brand}</span>
             </label>
           ))}
         </div>
@@ -208,17 +208,17 @@ export default function FilterSidebar({
 
       {/* Availability */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Availability</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Availability</h4>
         <div className="space-y-2">
           {['In Stock', 'Out of Stock', 'Pre-order'].map((availability) => (
-            <label key={availability} className="flex items-center gap-2 cursor-pointer">
+            <label key={availability} className="flex items-center gap-2 cursor-pointer mobile-touch-target">
               <input 
                 type="checkbox" 
                 checked={localFilters.availability.includes(availability)}
                 onChange={() => handleAvailabilityToggle(availability)}
                 className="text-primary focus:ring-primary" 
               />
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">{availability}</span>
+              <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">{availability}</span>
             </label>
           ))}
         </div>
@@ -226,57 +226,55 @@ export default function FilterSidebar({
 
       {/* Special Filters */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Special</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Special Filters</h4>
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer mobile-touch-target">
             <input 
               type="checkbox" 
               checked={localFilters.discount}
               onChange={(e) => handleFilterChange({ discount: e.target.checked })}
               className="text-primary focus:ring-primary" 
             />
-            <FiTag className="h-4 w-4 text-warning" />
-            <span className="text-sm text-neutral-600 dark:text-neutral-400">On Sale</span>
+            <FiTag className="h-3 w-3 lg:h-4 lg:w-4 text-neutral-400" />
+            <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">On Sale</span>
           </label>
-          
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer mobile-touch-target">
             <input 
               type="checkbox" 
               checked={localFilters.newArrivals}
               onChange={(e) => handleFilterChange({ newArrivals: e.target.checked })}
               className="text-primary focus:ring-primary" 
             />
-            <FiPackage className="h-4 w-4 text-primary" />
-            <span className="text-sm text-neutral-600 dark:text-neutral-400">New Arrivals</span>
+            <FiPackage className="h-3 w-3 lg:h-4 lg:w-4 text-neutral-400" />
+            <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">New Arrivals</span>
           </label>
-          
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer mobile-touch-target">
             <input 
               type="checkbox" 
               checked={localFilters.featured}
               onChange={(e) => handleFilterChange({ featured: e.target.checked })}
               className="text-primary focus:ring-primary" 
             />
-            <FiTrendingUp className="h-4 w-4 text-success" />
-            <span className="text-sm text-neutral-600 dark:text-neutral-400">Featured</span>
+            <FiTrendingUp className="h-3 w-3 lg:h-4 lg:w-4 text-neutral-400" />
+            <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">Featured</span>
           </label>
         </div>
       </div>
 
       {/* Sort By */}
       <div>
-        <h4 className="mb-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">Sort By</h4>
+        <h4 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-neutral-700 dark:text-neutral-300">Sort By</h4>
         <select
           value={localFilters.sortBy}
           onChange={(e) => handleFilterChange({ sortBy: e.target.value })}
-          className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
+          className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-xs lg:text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 mobile-touch-target"
         >
           <option value="relevance">Relevance</option>
           <option value="price-low">Price: Low to High</option>
           <option value="price-high">Price: High to Low</option>
-          <option value="rating">Highest Rated</option>
           <option value="newest">Newest First</option>
-          <option value="name">Name A-Z</option>
+          <option value="rating">Highest Rated</option>
+          <option value="popularity">Most Popular</option>
         </select>
       </div>
     </aside>
