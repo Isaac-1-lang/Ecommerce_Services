@@ -1,6 +1,7 @@
 import { AuthUser } from "../features/auth/store";
 import api from "../lib/api";
 import { parseJavaBoolean, formatJavaDate } from "../lib/javaIntegration";
+import { googleAuthService, GoogleUser } from "../lib/googleAuth";
 
 export interface LoginRequest {
   email: string;
@@ -245,5 +246,46 @@ export const authService = {
   // Helper method to get stored token
   getStoredToken(): string | null {
     return localStorage.getItem('authToken');
+  },
+
+  // Google OAuth login
+  async googleLogin(): Promise<{ user: AuthUser; token: string }> {
+    try {
+      // Initialize and sign in with Google
+      await googleAuthService.initialize();
+      const googleUser = await googleAuthService.signIn();
+      
+      // Get the ID token
+      const idToken = googleUser.getAuthResponse().id_token;
+      
+      // Send token to backend for verification
+      const response = await api.post<JavaLoginResponse>('/v1/auth/google/login', {
+        idToken: idToken
+      });
+
+      if (response.data.success && response.data.data) {
+        const loginData = response.data.data;
+        const profile = googleUser.getBasicProfile();
+        
+        const authUser: AuthUser = {
+          id: loginData.userId,
+          name: loginData.userName,
+          username: loginData.userName.split(' ')[0],
+          email: loginData.userEmail,
+          profilePicture: profile.getImageUrl() || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          role: loginData.role as any
+        };
+
+        // Store token and user data
+        localStorage.setItem('authToken', loginData.token);
+        localStorage.setItem('user', JSON.stringify(authUser));
+
+        return { user: authUser, token: loginData.token };
+      } else {
+        throw new Error(response.data.message || 'Google login failed');
+      }
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message || 'Google login failed');
+    }
   }
 };

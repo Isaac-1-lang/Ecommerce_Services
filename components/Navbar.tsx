@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { 
   FiMoon, 
@@ -14,7 +14,12 @@ import {
   FiX,
   FiChevronDown,
   FiMapPin,
-  FiLogOut
+  FiLogOut,
+  FiSettings,
+  FiPackage,
+  FiCreditCard,
+  FiMapPin as FiAddress,
+  FiHeart as FiWishlist
 } from "react-icons/fi";
 import SearchBar from "./SearchBar";
 import { useCartStore } from "../features/cart/store";
@@ -30,17 +35,33 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const cartItemCount = useCartStore((s) => s.totalQuantity);
   const { user, logout } = useAuthStore();
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
+  const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
 
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
+    setIsProfileDropdownOpen(false);
   };
 
   return (
@@ -164,14 +185,161 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Account */}
-            <Link 
-              href={user ? "/account" : "/auth/login"} 
-              aria-label="Account" 
-              className="p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
-            >
-              <FiUser className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
-            </Link>
+            {/* Profile Dropdown */}
+            {user ? (
+              <div className="relative" ref={profileDropdownRef}>
+                <button
+                  onClick={toggleProfileDropdown}
+                  className="flex items-center gap-2 p-2 rounded-md hover:bg-highlight transition-colors cursor-pointer"
+                  aria-label="Profile menu"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
+                    {user.profilePicture ? (
+                      <img 
+                        src={user.profilePicture} 
+                        alt={user.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FiUser className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                  <span className="hidden md:block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    {user.name}
+                  </span>
+                  <FiChevronDown className={`h-4 w-4 text-neutral-500 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 py-2 z-50">
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-700">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
+                          {user.profilePicture ? (
+                            <img 
+                              src={user.profilePicture} 
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <FiUser className="h-5 w-5 text-primary" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium text-neutral-800 dark:text-neutral-200">{user.name}</p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">{user.email}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <Link
+                        href="/account"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiUser className="h-4 w-4" />
+                        My Profile
+                      </Link>
+                      <Link
+                        href="/account/orders"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiPackage className="h-4 w-4" />
+                        My Orders
+                      </Link>
+                      <Link
+                        href="/wishlist"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiWishlist className="h-4 w-4" />
+                        Wishlist
+                      </Link>
+                      <Link
+                        href="/account/addresses"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiAddress className="h-4 w-4" />
+                        Addresses
+                      </Link>
+                      <Link
+                        href="/account/payment-methods"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiCreditCard className="h-4 w-4" />
+                        Payment Methods
+                      </Link>
+                      <Link
+                        href="/account/settings"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        <FiSettings className="h-4 w-4" />
+                        Settings
+                      </Link>
+
+                      {/* Portal Links for Admin/Employee/Delivery */}
+                      {user.role === 'admin' && (
+                        <Link
+                          href="/admin"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <FiSettings className="h-4 w-4" />
+                          Admin Panel
+                        </Link>
+                      )}
+                      {user.role === 'employee' && (
+                        <Link
+                          href="/employee"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <FiSettings className="h-4 w-4" />
+                          Employee Portal
+                        </Link>
+                      )}
+                      {user.role === 'delivery' && (
+                        <Link
+                          href="/delivery"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-primary hover:bg-primary/10 transition-colors"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <FiSettings className="h-4 w-4" />
+                          Delivery Portal
+                        </Link>
+                      )}
+
+                      {/* Logout */}
+                      <div className="border-t border-neutral-200 dark:border-neutral-700 mt-2 pt-2">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left"
+                        >
+                          <FiLogOut className="h-4 w-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link 
+                href="/auth/login" 
+                aria-label="Sign in" 
+                className="p-2 rounded-md hover:bg-highlight transition-colors group cursor-pointer"
+              >
+                <FiUser className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
+              </Link>
+            )}
 
             {/* Theme Toggle */}
             <button

@@ -126,8 +126,12 @@ export const useAuthStore = create<AuthState>()(
       socialLogin: async (provider) => {
         set({ loading: true, error: null });
         try {
-          const res = await authService.socialLogin(provider);
-          set({ user: res.user, token: res.token, loading: false, isEmailVerified: true });
+          if (provider === 'google') {
+            const res = await authService.googleLogin();
+            set({ user: res.user, token: res.token, loading: false, isEmailVerified: true });
+          } else {
+            throw new Error(`${provider} login is not supported`);
+          }
         } catch (error) {
           set({ error: error instanceof Error ? error.message : `${provider} login failed`, loading: false });
         }
