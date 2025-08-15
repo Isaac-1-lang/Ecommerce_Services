@@ -33,8 +33,38 @@ export interface Product {
   };
   colors?: string[];
   sizes?: string[];
+  variants?: ProductVariant[];
+  warehouseInfo?: WarehouseInfo[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  sku: string;
+  price: number;
+  originalPrice?: number;
+  stockQuantity: number;
+  availableQuantity: number;
+  attributes: VariantAttribute[];
+  images?: string[];
+  isActive: boolean;
+}
+
+export interface VariantAttribute {
+  type: string;
+  name: string;
+  value: string;
+}
+
+export interface WarehouseInfo {
+  warehouseId: string;
+  warehouseName: string;
+  warehouseCode: string;
+  stockQuantity: number;
+  availableQuantity: number;
+  location: string;
+  lastRestocked?: string;
 }
 
 export interface ProductCategory {

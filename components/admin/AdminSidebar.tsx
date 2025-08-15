@@ -12,7 +12,8 @@ import {
   FiGrid,
   FiTag,
   FiTruck,
-  FiFileText
+  FiFileText,
+  FiMapPin
 } from 'react-icons/fi';
 
 const navigation = [
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Categories', href: '/admin/categories', icon: FiGrid },
   { name: 'Orders', href: '/admin/orders', icon: FiShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: FiUsers },
+  { name: 'Warehouses', href: '/admin/warehouses', icon: FiMapPin },
   { name: 'Inventory', href: '/admin/inventory', icon: FiTruck },
   { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart },
   { name: 'Reports', href: '/admin/reports', icon: FiFileText },

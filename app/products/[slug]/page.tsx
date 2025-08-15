@@ -235,6 +235,96 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
+          {/* Product Variants */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                Product Variants
+              </h3>
+              <div className="space-y-3">
+                {product.variants.map((variant) => (
+                  <div key={variant.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          {variant.attributes.map(attr => `${attr.name}: ${attr.value}`).join(' - ')}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">SKU: {variant.sku}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {variant.originalPrice && variant.originalPrice > variant.price ? (
+                            <>
+                              <span className="line-through text-gray-500 mr-2">
+                                ${variant.originalPrice.toFixed(2)}
+                              </span>
+                              ${variant.price.toFixed(2)}
+                            </>
+                          ) : (
+                            `$${variant.price.toFixed(2)}`
+                          )}
+                        </p>
+                        <p className={`text-sm ${variant.availableQuantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {variant.availableQuantity > 0 ? `${variant.availableQuantity} in stock` : 'Out of stock'}
+                        </p>
+                      </div>
+                    </div>
+                    {variant.images && variant.images.length > 0 && (
+                      <div className="flex gap-2 mt-2">
+                        {variant.images.map((image, index) => (
+                          <img
+                            key={index}
+                            src={image}
+                            alt={`Variant ${index + 1}`}
+                            className="w-12 h-12 object-cover rounded border"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Warehouse Information */}
+          {product.warehouseInfo && product.warehouseInfo.length > 0 && (
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                Warehouse Locations
+              </h3>
+              <div className="space-y-3">
+                {product.warehouseInfo.map((warehouse) => (
+                  <div key={warehouse.warehouseId} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          {warehouse.warehouseName}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {warehouse.location} • Code: {warehouse.warehouseCode}
+                        </p>
+                        {warehouse.lastRestocked && (
+                          <p className="text-xs text-gray-500">
+                            Last restocked: {new Date(warehouse.lastRestocked).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-medium ${warehouse.availableQuantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {warehouse.availableQuantity} available
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Total: {warehouse.stockQuantity}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Product Details */}
           <div className="border-t pt-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
@@ -246,12 +336,14 @@ export default function ProductDetailPage() {
                 <span>{product.category}</span>
               </div>
               <div className="flex justify-between">
-                <span>SKU:</span>
-                <span>{product.id}</span>
+                <span>Brand:</span>
+                <span>{product.brand}</span>
               </div>
               <div className="flex justify-between">
                 <span>Availability:</span>
-                <span className="text-green-600">In Stock</span>
+                <span className={`${product.stockQuantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of stock'}
+                </span>
               </div>
             </div>
           </div>
