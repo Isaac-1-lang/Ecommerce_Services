@@ -2,33 +2,61 @@
 
 import { useState, useRef } from "react";
 import { useAuthStore } from "../features/auth/store";
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import EmailVerificationModal from "./EmailVerificationModal";
 import Image from "next/image";
+import { authService } from "@/services/authService";
 
 export default function RegisterForm() {
   const register = useAuthStore((s) => s.register);
   const socialLogin = useAuthStore((s) => s.socialLogin);
   const loading = useAuthStore((s) => s.loading);
-  const [name, setName] = useState("");
+  const router = useRouter();
+  
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage({
+          type: "error",
+          text: "Profile picture must be less than 5MB"
+        });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage({
+          type: "error",
+          text: "Please select a valid image file"
+        });
+        return;
+      }
+
       setProfilePicture(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      setMessage(null); // Clear any previous errors
     }
   };
 
@@ -40,40 +68,107 @@ export default function RegisterForm() {
     }
   };
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setMessage(null);
-    try {
-      await register({ name, username, email, password, profilePicture: profilePicture || undefined });
-      setMessageType("success");
-      setMessage("Account created successfully! Please check your email to verify your account before signing in.");
-      setShowVerificationModal(true);
-      // Don't clear the form yet, let user see the modal first
-    } catch (err: unknown) {
-      setMessageType("error");
-      setMessage(err instanceof Error ? err.message : "Registration failed");
-    }
-  }
-
   const handleCloseVerificationModal = () => {
     setShowVerificationModal(false);
-    // Clear the form after modal is closed
-    setName("");
+    // Redirect to login page after modal is closed
+    router.push('/auth/login');
+  };
+
+  const clearForm = () => {
+    setFirstName("");
+    setLastName("");
     setUsername("");
     setEmail("");
     setPassword("");
     setProfilePicture(null);
     setPreviewUrl("");
-    setMessage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     setMessage(null);
     try {
       await socialLogin(provider);
+      router.push('/dashboard'); // Redirect on successful social login
     } catch (err: unknown) {
-      setMessageType("error");
-      setMessage(err instanceof Error ? err.message : `${provider} login failed`);
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : `${provider} login failed`
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+    setIsLoading(true);
+
+    // Client-side validation
+    if (firstName.trim().length < 2) {
+      setMessage({ type: "error", text: "First name must be at least 2 characters long" });
+      setIsLoading(false);
+      return;
+    }
+
+    if (lastName.trim().length < 2) {
+      setMessage({ type: "error", text: "Last name must be at least 2 characters long" });
+      setIsLoading(false);
+      return;
+    }
+
+    if (username.trim().length < 3) {
+      setMessage({ type: "error", text: "Username must be at least 3 characters long" });
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters long" });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await authService.register({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        profilePicture: profilePicture || undefined,
+      });
+
+      // Show success message
+      setMessage({
+        type: "success",
+        text: response.message
+      });
+
+      // Show verification modal if email verification is required
+      if (response.message.toLowerCase().includes('verify') || response.message.toLowerCase().includes('email')) {
+        setTimeout(() => {
+          setShowVerificationModal(true);
+        }, 1500); // Show modal after 1.5 seconds to let user read the success message
+      } else {
+        // If no email verification required, redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 2000);
+      }
+
+      // Clear form
+      clearForm();
+
+    } catch (err: unknown) {
+      console.error('Registration error:', err);
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Registration failed. Please try again."
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,8 +189,32 @@ export default function RegisterForm() {
             </p>
           </div>
 
+          {/* Success/Error Message */}
+          {message && (
+            <div className={`mb-6 rounded-lg p-4 ${
+              message.type === "success" 
+                ? "bg-green-50 border border-green-200" 
+                : "bg-red-50 border border-red-200"
+            }`}>
+              <div className="flex items-center">
+                {message.type === "success" ? (
+                  <FiCheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                ) : (
+                  <FiAlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
+                )}
+                <p className={`text-sm ${
+                  message.type === "success" 
+                    ? "text-green-800" 
+                    : "text-red-800"
+                }`}>
+                  {message.text}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Form */}
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Picture Upload */}
             <div className="text-center">
               <label className="block text-sm font-medium text-neutral-700 mb-3">
@@ -140,14 +259,14 @@ export default function RegisterForm() {
                 className="hidden"
               />
               <p className="mt-2 text-xs text-neutral-500">
-                Click the camera icon to upload a photo
+                Click the camera icon to upload a photo (Max 5MB)
               </p>
             </div>
 
-            {/* Name Field */}
+            {/* First Name Field */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Full name
+                First name *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -155,11 +274,35 @@ export default function RegisterForm() {
                 </div>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   required
+                  minLength={2}
+                  maxLength={50}
                   className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                  placeholder="Enter your full name"
+                  placeholder="Enter your first name"
+                />
+              </div>
+            </div>
+
+            {/* Last Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Last Name *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiUser className="h-5 w-5 text-neutral-400" />
+                </div>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  minLength={2}
+                  maxLength={50}
+                  className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                  placeholder="Enter your last name"
                 />
               </div>
             </div>
@@ -167,7 +310,7 @@ export default function RegisterForm() {
             {/* Username Field */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Username
+                Username *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -176,21 +319,24 @@ export default function RegisterForm() {
                 <input
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
                   required
+                  minLength={3}
+                  maxLength={30}
+                  pattern="^[a-zA-Z0-9._-]+$"
                   className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                   placeholder="Choose a unique username"
                 />
               </div>
               <p className="mt-1 text-xs text-neutral-500">
-                Username must be at least 3 characters long
+                Username must be at least 3 characters (letters, numbers, dots, underscores, hyphens only)
               </p>
             </div>
 
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Email address
+                Email address *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -210,7 +356,7 @@ export default function RegisterForm() {
             {/* Password Field */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Password
+                Password *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -221,8 +367,9 @@ export default function RegisterForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={8}
                   className="block w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                  placeholder="Create a password"
+                  placeholder="Create a strong password"
                 />
                 <button
                   type="button"
@@ -241,30 +388,13 @@ export default function RegisterForm() {
               </p>
             </div>
 
-            {/* Message */}
-            {message && (
-              <div className={`rounded-lg p-3 ${
-                messageType === "success" 
-                  ? "bg-success-50 border border-success-200" 
-                  : "bg-error-50 border border-error-200"
-              }`}>
-                <p className={`text-sm ${
-                  messageType === "success" 
-                    ? "text-success-600" 
-                    : "text-error-600"
-                }`}>
-                  {message}
-                </p>
-              </div>
-            )}
-
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading || loading}
               className="w-full bg-primary hover:bg-primary-600 disabled:bg-neutral-300 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:cursor-not-allowed shadow-soft"
             >
-              {loading ? (
+              {(isLoading || loading) ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Creating account...
@@ -293,7 +423,7 @@ export default function RegisterForm() {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('google')}
-                disabled={loading}
+                disabled={isLoading || loading}
                 className="w-full inline-flex justify-center py-2 px-4 border border-neutral-200 rounded-lg shadow-sm bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -308,7 +438,7 @@ export default function RegisterForm() {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('github')}
-                disabled={loading}
+                disabled={isLoading || loading}
                 className="w-full inline-flex justify-center py-2 px-4 border border-neutral-200 rounded-lg shadow-sm bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

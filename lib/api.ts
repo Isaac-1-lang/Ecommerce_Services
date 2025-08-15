@@ -2,7 +2,7 @@ import axios from "axios";
 import { handleJavaApiError } from "./javaIntegration";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api",
   timeout: parseInt(process.env.NEXT_PUBLIC_JAVA_TIMEOUT || "10000"),
   headers: {
     'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use((response) => {
   // Log response in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(`✅ API Response: ${response.status} ${response.config.url}`, response.data);
+    console.log(`API Response: ${response.status} ${response.config.url}`, response.data);
   }
   return response;
 }, (error) => {

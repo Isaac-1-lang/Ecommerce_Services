@@ -10,8 +10,8 @@ Create a `.env.local` file in your frontend root directory with the following va
 
 ```env
 # Java Backend API Configuration
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-NEXT_PUBLIC_JAVA_BACKEND_URL=http://localhost:8080
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api
+NEXT_PUBLIC_JAVA_BACKEND_URL=http://localhost:8081
 
 # Java Backend Specific Settings
 NEXT_PUBLIC_JAVA_API_VERSION=v1

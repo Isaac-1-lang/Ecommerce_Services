@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { authService } from "@/services/authService";
 import { useAuthStore } from "../features/auth/store";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiUser } from "react-icons/fi";
 import Link from "next/link";
@@ -13,12 +14,15 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setUser,setToken } = useAuthStore();
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     try {
-      await login({ emailOrUsername, password });
+      const { user, token} = await authService.login({ email:emailOrUsername, password});
+      setUser(user);
+      setToken(token);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     }
