@@ -3,8 +3,70 @@
 import { useState } from "react";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "../features/auth/store";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiUser } from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiUser, FiShield, FiTruck, FiUsers, FiCheckCircle } from "react-icons/fi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+// Predefined role assignments based on email/username
+const ROLE_ASSIGNMENTS = {
+  // Admin credentials
+  ADMIN: {
+    emails: ['admin@company.com', 'superadmin@company.com'],
+    usernames: ['admin', 'superadmin'],
+    redirectPath: '/admin'
+  },
+  // Delivery credentials
+  DELIVERY: {
+    emails: ['delivery@company.com', 'driver@company.com'],
+    usernames: ['delivery', 'driver', 'courier'],
+    redirectPath: '/delivery'
+  },
+  // Employee credentials (default for others)
+  EMPLOYEE: {
+    emails: ['employee@company.com', 'staff@company.com'],
+    usernames: ['employee', 'staff'],
+    redirectPath: '/employee'
+  }
+};
+
+// Function to determine user role and redirect path based on email or username
+const determineUserRole = (emailOrUsername: string) => {
+  const lowercaseInput = emailOrUsername.toLowerCase().trim();
+
+  // Check for admin
+  if (ROLE_ASSIGNMENTS.ADMIN.emails.includes(lowercaseInput) || 
+      ROLE_ASSIGNMENTS.ADMIN.usernames.includes(lowercaseInput)) {
+    return { role: 'ADMIN', redirectPath: ROLE_ASSIGNMENTS.ADMIN.redirectPath };
+  }
+
+  // Check for delivery
+  if (ROLE_ASSIGNMENTS.DELIVERY.emails.includes(lowercaseInput) || 
+      ROLE_ASSIGNMENTS.DELIVERY.usernames.includes(lowercaseInput)) {
+    return { role: 'DELIVERY', redirectPath: ROLE_ASSIGNMENTS.DELIVERY.redirectPath };
+  }
+
+  // Check for specific employee credentials
+  if (ROLE_ASSIGNMENTS.EMPLOYEE.emails.includes(lowercaseInput) || 
+      ROLE_ASSIGNMENTS.EMPLOYEE.usernames.includes(lowercaseInput)) {
+    return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
+  }
+
+  // Default to employee for all other users
+  return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
+};
+
+// Function to get role icon and color
+const getRoleInfo = (role: string) => {
+  switch (role) {
+    case 'ADMIN':
+      return { icon: FiShield, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+    case 'DELIVERY':
+      return { icon: FiTruck, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
+    case 'EMPLOYEE':
+    default:
+      return { icon: FiUsers, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
+  }
+};
 
 export default function LoginForm() {
   const login = useAuthStore((s) => s.login);
@@ -14,28 +76,73 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { setUser,setToken } = useAuthStore();
+  const [detectedRole, setDetectedRole] = useState<string>('EMPLOYEE');
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { setUser, setToken } = useAuthStore();
+  const router = useRouter();
+
+  // Update detected role when email/username changes
+  const handleEmailOrUsernameChange = (input: string) => {
+    setEmailOrUsername(input);
+    if (input.trim()) {
+      const { role } = determineUserRole(input);
+      setDetectedRole(role);
+    } else {
+      setDetectedRole('EMPLOYEE');
+    }
+  };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
+    setIsLoading(true);
+
     try {
-      const { user, token} = await authService.login({ email:emailOrUsername, password});
-      setUser(user);
+      // Determine redirect path based on credentials
+      const { role, redirectPath } = determineUserRole(emailOrUsername);
+      
+      const { user, token } = await authService.login({ 
+        email: emailOrUsername, 
+        password 
+      });
+
+      // Set user data with role information
+      const userWithRole = { ...user, role };
+      setUser(userWithRole);
       setToken(token);
+
+      // Show success message
+      setSuccessMessage(`Welcome back! Redirecting to ${role.toLowerCase()} dashboard...`);
+
+      // Redirect to appropriate dashboard after a brief delay
+      setTimeout(() => {
+        router.push(redirectPath);
+      }, 1500);
+
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     setError(null);
+    setSuccessMessage(null);
     try {
       await socialLogin(provider);
+      // For social login, default to employee dashboard
+      router.push('/employee');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : `${provider} login failed`);
     }
   };
+
+  // Get role display info
+  const roleInfo = getRoleInfo(detectedRole);
+  const RoleIcon = roleInfo.icon;
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -53,6 +160,52 @@ export default function LoginForm() {
           </p>
         </div>
 
+        {/* Role Detection Display */}
+        {emailOrUsername && (
+          <div className={`mb-6 rounded-lg p-4 ${roleInfo.bgColor} ${roleInfo.borderColor} border`}>
+            <div className="flex items-center">
+              <RoleIcon className={`w-5 h-5 ${roleInfo.color} mr-3 flex-shrink-0`} />
+              <div>
+                <p className={`text-sm font-medium ${roleInfo.color}`}>
+                  Login as: {detectedRole}
+                </p>
+                <p className="text-xs text-neutral-600 mt-1">
+                  You'll be redirected to the {detectedRole.toLowerCase()} dashboard
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 rounded-lg p-4 bg-green-50 border border-green-200">
+            <div className="flex items-center">
+              <FiCheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+              <p className="text-sm text-green-800">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Login Credentials Guide */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-800 mb-2">Quick Login Guide:</h4>
+          <div className="text-xs text-blue-700 space-y-1">
+            <div className="flex items-center">
+              <FiShield className="w-3 h-3 mr-2" />
+              <span><strong>Admin:</strong> admin@company.com or 'admin'</span>
+            </div>
+            <div className="flex items-center">
+              <FiTruck className="w-3 h-3 mr-2" />
+              <span><strong>Delivery:</strong> delivery@company.com or 'delivery'</span>
+            </div>
+            <div className="flex items-center">
+              <FiUsers className="w-3 h-3 mr-2" />
+              <span><strong>Employee:</strong> employee@company.com or 'employee'</span>
+            </div>
+          </div>
+        </div>
+
         {/* Form */}
         <form onSubmit={onSubmit} className="space-y-6">
           {/* Email/Username Field */}
@@ -67,7 +220,7 @@ export default function LoginForm() {
               <input
                 type="text"
                 value={emailOrUsername}
-                onChange={(e) => setEmailOrUsername(e.target.value)}
+                onChange={(e) => handleEmailOrUsernameChange(e.target.value)}
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-neutral-200 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 placeholder="Enter your email or username"
@@ -108,26 +261,26 @@ export default function LoginForm() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-error-50 border border-error-200 rounded-lg p-3">
-              <p className="text-sm text-error-600">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isLoading}
             className="w-full bg-primary hover:bg-primary-600 disabled:bg-neutral-300 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:cursor-not-allowed"
           >
-            {loading ? (
+            {(loading || isLoading) ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 Signing in...
               </>
             ) : (
               <>
-                <FiLogIn className="w-5 h-5" />
-                Sign in
+                <RoleIcon className="w-5 h-5" />
+                Sign in as {detectedRole.toLowerCase()}
               </>
             )}
           </button>
@@ -148,7 +301,7 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => handleSocialLogin('google')}
-              disabled={loading}
+              disabled={loading || isLoading}
               className="w-full inline-flex justify-center py-3 px-4 border border-neutral-200 rounded-lg shadow-sm bg-white text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -159,6 +312,16 @@ export default function LoginForm() {
               </svg>
               <span className="ml-3 font-medium">Continue with Google</span>
             </button>
+          </div>
+        </div>
+
+        {/* Demo Credentials */}
+        <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h4 className="text-xs font-medium text-yellow-800 mb-2">Demo Credentials:</h4>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>Admin: admin@company.com / password123</div>
+            <div>Delivery: delivery@company.com / password123</div>
+            <div>Employee: employee@company.com / password123</div>
           </div>
         </div>
 

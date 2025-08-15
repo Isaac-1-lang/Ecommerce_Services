@@ -2,12 +2,74 @@
 
 import { useState, useRef } from "react";
 import { useAuthStore } from "../features/auth/store";
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX, FiCheckCircle, FiAlertCircle, FiShield, FiTruck, FiUsers } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import EmailVerificationModal from "./EmailVerificationModal";
 import Image from "next/image";
 import { authService } from "@/services/authService";
+
+// Predefined role assignments based on email/username
+const ROLE_ASSIGNMENTS = {
+  // Admin credentials
+  ADMIN: {
+    emails: ['admin@company.com', 'superadmin@company.com'],
+    usernames: ['admin', 'superadmin'],
+    redirectPath: '/admin'
+  },
+  // Delivery credentials
+  DELIVERY: {
+    emails: ['delivery@company.com', 'driver@company.com'],
+    usernames: ['delivery', 'driver', 'courier'],
+    redirectPath: '/delivery'
+  },
+  // Employee credentials (default for others)
+  EMPLOYEE: {
+    emails: ['employee@company.com', 'staff@company.com'],
+    usernames: ['employee', 'staff'],
+    redirectPath: '/employee'
+  }
+};
+
+// Function to determine user role based on email or username
+const determineUserRole = (email: string, username: string) => {
+  const lowercaseEmail = email.toLowerCase().trim();
+  const lowercaseUsername = username.toLowerCase().trim();
+
+  // Check for admin
+  if (ROLE_ASSIGNMENTS.ADMIN.emails.includes(lowercaseEmail) || 
+      ROLE_ASSIGNMENTS.ADMIN.usernames.includes(lowercaseUsername)) {
+    return { role: 'ADMIN', redirectPath: ROLE_ASSIGNMENTS.ADMIN.redirectPath };
+  }
+
+  // Check for delivery
+  if (ROLE_ASSIGNMENTS.DELIVERY.emails.includes(lowercaseEmail) || 
+      ROLE_ASSIGNMENTS.DELIVERY.usernames.includes(lowercaseUsername)) {
+    return { role: 'DELIVERY', redirectPath: ROLE_ASSIGNMENTS.DELIVERY.redirectPath };
+  }
+
+  // Check for specific employee credentials
+  if (ROLE_ASSIGNMENTS.EMPLOYEE.emails.includes(lowercaseEmail) || 
+      ROLE_ASSIGNMENTS.EMPLOYEE.usernames.includes(lowercaseUsername)) {
+    return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
+  }
+
+  // Default to employee for all other users
+  return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
+};
+
+// Function to get role icon and color
+const getRoleInfo = (role: string) => {
+  switch (role) {
+    case 'ADMIN':
+      return { icon: FiShield, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+    case 'DELIVERY':
+      return { icon: FiTruck, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
+    case 'EMPLOYEE':
+    default:
+      return { icon: FiUsers, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
+  }
+};
 
 export default function RegisterForm() {
   const register = useAuthStore((s) => s.register);
@@ -25,12 +87,27 @@ export default function RegisterForm() {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [detectedRole, setDetectedRole] = useState<string>('EMPLOYEE');
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update detected role when email or username changes
+  const handleEmailChange = (newEmail: string) => {
+    setEmail(newEmail);
+    const { role } = determineUserRole(newEmail, username);
+    setDetectedRole(role);
+  };
+
+  const handleUsernameChange = (newUsername: string) => {
+    const sanitizedUsername = newUsername.toLowerCase().replace(/[^a-z0-9._-]/g, '');
+    setUsername(sanitizedUsername);
+    const { role } = determineUserRole(email, sanitizedUsername);
+    setDetectedRole(role);
+  };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,8 +147,9 @@ export default function RegisterForm() {
 
   const handleCloseVerificationModal = () => {
     setShowVerificationModal(false);
-    // Redirect to login page after modal is closed
-    router.push('/auth/login');
+    // Redirect based on user role
+    const { redirectPath } = determineUserRole(email, username);
+    router.push(redirectPath);
   };
 
   const clearForm = () => {
@@ -82,6 +160,7 @@ export default function RegisterForm() {
     setPassword("");
     setProfilePicture(null);
     setPreviewUrl("");
+    setDetectedRole('EMPLOYEE');
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -91,7 +170,8 @@ export default function RegisterForm() {
     setMessage(null);
     try {
       await socialLogin(provider);
-      router.push('/dashboard'); // Redirect on successful social login
+      // For social login, default to employee dashboard
+      router.push('/employee');
     } catch (err: unknown) {
       setMessage({
         type: "error",
@@ -131,30 +211,34 @@ export default function RegisterForm() {
     }
 
     try {
+      // Determine user role and redirect path
+      const { role, redirectPath } = determineUserRole(email, username);
+
       const response = await authService.register({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         username: username.trim(),
         email: email.trim().toLowerCase(),
         password,
+        role, // Include role in registration
         profilePicture: profilePicture || undefined,
       });
 
-      // Show success message
+      // Show success message with role information
       setMessage({
         type: "success",
-        text: response.message
+        text: `${response.message} You've been assigned the ${role.toLowerCase()} role.`
       });
 
       // Show verification modal if email verification is required
       if (response.message.toLowerCase().includes('verify') || response.message.toLowerCase().includes('email')) {
         setTimeout(() => {
           setShowVerificationModal(true);
-        }, 1500); // Show modal after 1.5 seconds to let user read the success message
+        }, 1500);
       } else {
-        // If no email verification required, redirect to login after 2 seconds
+        // If no email verification required, redirect to appropriate dashboard
         setTimeout(() => {
-          router.push('/auth/login');
+          router.push(redirectPath);
         }, 2000);
       }
 
@@ -172,6 +256,10 @@ export default function RegisterForm() {
     }
   };
 
+  // Get role display info
+  const roleInfo = getRoleInfo(detectedRole);
+  const RoleIcon = roleInfo.icon;
+
   return (
     <>
       <div className="w-full max-w-md mx-auto">
@@ -188,6 +276,23 @@ export default function RegisterForm() {
               Join us and start shopping today
             </p>
           </div>
+
+          {/* Role Detection Display */}
+          {(email || username) && (
+            <div className={`mb-6 rounded-lg p-4 ${roleInfo.bgColor} ${roleInfo.borderColor} border`}>
+              <div className="flex items-center">
+                <RoleIcon className={`w-5 h-5 ${roleInfo.color} mr-3 flex-shrink-0`} />
+                <div>
+                  <p className={`text-sm font-medium ${roleInfo.color}`}>
+                    Detected Role: {detectedRole}
+                  </p>
+                  <p className="text-xs text-neutral-600 mt-1">
+                    You'll be redirected to the {detectedRole.toLowerCase()} dashboard after registration
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Success/Error Message */}
           {message && (
@@ -212,6 +317,25 @@ export default function RegisterForm() {
               </div>
             </div>
           )}
+
+          {/* Role Assignment Info */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-800 mb-2">Role Assignment Guide:</h4>
+            <div className="text-xs text-blue-700 space-y-1">
+              <div className="flex items-center">
+                <FiShield className="w-3 h-3 mr-2" />
+                <span><strong>Admin:</strong> admin@company.com or username 'admin'</span>
+              </div>
+              <div className="flex items-center">
+                <FiTruck className="w-3 h-3 mr-2" />
+                <span><strong>Delivery:</strong> delivery@company.com or username 'delivery'</span>
+              </div>
+              <div className="flex items-center">
+                <FiUsers className="w-3 h-3 mr-2" />
+                <span><strong>Employee:</strong> All other credentials</span>
+              </div>
+            </div>
+          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -319,7 +443,7 @@ export default function RegisterForm() {
                 <input
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
+                  onChange={(e) => handleUsernameChange(e.target.value)}
                   required
                   minLength={3}
                   maxLength={30}
@@ -345,7 +469,7 @@ export default function RegisterForm() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
                   required
                   className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                   placeholder="Enter your email"
@@ -401,8 +525,8 @@ export default function RegisterForm() {
                 </>
               ) : (
                 <>
-                  <FiUserPlus className="w-5 h-5" />
-                  Create account
+                  <RoleIcon className="w-5 h-5" />
+                  Create {detectedRole.toLowerCase()} account
                 </>
               )}
             </button>
