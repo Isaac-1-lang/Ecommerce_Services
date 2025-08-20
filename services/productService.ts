@@ -207,63 +207,53 @@ export const productService = {
 
   async getCategories(): Promise<Array<{id: number, name: string, slug: string}>> {
     try {
-      console.log('🔍 Fetching categories from API...');
+      const response = await api.get('/api/v1/categories');
       
-      // Get authentication token
-      const token = localStorage.getItem('now_token');
-      const headers: any = {
-        'Content-Type': 'application/json',
-      };
-      
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-        console.log('✅ Using authentication token');
-      } else {
-        console.log('⚠️ No authentication token found');
-      }
-
-      // Try the categories endpoint
-      const response = await api.get<JavaPaginationResponse<{id: number, name: string, slug: string}> | Array<{id: number, name: string, slug: string}>>('/api/categories', {
-        headers,
-        params: {
-          size: 100, // Get all categories
-          page: 0,
-          sortBy: 'name',
-          sortDir: 'asc'
-        }
-      });
-
-      console.log('📡 API Response:', response.data);
-
-      // Handle both Page wrapper and direct array response
-      let categoriesData: Array<{id: number, name: string, slug: string}>;
+      // Handle both paginated response (with content) and direct array response
+      let categoriesData: any[];
       if (response.data && typeof response.data === 'object' && 'content' in response.data) {
-        // Page wrapper response
         categoriesData = response.data.content;
-        console.log(`✅ Found ${categoriesData.length} categories in page response`);
       } else if (Array.isArray(response.data)) {
-        // Direct array response
         categoriesData = response.data;
-        console.log(`✅ Found ${categoriesData.length} categories in direct array`);
       } else {
-        console.log('❌ No categories found in response');
+        console.warn('Unexpected categories response format:', response.data);
         return [];
       }
       
-      return categoriesData;
-    } catch (error: any) {
-      console.error('❌ Error fetching categories:', error);
-      console.error('Error details:', error.response?.data || error.message);
+      return categoriesData.map((category: any) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug
+      }));
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+  },
+
+  async getWarehouses(): Promise<Array<{id: number, name: string, location: string}>> {
+    try {
+      const response = await api.get('/api/warehouses');
       
-      // Return default categories if API fails
-      console.log('🔄 Returning default categories as fallback');
-      return [
-        { id: 1, name: 'Electronics', slug: 'electronics' },
-        { id: 2, name: 'Fashion', slug: 'fashion' },
-        { id: 3, name: 'Home & Garden', slug: 'home-garden' },
-        { id: 4, name: 'Sports & Outdoors', slug: 'sports-outdoors' },
-        { id: 5, name: 'Beauty & Health', slug: 'beauty-health' }
-      ];
+      // Handle both paginated response (with content) and direct array response
+      let warehousesData: any[];
+      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
+        warehousesData = response.data.content;
+      } else if (Array.isArray(response.data)) {
+        warehousesData = response.data;
+      } else {
+        console.warn('Unexpected warehouses response format:', response.data);
+        return [];
+      }
+      
+      return warehousesData.map((warehouse: any) => ({
+        id: warehouse.id,
+        name: warehouse.name,
+        location: warehouse.location
+      }));
+    } catch (error) {
+      console.error('Error fetching warehouses:', error);
+      return [];
     }
   },
 

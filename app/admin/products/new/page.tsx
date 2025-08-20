@@ -11,14 +11,18 @@ export default function NewProductPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [categories, setCategories] = useState<Array<{id: number, name: string, slug: string}>>([]);
+  const [warehouses, setWarehouses] = useState<Array<{id: number, name: string, location: string}>>([]);
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    fullDescription: '',
     sku: '',
     basePrice: '',
     salePrice: '',
+    costPrice: '',
     stockQuantity: '',
+    lowStockThreshold: '',
     category: '',
     brandId: '',
     slug: '',
@@ -26,6 +30,49 @@ export default function NewProductPage() {
     isFeatured: false,
     isNewArrival: false,
     isOnSale: false,
+    salePercentage: '',
+    
+    // Physical dimensions and weight
+    heightCm: '',
+    widthCm: '',
+    lengthCm: '',
+    weightKg: '',
+    
+    // Product specifications
+    material: '',
+    careInstructions: '',
+    warrantyInfo: '',
+    shippingInfo: '',
+    returnPolicy: '',
+    
+    // SEO and meta information
+    metaTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    searchKeywords: '',
+    
+    // Warehouse stock
+    warehouseStock: [] as Array<{
+      warehouseId: string;
+      stockQuantity: string;
+      lowStockThreshold: string;
+      reorderPoint: string;
+    }>,
+    
+    // Variants
+    variants: [] as Array<{
+      variantSku: string;
+      price: string;
+      stockQuantity: string;
+      attributes: Record<string, string>;
+      heightCm: string;
+      widthCm: string;
+      lengthCm: string;
+      weightKg: string;
+      material: string;
+      color: string;
+      size: string;
+    }>
   });
 
 
@@ -35,16 +82,20 @@ export default function NewProductPage() {
 
   // Load categories on component mount
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadData = async () => {
       try {
-        const categoriesData = await productService.getCategories();
+        const [categoriesData, warehousesData] = await Promise.all([
+          productService.getCategories(),
+          productService.getWarehouses()
+        ]);
         setCategories(categoriesData);
+        setWarehouses(warehousesData);
       } catch (error) {
-        console.error('Failed to load categories:', error);
+        console.error('Failed to load data:', error);
       }
     };
     
-    loadCategories();
+    loadData();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -295,6 +346,22 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Cost Price
+              </label>
+              <input
+                type="number"
+                name="costPrice"
+                value={formData.costPrice}
+                onChange={handleInputChange}
+                step="0.01"
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0.00"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
                 Stock Quantity
               </label>
               <input
@@ -303,6 +370,37 @@ export default function NewProductPage() {
                 value={formData.stockQuantity}
                 onChange={handleInputChange}
                 min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0 (optional)"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Low Stock Threshold
+              </label>
+              <input
+                type="number"
+                name="lowStockThreshold"
+                value={formData.lowStockThreshold}
+                onChange={handleInputChange}
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="5 (optional)"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Sale Percentage
+              </label>
+              <input
+                type="number"
+                name="salePercentage"
+                value={formData.salePercentage}
+                onChange={handleInputChange}
+                min="0"
+                max="100"
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 placeholder="0 (optional)"
               />
@@ -339,6 +437,232 @@ export default function NewProductPage() {
                 rows={6}
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 placeholder="Detailed product description (optional)"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Full Description (SEO)
+              </label>
+              <textarea
+                name="fullDescription"
+                value={formData.fullDescription}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Extended product description for SEO (optional)"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Physical Specifications */}
+        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Physical Specifications</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Height (cm)
+              </label>
+              <input
+                type="number"
+                name="heightCm"
+                value={formData.heightCm}
+                onChange={handleInputChange}
+                step="0.1"
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0.0"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Width (cm)
+              </label>
+              <input
+                type="number"
+                name="widthCm"
+                value={formData.widthCm}
+                onChange={handleInputChange}
+                step="0.1"
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0.0"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Length (cm)
+              </label>
+              <input
+                type="number"
+                name="lengthCm"
+                value={formData.lengthCm}
+                onChange={handleInputChange}
+                step="0.1"
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0.0"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Weight (kg)
+              </label>
+              <input
+                type="number"
+                name="weightKg"
+                value={formData.weightKg}
+                onChange={handleInputChange}
+                step="0.001"
+                min="0"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="0.000"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Product Details */}
+        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Product Details</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Material
+              </label>
+              <input
+                type="text"
+                name="material"
+                value={formData.material}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="e.g., Aluminum, Plastic, Wood"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Care Instructions
+              </label>
+              <textarea
+                name="careInstructions"
+                value={formData.careInstructions}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Care and maintenance instructions"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Warranty Information
+              </label>
+              <textarea
+                name="warrantyInfo"
+                value={formData.warrantyInfo}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Warranty details and terms"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Shipping Information
+              </label>
+              <textarea
+                name="shippingInfo"
+                value={formData.shippingInfo}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Shipping details and restrictions"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Return Policy
+              </label>
+              <textarea
+                name="returnPolicy"
+                value={formData.returnPolicy}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Return policy and conditions"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SEO and Meta Information */}
+        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">SEO & Meta Information</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Meta Title
+              </label>
+              <input
+                type="text"
+                name="metaTitle"
+                value={formData.metaTitle}
+                onChange={handleInputChange}
+                maxLength={255}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="SEO meta title (optional)"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Meta Description
+              </label>
+              <textarea
+                name="metaDescription"
+                value={formData.metaDescription}
+                onChange={handleInputChange}
+                rows={3}
+                maxLength={500}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="SEO meta description (optional)"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Meta Keywords
+              </label>
+              <input
+                type="text"
+                name="metaKeywords"
+                value={formData.metaKeywords}
+                onChange={handleInputChange}
+                maxLength={500}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="SEO meta keywords (optional)"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Search Keywords
+              </label>
+              <input
+                type="text"
+                name="searchKeywords"
+                value={formData.searchKeywords}
+                onChange={handleInputChange}
+                maxLength={500}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Search optimization keywords (optional)"
               />
             </div>
           </div>
@@ -388,6 +712,382 @@ export default function NewProductPage() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Warehouse Management */}
+        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Warehouse Management</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-neutral-600">Assign stock to warehouses</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    warehouseStock: [...prev.warehouseStock, {
+                      warehouseId: '',
+                      stockQuantity: '',
+                      lowStockThreshold: '',
+                      reorderPoint: ''
+                    }]
+                  }));
+                }}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors text-sm"
+              >
+                Add Warehouse
+              </button>
+            </div>
+            
+            {formData.warehouseStock.map((warehouse, index) => (
+              <div key={index} className="border border-neutral-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-neutral-800">Warehouse {index + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        warehouseStock: prev.warehouseStock.filter((_, i) => i !== index)
+                      }));
+                    }}
+                    className="text-error hover:text-error-600 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Warehouse
+                    </label>
+                    <select
+                      value={warehouse.warehouseId}
+                      onChange={(e) => {
+                        const newWarehouseStock = [...formData.warehouseStock];
+                        newWarehouseStock[index].warehouseId = e.target.value;
+                        setFormData(prev => ({ ...prev, warehouseStock: newWarehouseStock }));
+                      }}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Select warehouse</option>
+                      {warehouses.map(w => (
+                        <option key={w.id} value={w.id}>
+                          {w.name} - {w.location}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Stock Quantity
+                    </label>
+                    <input
+                      type="number"
+                      value={warehouse.stockQuantity}
+                      onChange={(e) => {
+                        const newWarehouseStock = [...formData.warehouseStock];
+                        newWarehouseStock[index].stockQuantity = e.target.value;
+                        setFormData(prev => ({ ...prev, warehouseStock: newWarehouseStock }));
+                      }}
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="100"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Low Stock Threshold
+                    </label>
+                    <input
+                      type="number"
+                      value={warehouse.lowStockThreshold}
+                      onChange={(e) => {
+                        const newWarehouseStock = [...formData.warehouseStock];
+                        newWarehouseStock[index].lowStockThreshold = e.target.value;
+                        setFormData(prev => ({ ...prev, warehouseStock: newWarehouseStock }));
+                      }}
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="10"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Reorder Point
+                    </label>
+                    <input
+                      type="number"
+                      value={warehouse.reorderPoint}
+                      onChange={(e) => {
+                        const newWarehouseStock = [...formData.warehouseStock];
+                        newWarehouseStock[index].reorderPoint = e.target.value;
+                        setFormData(prev => ({ ...prev, warehouseStock: newWarehouseStock }));
+                      }}
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="20"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {formData.warehouseStock.length === 0 && (
+              <p className="text-sm text-neutral-500 text-center py-4">
+                No warehouses assigned. Click "Add Warehouse" to assign stock.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Product Variants */}
+        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
+          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Product Variants</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-neutral-600">Create product variants with different attributes</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    variants: [...prev.variants, {
+                      variantSku: '',
+                      price: '',
+                      stockQuantity: '',
+                      attributes: {},
+                      heightCm: '',
+                      widthCm: '',
+                      lengthCm: '',
+                      weightKg: '',
+                      material: '',
+                      color: '',
+                      size: ''
+                    }]
+                  }));
+                }}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors text-sm"
+              >
+                Add Variant
+              </button>
+            </div>
+            
+            {formData.variants.map((variant, index) => (
+              <div key={index} className="border border-neutral-200 rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-neutral-800">Variant {index + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        variants: prev.variants.filter((_, i) => i !== index)
+                      }));
+                    }}
+                    className="text-error hover:text-error-600 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Variant SKU
+                    </label>
+                    <input
+                      type="text"
+                      value={variant.variantSku}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].variantSku = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="VARIANT-SKU-001"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.price}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].price = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      step="0.01"
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Stock Quantity
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.stockQuantity}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].stockQuantity = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="50"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Color
+                    </label>
+                    <input
+                      type="text"
+                      value={variant.color}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].color = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="Red, Blue, Black"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Size
+                    </label>
+                    <input
+                      type="text"
+                      value={variant.size}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].size = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="S, M, L, XL"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Material
+                    </label>
+                    <input
+                      type="text"
+                      value={variant.material}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].material = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="Cotton, Polyester"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Height (cm)
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.heightCm}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].heightCm = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      step="0.1"
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Width (cm)
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.widthCm}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].widthCm = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      step="0.1"
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Length (cm)
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.lengthCm}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].lengthCm = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      step="0.1"
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="0.0"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Weight (kg)
+                    </label>
+                    <input
+                      type="number"
+                      value={variant.weightKg}
+                      onChange={(e) => {
+                        const newVariants = [...formData.variants];
+                        newVariants[index].weightKg = e.target.value;
+                        setFormData(prev => ({ ...prev, variants: newVariants }));
+                      }}
+                      step="0.001"
+                      min="0"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                      placeholder="0.000"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {formData.variants.length === 0 && (
+              <p className="text-sm text-neutral-500 text-center py-4">
+                No variants created. Click "Add Variant" to create product variations.
+              </p>
             )}
           </div>
         </div>

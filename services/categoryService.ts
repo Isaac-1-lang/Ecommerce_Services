@@ -14,7 +14,7 @@ export interface CategoryDTO {
 
 export const categoryService = {
   async getAll(page = 0, size = 100, sortBy = "name", sortDir: "asc" | "desc" = "asc"): Promise<CategoryDTO[]> {
-    const resp = await api.get(`/api/categories`, { params: { page, size, sortBy, sortDir } });
+    const resp = await api.get(`/api/v1/categories`, { params: { page, size, sortBy, sortDir } });
     if (resp.data && typeof resp.data === "object" && "content" in resp.data) {
       return resp.data.content as CategoryDTO[];
     }
@@ -22,27 +22,27 @@ export const categoryService = {
   },
 
   async getTopLevel(): Promise<CategoryDTO[]> {
-    const resp = await api.get(`/api/categories/top-level`);
+    const resp = await api.get(`/api/v1/categories/top-level`);
     return resp.data as CategoryDTO[];
   },
 
   async getSubCategories(parentId: number): Promise<CategoryDTO[]> {
-    const resp = await api.get(`/api/categories/sub-categories/${parentId}`);
+    const resp = await api.get(`/api/v1/categories/sub-categories/${parentId}`);
     return resp.data as CategoryDTO[];
   },
 
   async create(category: Partial<CategoryDTO>): Promise<CategoryDTO> {
-    const resp = await api.post(`/api/categories`, category);
+    const resp = await api.post(`/api/v1/categories`, category);
     return resp.data as CategoryDTO;
   },
 
   async update(id: number, category: Partial<CategoryDTO>): Promise<CategoryDTO> {
-    const resp = await api.put(`/api/categories/${id}`, category);
+    const resp = await api.put(`/api/v1/categories/${id}`, category);
     return resp.data as CategoryDTO;
   },
 
   async remove(id: number): Promise<void> {
-    await api.delete(`/api/categories/${id}`);
+    await api.delete(`/api/v1/categories/${id}`);
   },
 };
 
