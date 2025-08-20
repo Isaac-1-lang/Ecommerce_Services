@@ -15,13 +15,17 @@ export default function ProtectedRoute({
   allowedRoles = [], 
   redirectTo = '/auth/login' 
 }: ProtectedRouteProps) {
-  const { user, token } = useAuthStore();
+  const { user, token, isInitialized } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!isInitialized) {
+      // Wait until auth store initialization completes
+      return;
+    }
     const checkAuthorization = () => {
       // If no token, redirect to login
       if (!token) {
@@ -37,15 +41,17 @@ export default function ProtectedRoute({
 
       // If specific roles are required, check if user has the required role
       if (allowedRoles.length > 0) {
-        if (!allowedRoles.includes(user.role as any)) {
+        const normalizedRole = (user.role as any)?.toString().toLowerCase();
+        const normalizedAllowed = allowedRoles.map((r) => r.toLowerCase());
+        if (!normalizedAllowed.includes(normalizedRole)) {
           // Redirect to appropriate portal or home page based on user role
           let redirectPath = '/';
           
-          if (user.role === 'admin') {
+          if (normalizedRole === 'admin') {
             redirectPath = '/admin';
-          } else if (user.role === 'employee') {
+          } else if (normalizedRole === 'employee') {
             redirectPath = '/employee';
-          } else if (user.role === 'delivery') {
+          } else if (normalizedRole === 'delivery' || normalizedRole === 'delivery_partner') {
             redirectPath = '/delivery';
           }
           
@@ -60,7 +66,7 @@ export default function ProtectedRoute({
     };
 
     checkAuthorization();
-  }, [user, token, allowedRoles, redirectTo, pathname, router]);
+  }, [user, token, allowedRoles, redirectTo, pathname, router, isInitialized]);
 
   // Show loading state
   if (isLoading) {

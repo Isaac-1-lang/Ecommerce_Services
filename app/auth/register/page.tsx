@@ -1,6 +1,6 @@
 "use client";
 
-import RegisterForm from "../../../components/RegisterForm";
+import NewRegisterForm from "../../../components/NewRegisterForm";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form */}
-        <RegisterForm />
+        <NewRegisterForm />
 
         {/* Additional Info */}
         <div className="mt-8 text-center">

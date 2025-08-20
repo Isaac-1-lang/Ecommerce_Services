@@ -1,82 +1,21 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useAuthStore } from "../features/auth/store";
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX, FiCheckCircle, FiAlertCircle, FiShield, FiTruck, FiUsers } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiUserPlus, FiCamera, FiX, FiCheckCircle, FiAlertCircle, FiShield, FiTruck, FiUsers, FiCreditCard, FiBuilding, FiKey, FiBriefcase } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import EmailVerificationModal from "./EmailVerificationModal";
 import Image from "next/image";
 import { authService } from "@/services/authService";
-
-// Predefined role assignments based on email/username
-const ROLE_ASSIGNMENTS = {
-  // Admin credentials
-  ADMIN: {
-    emails: ['admin@company.com', 'superadmin@company.com'],
-    usernames: ['admin', 'superadmin'],
-    redirectPath: '/admin'
-  },
-  // Delivery credentials
-  DELIVERY: {
-    emails: ['delivery@company.com', 'driver@company.com'],
-    usernames: ['delivery', 'driver', 'courier'],
-    redirectPath: '/delivery'
-  },
-  // Employee credentials (default for others)
-  EMPLOYEE: {
-    emails: ['employee@company.com', 'staff@company.com'],
-    usernames: ['employee', 'staff'],
-    redirectPath: '/employee'
-  }
-};
-
-// Function to determine user role based on email or username
-const determineUserRole = (email: string, username: string) => {
-  const lowercaseEmail = email.toLowerCase().trim();
-  const lowercaseUsername = username.toLowerCase().trim();
-
-  // Check for admin
-  if (ROLE_ASSIGNMENTS.ADMIN.emails.includes(lowercaseEmail) || 
-      ROLE_ASSIGNMENTS.ADMIN.usernames.includes(lowercaseUsername)) {
-    return { role: 'ADMIN', redirectPath: ROLE_ASSIGNMENTS.ADMIN.redirectPath };
-  }
-
-  // Check for delivery
-  if (ROLE_ASSIGNMENTS.DELIVERY.emails.includes(lowercaseEmail) || 
-      ROLE_ASSIGNMENTS.DELIVERY.usernames.includes(lowercaseUsername)) {
-    return { role: 'DELIVERY', redirectPath: ROLE_ASSIGNMENTS.DELIVERY.redirectPath };
-  }
-
-  // Check for specific employee credentials
-  if (ROLE_ASSIGNMENTS.EMPLOYEE.emails.includes(lowercaseEmail) || 
-      ROLE_ASSIGNMENTS.EMPLOYEE.usernames.includes(lowercaseUsername)) {
-    return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
-  }
-
-  // Default to employee for all other users
-  return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
-};
-
-// Function to get role icon and color
-const getRoleInfo = (role: string) => {
-  switch (role) {
-    case 'ADMIN':
-      return { icon: FiShield, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
-    case 'DELIVERY':
-      return { icon: FiTruck, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
-    case 'EMPLOYEE':
-    default:
-      return { icon: FiUsers, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
-  }
-};
+import { UserRole, RegistrationFlow, RoleRedirectPaths, CustomerRegisterData, AdminRegisterData, EmployeeRegisterData } from "@/types/auth";
 
 export default function RegisterForm() {
-  const register = useAuthStore((s) => s.register);
-  const socialLogin = useAuthStore((s) => s.socialLogin);
-  const loading = useAuthStore((s) => s.loading);
   const router = useRouter();
   
+  // Registration flow state
+  const [registrationFlow, setRegistrationFlow] = useState<RegistrationFlow>('customer');
+  
+  // Common form fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -85,9 +24,24 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  
+  // Admin-specific fields
+  const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardholderName, setCardholderName] = useState("");
+  
+  // Employee-specific fields
+  const [adminToken, setAdminToken] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
+  const [department, setDepartment] = useState("");
+  const [position, setPosition] = useState("");
+  
+  // UI state
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [detectedRole, setDetectedRole] = useState<string>('EMPLOYEE');
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -95,24 +49,42 @@ export default function RegisterForm() {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Update detected role when email or username changes
-  const handleEmailChange = (newEmail: string) => {
-    setEmail(newEmail);
-    const { role } = determineUserRole(newEmail, username);
-    setDetectedRole(role);
-  };
-
-  const handleUsernameChange = (newUsername: string) => {
-    const sanitizedUsername = newUsername.toLowerCase().replace(/[^a-z0-9._-]/g, '');
-    setUsername(sanitizedUsername);
-    const { role } = determineUserRole(email, sanitizedUsername);
-    setDetectedRole(role);
+  // Role info function
+  const getRoleInfo = (flow: RegistrationFlow) => {
+    switch (flow) {
+      case 'admin':
+        return {
+          icon: FiShield,
+          color: 'text-purple-600',
+          bgColor: 'bg-purple-50',
+          borderColor: 'border-purple-200',
+          title: 'Admin Registration',
+          description: 'Register as an administrator with business management capabilities'
+        };
+      case 'employee':
+        return {
+          icon: FiUsers,
+          color: 'text-green-600',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-200',
+          title: 'Employee Registration',
+          description: 'Register as an employee with admin-provided token'
+        };
+      default:
+        return {
+          icon: FiUser,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+          title: 'Customer Registration',
+          description: 'Create a customer account to start shopping'
+        };
+    }
   };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setMessage({
           type: "error",
@@ -121,7 +93,6 @@ export default function RegisterForm() {
         return;
       }
 
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setMessage({
           type: "error",
@@ -133,7 +104,7 @@ export default function RegisterForm() {
       setProfilePicture(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      setMessage(null); // Clear any previous errors
+      setMessage(null);
     }
   };
 
@@ -147,9 +118,19 @@ export default function RegisterForm() {
 
   const handleCloseVerificationModal = () => {
     setShowVerificationModal(false);
-    // Redirect based on user role
-    const { redirectPath } = determineUserRole(email, username);
+    const redirectPath = RoleRedirectPaths[getRoleFromFlow(registrationFlow)];
     router.push(redirectPath);
+  };
+
+  const getRoleFromFlow = (flow: RegistrationFlow): UserRole => {
+    switch (flow) {
+      case 'admin':
+        return UserRole.ADMIN;
+      case 'employee':
+        return UserRole.EMPLOYEE;
+      default:
+        return UserRole.CUSTOMER;
+    }
   };
 
   const clearForm = () => {
@@ -160,24 +141,50 @@ export default function RegisterForm() {
     setPassword("");
     setProfilePicture(null);
     setPreviewUrl("");
-    setDetectedRole('EMPLOYEE');
+    setBusinessName("");
+    setBusinessAddress("");
+    setCardNumber("");
+    setExpiryDate("");
+    setCvv("");
+    setCardholderName("");
+    setAdminToken("");
+    setEmployeeId("");
+    setDepartment("");
+    setPosition("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'github') => {
-    setMessage(null);
-    try {
-      await socialLogin(provider);
-      // For social login, default to employee dashboard
-      router.push('/employee');
-    } catch (err: unknown) {
-      setMessage({
-        type: "error",
-        text: err instanceof Error ? err.message : `${provider} login failed`
-      });
+  const validateForm = (): boolean => {
+    // Common validation
+    if (firstName.trim().length < 2) {
+      setMessage({ type: "error", text: "First name must be at least 2 characters long" });
+      return false;
     }
+
+    if (lastName.trim().length < 2) {
+      setMessage({ type: "error", text: "Last name must be at least 2 characters long" });
+      return false;
+    }
+
+    if (username.trim().length < 3) {
+      setMessage({ type: "error", text: "Username must be at least 3 characters long" });
+      return false;
+    }
+
+    if (password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters long" });
+      return false;
+    }
+
+    // Role-specific validation
+    if (registrationFlow === 'employee' && !adminToken.trim()) {
+      setMessage({ type: "error", text: "Admin token is required for employee registration" });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -185,64 +192,78 @@ export default function RegisterForm() {
     setMessage(null);
     setIsLoading(true);
 
-    // Client-side validation
-    if (firstName.trim().length < 2) {
-      setMessage({ type: "error", text: "First name must be at least 2 characters long" });
-      setIsLoading(false);
-      return;
-    }
-
-    if (lastName.trim().length < 2) {
-      setMessage({ type: "error", text: "Last name must be at least 2 characters long" });
-      setIsLoading(false);
-      return;
-    }
-
-    if (username.trim().length < 3) {
-      setMessage({ type: "error", text: "Username must be at least 3 characters long" });
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      setMessage({ type: "error", text: "Password must be at least 8 characters long" });
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
 
     try {
-      // Determine user role and redirect path
-      const { role, redirectPath } = determineUserRole(email, username);
+      const role = getRoleFromFlow(registrationFlow);
+      let registerData: CustomerRegisterData | AdminRegisterData | EmployeeRegisterData;
 
-      const response = await authService.register({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        username: username.trim(),
-        email: email.trim().toLowerCase(),
-        password,
-        role, // Include role in registration
-        profilePicture: profilePicture || undefined,
-      });
+      // Create role-specific registration data
+      switch (registrationFlow) {
+        case 'admin':
+          registerData = {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            username: username.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+            role: UserRole.ADMIN,
+            profilePicture: profilePicture || undefined,
+            businessName: businessName.trim() || undefined,
+            businessAddress: businessAddress.trim() || undefined,
+            paymentMethod: {
+              cardNumber: cardNumber.trim() || undefined,
+              expiryDate: expiryDate.trim() || undefined,
+              cvv: cvv.trim() || undefined,
+              cardholderName: cardholderName.trim() || undefined,
+            }
+          } as AdminRegisterData;
+          break;
 
-      // Show success message with role information
-      setMessage({
-        type: "success",
-        text: `${response.message} You've been assigned the ${role.toLowerCase()} role.`
-      });
+        case 'employee':
+          registerData = {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            username: username.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+            role: UserRole.EMPLOYEE,
+            profilePicture: profilePicture || undefined,
+            adminToken: adminToken.trim(),
+            employeeId: employeeId.trim() || undefined,
+            department: department.trim() || undefined,
+            position: position.trim() || undefined,
+          } as EmployeeRegisterData;
+          break;
 
-      // Show verification modal if email verification is required
-      if (response.message.toLowerCase().includes('verify') || response.message.toLowerCase().includes('email')) {
-        setTimeout(() => {
-          setShowVerificationModal(true);
-        }, 1500);
-      } else {
-        // If no email verification required, redirect to appropriate dashboard
-        setTimeout(() => {
-          router.push(redirectPath);
-        }, 2000);
+        default:
+          registerData = {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            username: username.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+            role: UserRole.CUSTOMER,
+            profilePicture: profilePicture || undefined,
+          } as CustomerRegisterData;
       }
 
-      // Clear form
+      const response = await authService.register(registerData);
+
+      setMessage({
+        type: "success",
+        text: `Registration successful! You've been registered as a ${registrationFlow}. Redirecting to your dashboard...`
+      });
+
+      // Redirect to appropriate dashboard
+      setTimeout(() => {
+        const redirectPath = RoleRedirectPaths[role];
+        router.push(redirectPath);
+      }, 2000);
+
       clearForm();
 
     } catch (err: unknown) {
@@ -256,8 +277,7 @@ export default function RegisterForm() {
     }
   };
 
-  // Get role display info
-  const roleInfo = getRoleInfo(detectedRole);
+  const roleInfo = getRoleInfo(registrationFlow);
   const RoleIcon = roleInfo.icon;
 
   return (
@@ -273,26 +293,66 @@ export default function RegisterForm() {
               Create account
             </h2>
             <p className="text-neutral-600">
-              Join us and start shopping today
+              Choose your registration type
             </p>
           </div>
 
-          {/* Role Detection Display */}
-          {(email || username) && (
-            <div className={`mb-6 rounded-lg p-4 ${roleInfo.bgColor} ${roleInfo.borderColor} border`}>
-              <div className="flex items-center">
-                <RoleIcon className={`w-5 h-5 ${roleInfo.color} mr-3 flex-shrink-0`} />
-                <div>
-                  <p className={`text-sm font-medium ${roleInfo.color}`}>
-                    Detected Role: {detectedRole}
-                  </p>
-                  <p className="text-xs text-neutral-600 mt-1">
-                    You'll be redirected to the {detectedRole.toLowerCase()} dashboard after registration
-                  </p>
-                </div>
+          {/* Registration Flow Selector */}
+          <div className="mb-6">
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setRegistrationFlow('customer')}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  registrationFlow === 'customer'
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300'
+                }`}
+              >
+                <FiUser className="w-6 h-6 mx-auto mb-2" />
+                <span className="text-xs font-medium">Customer</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRegistrationFlow('admin')}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  registrationFlow === 'admin'
+                    ? 'border-purple-500 bg-purple-50 text-purple-700'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300'
+                }`}
+              >
+                <FiShield className="w-6 h-6 mx-auto mb-2" />
+                <span className="text-xs font-medium">Admin</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRegistrationFlow('employee')}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  registrationFlow === 'employee'
+                    ? 'border-green-500 bg-green-50 text-green-700'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300'
+                }`}
+              >
+                <FiUsers className="w-6 h-6 mx-auto mb-2" />
+                <span className="text-xs font-medium">Employee</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Role Info Display */}
+          <div className={`mb-6 rounded-lg p-4 ${roleInfo.bgColor} ${roleInfo.borderColor} border`}>
+            <div className="flex items-center">
+              <RoleIcon className={`w-5 h-5 ${roleInfo.color} mr-3 flex-shrink-0`} />
+              <div>
+                <p className={`text-sm font-medium ${roleInfo.color}`}>
+                  {roleInfo.title}
+                </p>
+                <p className="text-xs text-neutral-600 mt-1">
+                  {roleInfo.description}
+                </p>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Success/Error Message */}
           {message && (
@@ -317,25 +377,6 @@ export default function RegisterForm() {
               </div>
             </div>
           )}
-
-          {/* Role Assignment Info */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">Role Assignment Guide:</h4>
-            <div className="text-xs text-blue-700 space-y-1">
-              <div className="flex items-center">
-                <FiShield className="w-3 h-3 mr-2" />
-                <span><strong>Admin:</strong> admin@company.com or username 'admin'</span>
-              </div>
-              <div className="flex items-center">
-                <FiTruck className="w-3 h-3 mr-2" />
-                <span><strong>Delivery:</strong> delivery@company.com or username 'delivery'</span>
-              </div>
-              <div className="flex items-center">
-                <FiUsers className="w-3 h-3 mr-2" />
-                <span><strong>Employee:</strong> All other credentials</span>
-              </div>
-            </div>
-          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -387,47 +428,48 @@ export default function RegisterForm() {
               </p>
             </div>
 
-            {/* First Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                First name *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="h-5 w-5 text-neutral-400" />
+            {/* Common Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  First name *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiUser className="h-5 w-5 text-neutral-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={50}
+                    className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    placeholder="First name"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  minLength={2}
-                  maxLength={50}
-                  className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                  placeholder="Enter your first name"
-                />
               </div>
-            </div>
 
-            {/* Last Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Last Name *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="h-5 w-5 text-neutral-400" />
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Last name *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiUser className="h-5 w-5 text-neutral-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={50}
+                    className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    placeholder="Last name"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                  minLength={2}
-                  maxLength={50}
-                  className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
-                  placeholder="Enter your last name"
-                />
               </div>
             </div>
 
@@ -443,7 +485,7 @@ export default function RegisterForm() {
                 <input
                   type="text"
                   value={username}
-                  onChange={(e) => handleUsernameChange(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''))}
                   required
                   minLength={3}
                   maxLength={30}
@@ -453,7 +495,7 @@ export default function RegisterForm() {
                 />
               </div>
               <p className="mt-1 text-xs text-neutral-500">
-                Username must be at least 3 characters (letters, numbers, dots, underscores, hyphens only)
+                Letters, numbers, dots, underscores, hyphens only
               </p>
             </div>
 
@@ -469,7 +511,7 @@ export default function RegisterForm() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                   placeholder="Enter your email"
@@ -512,13 +554,181 @@ export default function RegisterForm() {
               </p>
             </div>
 
+            {/* Admin-specific fields */}
+            {registrationFlow === 'admin' && (
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="text-sm font-medium text-purple-700 flex items-center">
+                  <FiBuilding className="w-4 h-4 mr-2" />
+                  Business Information (Optional)
+                </h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Business Name
+                  </label>
+                  <input
+                    type="text"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    placeholder="Enter business name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Business Address
+                  </label>
+                  <textarea
+                    value={businessAddress}
+                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    rows={2}
+                    className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    placeholder="Enter business address"
+                  />
+                </div>
+
+                <h4 className="text-sm font-medium text-purple-700 flex items-center mt-6">
+                  <FiCreditCard className="w-4 h-4 mr-2" />
+                  Payment Information (Optional)
+                </h4>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Cardholder Name
+                  </label>
+                  <input
+                    type="text"
+                    value={cardholderName}
+                    onChange={(e) => setCardholderName(e.target.value)}
+                    className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    placeholder="Name on card"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Card Number
+                  </label>
+                  <input
+                    type="text"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').slice(0, 16))}
+                    className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    placeholder="1234 5678 9012 3456"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Expiry Date
+                    </label>
+                    <input
+                      type="text"
+                      value={expiryDate}
+                      onChange={(e) => setExpiryDate(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                      placeholder="MMYY"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      CVV
+                    </label>
+                    <input
+                      type="text"
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                      placeholder="123"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Employee-specific fields */}
+            {registrationFlow === 'employee' && (
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="text-sm font-medium text-green-700 flex items-center">
+                  <FiKey className="w-4 h-4 mr-2" />
+                  Employee Information
+                </h4>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Admin Token *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiKey className="h-5 w-5 text-neutral-400" />
+                    </div>
+                    <input
+                      type="text"
+                      value={adminToken}
+                      onChange={(e) => setAdminToken(e.target.value)}
+                      required
+                      className="block w-full pl-10 pr-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                      placeholder="Enter admin-provided token"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    This token must be provided by an administrator
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Employee ID
+                  </label>
+                  <input
+                    type="text"
+                    value={employeeId}
+                    onChange={(e) => setEmployeeId(e.target.value)}
+                    className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Enter employee ID"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Department
+                    </label>
+                    <input
+                      type="text"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                      placeholder="e.g., Sales, IT"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Position
+                    </label>
+                    <input
+                      type="text"
+                      value={position}
+                      onChange={(e) => setPosition(e.target.value)}
+                      className="block w-full px-3 py-3 border border-neutral-300 rounded-lg bg-white text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                      placeholder="e.g., Manager, Associate"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || loading}
+              disabled={isLoading}
               className="w-full bg-primary hover:bg-primary-600 disabled:bg-neutral-300 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:cursor-not-allowed shadow-soft"
             >
-              {(isLoading || loading) ? (
+              {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Creating account...
@@ -526,52 +736,11 @@ export default function RegisterForm() {
               ) : (
                 <>
                   <RoleIcon className="w-5 h-5" />
-                  Create {detectedRole.toLowerCase()} account
+                  Create {registrationFlow} account
                 </>
               )}
             </button>
           </form>
-
-          {/* Social Registration */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-neutral-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('google')}
-                disabled={isLoading || loading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-neutral-200 rounded-lg shadow-sm bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                <span className="ml-2">Google</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('github')}
-                disabled={isLoading || loading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-neutral-200 rounded-lg shadow-sm bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                <span className="ml-2">GitHub</span>
-              </button>
-            </div>
-          </div>
 
           {/* Footer Links */}
           <div className="mt-6 text-center">

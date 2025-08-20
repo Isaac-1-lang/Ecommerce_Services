@@ -38,7 +38,7 @@ export default function CartItem({
           >
             -
           </button>
-          <span className="px-3 py-1 bg-neutral-100 rounded-md font-medium">{item.quantity}</span>
+          <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-md font-medium ring-1 ring-neutral-200 dark:ring-neutral-600">{item.quantity}</span>
           <button 
             onClick={() => onQuantityChange(item.quantity + 1)} 
             disabled={disabled}

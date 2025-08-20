@@ -12,7 +12,7 @@ export default function ActiveDeliveriesPage() {
     {
       id: '#DEL-001',
       orderId: '#ORD-001',
-      customer: 'John Doe',
+      customer: 'NIYONKURU',
       address: '123 Main St, Downtown, City, State 12345',
       phone: '+1-555-0123',
       items: [
@@ -30,7 +30,7 @@ export default function ActiveDeliveriesPage() {
     {
       id: '#DEL-002',
       orderId: '#ORD-002',
-      customer: 'Jane Smith',
+      customer: 'UWASE',
       address: '456 Oak Ave, Midtown, City, State 12345',
       phone: '+1-555-0124',
       items: [
@@ -47,7 +47,7 @@ export default function ActiveDeliveriesPage() {
     {
       id: '#DEL-003',
       orderId: '#ORD-003',
-      customer: 'Mike Johnson',
+      customer: 'KABUGA',
       address: '789 Pine Rd, Uptown, City, State 12345',
       phone: '+1-555-0125',
       items: [

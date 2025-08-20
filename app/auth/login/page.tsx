@@ -12,7 +12,16 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) router.replace("/account");
+    if (user) {
+      const role = String((user as any).role || '').toLowerCase();
+      let redirect = '/dashboard';
+
+      if (role === 'admin') redirect = '/admin';
+      else if (role === 'employee') redirect = '/employee';
+      else if (role === 'delivery' || role === 'delivery_partner') redirect = '/delivery';
+
+      router.replace(redirect);
+    }
   }, [user, router]);
 
   return (

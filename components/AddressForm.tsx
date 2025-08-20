@@ -248,7 +248,7 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
           <input
             type="text"
             required
-            placeholder="John"
+            placeholder="Isaac"
             className="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
             value={data.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
@@ -261,7 +261,7 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
           <input
             type="text"
             required
-            placeholder="Doe"
+            placeholder="NIYOBYOSE"
             className="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
             value={data.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
@@ -276,7 +276,7 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
         <input
           type="email"
           required
-          placeholder="john.doe@example.com"
+          placeholder="niyonkuru@gmail.com"
           className="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           value={data.email}
           onChange={(e) => handleChange('email', e.target.value)}

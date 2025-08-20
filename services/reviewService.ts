@@ -90,7 +90,16 @@ export const reviewService = {
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.size) queryParams.append('size', params.size.toString());
 
-      const response = await api.get<JavaReviewResponse<JavaReview[]>>(`/v1/reviews?${queryParams.toString()}`);
+      // Backend exposes specific endpoints for product and user reviews
+      if (params?.productId) {
+        const resp = await api.get<JavaReviewResponse<JavaReview[]>>(`/api/v1/reviews/product/${params.productId}`, {
+          params: { page: params.page ?? 0, size: params.size ?? 10, sortBy: 'createdAt', sortDirection: 'desc' }
+        });
+        if (resp.data.success && resp.data.data) return resp.data.data.map(transformJavaReview);
+        return [];
+      }
+      // Fallback: no generic list endpoint defined; return []
+      return [];
 
       if (response.data.success && response.data.data) {
         return response.data.data.map(transformJavaReview);
@@ -105,7 +114,7 @@ export const reviewService = {
 
   async getReviewById(reviewId: string): Promise<Review | null> {
     try {
-      const response = await api.get<JavaReviewResponse<JavaReview>>(`/v1/reviews/${reviewId}`);
+      const response = await api.get<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -127,7 +136,7 @@ export const reviewService = {
 
   async createReview(reviewData: CreateReviewRequest): Promise<Review> {
     try {
-      const response = await api.post<JavaReviewResponse<JavaReview>>('/v1/reviews', reviewData);
+      const response = await api.post<JavaReviewResponse<JavaReview>>('/api/v1/reviews/create', reviewData);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -142,7 +151,7 @@ export const reviewService = {
 
   async updateReview(reviewId: string, reviewData: UpdateReviewRequest): Promise<Review> {
     try {
-      const response = await api.put<JavaReviewResponse<JavaReview>>(`/v1/reviews/${reviewId}`, reviewData);
+      const response = await api.put<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}`, reviewData);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -157,7 +166,7 @@ export const reviewService = {
 
   async deleteReview(reviewId: string): Promise<void> {
     try {
-      const response = await api.delete<JavaReviewResponse<void>>(`/v1/reviews/${reviewId}`);
+      const response = await api.delete<JavaReviewResponse<void>>(`/api/v1/reviews/${reviewId}`);
 
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to delete review');
@@ -170,7 +179,7 @@ export const reviewService = {
 
   async markReviewHelpful(reviewId: string, helpful: boolean): Promise<Review> {
     try {
-      const response = await api.post<JavaReviewResponse<JavaReview>>(`/v1/reviews/${reviewId}/helpful`, {
+      const response = await api.post<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}/helpful`, {
         helpful
       });
 
@@ -187,7 +196,7 @@ export const reviewService = {
 
   async getAverageRating(productId: string): Promise<{ averageRating: number; totalReviews: number }> {
     try {
-      const response = await api.get<JavaReviewResponse<{ averageRating: number; totalReviews: number }>>(`/v1/reviews/product/${productId}/rating`);
+      const response = await api.get<JavaReviewResponse<{ averageRating: number; totalReviews: number }>>(`/api/v1/reviews/product/${productId}/rating`);
 
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -202,7 +211,8 @@ export const reviewService = {
 
   async getUserReviews(userId: string): Promise<Review[]> {
     try {
-      const response = await api.get<JavaReviewResponse<JavaReview[]>>(`/v1/reviews/user/${userId}`);
+      // Backend exposes /api/v1/reviews/user for the authenticated user (no userId path segment)
+      const response = await api.get<JavaReviewResponse<JavaReview[]>>(`/api/v1/reviews/user`);
 
       if (response.data.success && response.data.data) {
         return response.data.data.map(transformJavaReview);

@@ -1,19 +1,42 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiPlus, FiEdit, FiTrash2, FiEye, FiSearch, FiFilter } from 'react-icons/fi';
-import { ALL_PRODUCTS } from '../../../data/dummyProducts';
+import { FiPlus, FiEdit, FiTrash2, FiEye, FiSearch, FiFilter, FiRefreshCw } from 'react-icons/fi';
+import { productService } from '../../../services/productService';
+import { Product } from '../../../types/product';
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load products on component mount
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const productsData = await productService.list();
+      setProducts(productsData);
+    } catch (error: any) {
+      console.error('Failed to load products:', error);
+      setError(error.message || 'Failed to load products');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Filter and sort products
-  const filteredProducts = ALL_PRODUCTS.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.brand.toLowerCase().includes(searchTerm.toLowerCase());
+                         (product.brand && product.brand.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   }).sort((a, b) => {
@@ -25,13 +48,71 @@ export default function ProductsPage() {
       case 'stock':
         return a.stockQuantity - b.stockQuantity;
       case 'rating':
-        return b.rating - a.rating;
+        return (b.rating || 0) - (a.rating || 0);
       default:
         return 0;
     }
   });
 
   const categories = ['all', 'electronics', 'fashion', 'home-garden', 'sports-outdoors', 'beauty-health'];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">Products</h1>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1">Loading products...</p>
+          </div>
+          <Link
+            href="/admin/products/new"
+            className="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <FiPlus className="h-4 w-4" />
+            Add Product
+          </Link>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <FiRefreshCw className="h-8 w-8 text-primary animate-spin mx-auto mb-4" />
+            <p className="text-neutral-600">Loading products...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">Products</h1>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1">Error loading products</p>
+          </div>
+          <Link
+            href="/admin/products/new"
+            className="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <FiPlus className="h-4 w-4" />
+            Add Product
+          </Link>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="text-center">
+            <p className="text-red-800 mb-4">{error}</p>
+            <button
+              onClick={loadProducts}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
+            >
+              <FiRefreshCw className="h-4 w-4" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -209,7 +290,7 @@ export default function ProductsPage() {
         <div className="bg-neutral-50 px-6 py-3 border-t border-neutral-200">
           <div className="flex items-center justify-between">
             <div className="text-sm text-neutral-700">
-              Showing {filteredProducts.length} of {ALL_PRODUCTS.length} products
+              Showing {filteredProducts.length} of {products.length} products
             </div>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm border border-neutral-300 rounded hover:bg-white transition-colors">

@@ -89,3 +89,31 @@ export interface ProductFilters {
   onSale: boolean;
   isNew: boolean;
 }
+
+export interface ManyProductsDto {
+  productId: string;
+  productName: string;
+  shortDescription?: string;
+  price: number;
+  compareAtPrice?: number;
+  stockQuantity: number;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  brand?: {
+    brandId: string;
+    brandName: string;
+  };
+  isBestSeller?: boolean;
+  isFeatured?: boolean;
+  discountInfo?: any;
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    isPrimary: boolean;
+    sortOrder?: number;
+  };
+}

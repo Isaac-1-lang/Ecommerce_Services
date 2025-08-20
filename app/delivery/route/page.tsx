@@ -1,4 +1,4 @@
-import { FiMapPin, FiNavigation, FiClock, FiPackage, FiTruck, FiCheckCircle } from 'react-icons/fi';
+import { FiMap, FiMapPin, FiNavigation, FiClock, FiPackage, FiTruck, FiCheckCircle } from 'react-icons/fi';
 
 export default function DeliveryRoutePage() {
   // Mock route data - replace with real data from backend
@@ -14,7 +14,7 @@ export default function DeliveryRoutePage() {
     {
       id: 1,
       orderId: '#ORD-001',
-      customer: 'John Doe',
+      customer: 'NIYONKURU',
       address: '123 Main St, Downtown',
       status: 'completed',
       time: '1:30 PM',
@@ -24,7 +24,7 @@ export default function DeliveryRoutePage() {
     {
       id: 2,
       orderId: '#ORD-002',
-      customer: 'Jane Smith',
+      customer: 'UWASE',
       address: '456 Oak Ave, Midtown',
       status: 'completed',
       time: '2:15 PM',
@@ -34,7 +34,7 @@ export default function DeliveryRoutePage() {
     {
       id: 3,
       orderId: '#ORD-003',
-      customer: 'Mike Johnson',
+      customer: 'KABUGA',
       address: '789 Pine Rd, Uptown',
       status: 'current',
       time: '2:45 PM',
@@ -44,7 +44,7 @@ export default function DeliveryRoutePage() {
     {
       id: 4,
       orderId: '#ORD-004',
-      customer: 'Sarah Wilson',
+      customer: 'KABUGA',
       address: '321 Elm St, Downtown',
       status: 'pending',
       time: '3:30 PM',
@@ -54,7 +54,7 @@ export default function DeliveryRoutePage() {
     {
       id: 5,
       orderId: '#ORD-005',
-      customer: 'David Brown',
+      customer: 'KABUGA',
       address: '654 Maple Dr, Midtown',
       status: 'pending',
       time: '4:00 PM',
@@ -64,7 +64,7 @@ export default function DeliveryRoutePage() {
     {
       id: 6,
       orderId: '#ORD-006',
-      customer: 'Lisa Davis',
+      customer: 'KABUGA',
       address: '987 Cedar Ln, Uptown',
       status: 'pending',
       time: '4:30 PM',
@@ -74,7 +74,7 @@ export default function DeliveryRoutePage() {
     {
       id: 7,
       orderId: '#ORD-007',
-      customer: 'Tom Wilson',
+      customer: 'KABUGA',
       address: '147 Birch Ave, Downtown',
       status: 'pending',
       time: '5:00 PM',
@@ -84,7 +84,7 @@ export default function DeliveryRoutePage() {
     {
       id: 8,
       orderId: '#ORD-008',
-      customer: 'Emma Taylor',
+      customer: 'KABUGA',
       address: '258 Spruce St, Midtown',
       status: 'pending',
       time: '5:30 PM',

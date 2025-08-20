@@ -6,63 +6,56 @@ import { useAuthStore } from "../features/auth/store";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiUser, FiShield, FiTruck, FiUsers, FiCheckCircle } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { RoleRedirectPaths, UserRole } from "@/types/auth";
 
-// Predefined role assignments based on email/username
-const ROLE_ASSIGNMENTS = {
-  // Admin credentials
+// Hardcoded credentials for admin, employee, and delivery
+const HARDCODED_CREDENTIALS = {
   ADMIN: {
-    emails: ['admin@company.com', 'superadmin@company.com'],
-    usernames: ['admin', 'superadmin'],
+    email: 'xyz@gmail.com',
+    password: '12345678',
     redirectPath: '/admin'
   },
-  // Delivery credentials
-  DELIVERY: {
-    emails: ['delivery@company.com', 'driver@company.com'],
-    usernames: ['delivery', 'driver', 'courier'],
-    redirectPath: '/delivery'
-  },
-  // Employee credentials (default for others)
   EMPLOYEE: {
-    emails: ['employee@company.com', 'staff@company.com'],
-    usernames: ['employee', 'staff'],
+    email: 'zxy@gmail.com', 
+    password: '12345678',
     redirectPath: '/employee'
+  },
+  DELIVERY: {
+    email: 'yzx@gmail.com',
+    password: '12345678', 
+    redirectPath: '/delivery'
   }
 };
 
-// Function to determine user role and redirect path based on email or username
-const determineUserRole = (emailOrUsername: string) => {
-  const lowercaseInput = emailOrUsername.toLowerCase().trim();
+// Function to determine user role and redirect path based on hardcoded credentials
+const determineUserRole = (email: string) => {
+  const lowercaseEmail = email.toLowerCase().trim();
 
-  // Check for admin
-  if (ROLE_ASSIGNMENTS.ADMIN.emails.includes(lowercaseInput) || 
-      ROLE_ASSIGNMENTS.ADMIN.usernames.includes(lowercaseInput)) {
-    return { role: 'ADMIN', redirectPath: ROLE_ASSIGNMENTS.ADMIN.redirectPath };
+  // Check for hardcoded credentials
+  if (lowercaseEmail === HARDCODED_CREDENTIALS.ADMIN.email) {
+    return { role: 'admin', redirectPath: HARDCODED_CREDENTIALS.ADMIN.redirectPath };
+  }
+  
+  if (lowercaseEmail === HARDCODED_CREDENTIALS.EMPLOYEE.email) {
+    return { role: 'employee', redirectPath: HARDCODED_CREDENTIALS.EMPLOYEE.redirectPath };
+  }
+  
+  if (lowercaseEmail === HARDCODED_CREDENTIALS.DELIVERY.email) {
+    return { role: 'delivery', redirectPath: HARDCODED_CREDENTIALS.DELIVERY.redirectPath };
   }
 
-  // Check for delivery
-  if (ROLE_ASSIGNMENTS.DELIVERY.emails.includes(lowercaseInput) || 
-      ROLE_ASSIGNMENTS.DELIVERY.usernames.includes(lowercaseInput)) {
-    return { role: 'DELIVERY', redirectPath: ROLE_ASSIGNMENTS.DELIVERY.redirectPath };
-  }
-
-  // Check for specific employee credentials
-  if (ROLE_ASSIGNMENTS.EMPLOYEE.emails.includes(lowercaseInput) || 
-      ROLE_ASSIGNMENTS.EMPLOYEE.usernames.includes(lowercaseInput)) {
-    return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
-  }
-
-  // Default to employee for all other users
-  return { role: 'EMPLOYEE', redirectPath: ROLE_ASSIGNMENTS.EMPLOYEE.redirectPath };
+  // Default to CUSTOMER for all other emails
+  return { role: 'customer', redirectPath: '/dashboard' };
 };
 
 // Function to get role icon and color
 const getRoleInfo = (role: string) => {
   switch (role) {
-    case 'ADMIN':
+    case 'admin':
       return { icon: FiShield, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
-    case 'DELIVERY':
+    case 'delivery':
       return { icon: FiTruck, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
-    case 'EMPLOYEE':
+    case 'employee':
     default:
       return { icon: FiUsers, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
   }
@@ -76,7 +69,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [detectedRole, setDetectedRole] = useState<string>('EMPLOYEE');
+  const [detectedRole, setDetectedRole] = useState<string>('employee');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { setUser, setToken } = useAuthStore();
@@ -89,7 +82,7 @@ export default function LoginForm() {
       const { role } = determineUserRole(input);
       setDetectedRole(role);
     } else {
-      setDetectedRole('EMPLOYEE');
+      setDetectedRole('employee');
     }
   };
 
@@ -100,26 +93,130 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      // Determine redirect path based on credentials
-      const { role, redirectPath } = determineUserRole(emailOrUsername);
-      
-      const { user, token } = await authService.login({ 
-        email: emailOrUsername, 
-        password 
-      });
+      const email = emailOrUsername.toLowerCase().trim();
+      // Always authenticate via backend to obtain a valid JWT
+      try {
+        const { user, token } = await authService.login({
+          email: emailOrUsername,
+          password
+        });
 
-      // Set user data with role information
-      const userWithRole = { ...user, role };
-      setUser(userWithRole);
-      setToken(token);
+        setUser(user);
+        setToken(token);
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
-      // Show success message
-      setSuccessMessage(`Welcome back! Redirecting to ${role.toLowerCase()} dashboard...`);
+        setSuccessMessage('Welcome! Redirecting...');
+        const redirect = (RoleRedirectPaths as any)[(user as any).role] || '/dashboard';
+        router.replace(redirect);
+        setTimeout(() => {
+          if (typeof window !== 'undefined' && window.location.pathname !== redirect) {
+            window.location.href = redirect;
+          }
+        }, 300);
+        return;
+      } catch (loginError) {
+        // Fall through to legacy logic below (kept for reference), but backend should handle all
+      }
+      const { role, redirectPath } = determineUserRole(email);
 
-      // Redirect to appropriate dashboard after a brief delay
-      setTimeout(() => {
-        router.push(redirectPath);
-      }, 1500);
+             // Check for hardcoded credentials first
+       if (email === HARDCODED_CREDENTIALS.ADMIN.email && password === HARDCODED_CREDENTIALS.ADMIN.password) {
+         // Hardcoded admin login
+         const adminUser = {
+           id: 'admin-001',
+           email: HARDCODED_CREDENTIALS.ADMIN.email,
+           firstName: 'Admin',
+           lastName: 'User',
+           role: 'admin',
+           isActive: true,
+           createdAt: new Date().toISOString(),
+           lastLoginAt: new Date().toISOString(),
+         };
+        
+        setUser(adminUser);
+        setToken('admin-token-123');
+        localStorage.setItem('authToken', 'admin-token-123');
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        
+        setSuccessMessage('Welcome Admin! Redirecting to admin dashboard...');
+        setTimeout(() => router.push('/admin'), 1000);
+        return;
+      }
+
+             if (email === HARDCODED_CREDENTIALS.EMPLOYEE.email && password === HARDCODED_CREDENTIALS.EMPLOYEE.password) {
+         // Hardcoded employee login
+         const employeeUser = {
+           id: 'employee-001',
+           email: HARDCODED_CREDENTIALS.EMPLOYEE.email,
+           firstName: 'Employee',
+           lastName: 'User',
+           role: 'employee',
+           isActive: true,
+           createdAt: new Date().toISOString(),
+           lastLoginAt: new Date().toISOString(),
+         };
+        
+        setUser(employeeUser);
+        setToken('employee-token-123');
+        localStorage.setItem('authToken', 'employee-token-123');
+        localStorage.setItem('user', JSON.stringify(employeeUser));
+        
+        setSuccessMessage('Welcome Employee! Redirecting to employee dashboard...');
+        setTimeout(() => router.push('/employee'), 1000);
+        return;
+      }
+
+             if (email === HARDCODED_CREDENTIALS.DELIVERY.email && password === HARDCODED_CREDENTIALS.DELIVERY.password) {
+         // Hardcoded delivery login
+         const deliveryUser = {
+           id: 'delivery-001',
+           email: HARDCODED_CREDENTIALS.DELIVERY.email,
+           firstName: 'Delivery',
+           lastName: 'Agent',
+           role: 'delivery',
+           isActive: true,
+           createdAt: new Date().toISOString(),
+           lastLoginAt: new Date().toISOString(),
+         };
+        
+        setUser(deliveryUser);
+        setToken('delivery-token-123');
+        localStorage.setItem('authToken', 'delivery-token-123');
+        localStorage.setItem('user', JSON.stringify(deliveryUser));
+        
+        setSuccessMessage('Welcome Delivery Agent! Redirecting to delivery dashboard...');
+        setTimeout(() => router.push('/delivery'), 1000);
+        return;
+      }
+      if (role === 'customer') {
+        try {
+          const { user, token } = await authService.login({ 
+            email: emailOrUsername, 
+            password 
+          });
+
+          setUser(user);
+          setToken(token);
+
+          localStorage.setItem('authToken', token);
+          localStorage.setItem('user', JSON.stringify(user));
+
+          setSuccessMessage('Welcome! Redirecting to dashboard...');
+          // Primary navigation
+          router.replace('/dashboard');
+          // Hard fallback in case router is blocked in dev
+          setTimeout(() => {
+            if (typeof window !== 'undefined' && window.location.pathname !== '/dashboard') {
+              window.location.href = '/dashboard';
+            }
+          }, 300);
+        } catch (loginError) {
+          setError(loginError instanceof Error ? loginError.message : 'Customer login failed. Please check your credentials.');
+        }
+      } else {
+        setError('Invalid credentials for this role. Please use the correct hardcoded credentials.');
+      }
 
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -193,15 +290,18 @@ export default function LoginForm() {
           <div className="text-xs text-blue-700 space-y-1">
             <div className="flex items-center">
               <FiShield className="w-3 h-3 mr-2" />
-              <span><strong>Admin:</strong> admin@company.com or 'admin'</span>
-            </div>
-            <div className="flex items-center">
-              <FiTruck className="w-3 h-3 mr-2" />
-              <span><strong>Delivery:</strong> delivery@company.com or 'delivery'</span>
+              <span><strong>Admin:</strong> xyz@gmail.com / 12345678</span>
             </div>
             <div className="flex items-center">
               <FiUsers className="w-3 h-3 mr-2" />
-              <span><strong>Employee:</strong> employee@company.com or 'employee'</span>
+              <span><strong>Employee:</strong> zxy@gmail.com / 12345678</span>
+            </div>
+            <div className="flex items-center">
+              <FiTruck className="w-3 h-3 mr-2" />
+              <span><strong>Delivery:</strong> yzx@gmail.com / 12345678</span>
+            </div>
+            <div className="mt-2 pt-2 border-t border-blue-200">
+              <span className="text-blue-600"><strong>Customers:</strong> Register or login with any other email</span>
             </div>
           </div>
         </div>

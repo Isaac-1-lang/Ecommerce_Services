@@ -1,5 +1,5 @@
 // services/authService.ts
-import { AuthUser } from "../types/auth";
+import { User, UserRole, LoginCredentials, RegisterData, CustomerRegisterData, AdminRegisterData, EmployeeRegisterData } from "../types/auth";
 import api from "../lib/api";
 import { googleAuthService } from "../lib/googleAuth";
 
@@ -84,76 +84,130 @@ const safeLocalStorage = {
 };
 
 export const authService = {
-  async login({ email, password }: LoginRequest): Promise<{ user: AuthUser; token: string }> {
+  async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
     try {
-      const response = await api.post<LoginResponse>("/v1/auth/users/login", { email, password });
+      const payload = {
+        email: (credentials.email || '').trim(),
+        password: (credentials.password || '').trim(),
+      };
+      const response = await api.post<any>("/api/v1/auth/users/login", payload);
 
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.message || "Login failed");
+      const raw = response.data as any;
+
+      // Handle both possible backend shapes
+      // 1) Wrapped: { success: true, data: { token, userName, userEmail, userId, role } }
+      // 2) Direct DTO: { token, userName, userEmail, userId, role, ... }
+      const loginData = (raw && raw.success && raw.data) ? raw.data
+                      : (raw && raw.token && raw.userEmail) ? raw
+                      : null;
+
+      if (!loginData) {
+        throw new Error(raw?.message || "Login failed");
       }
 
-      const loginData = response.data.data;
+      const fullName: string = String(loginData.userName || '').trim();
+      const firstName = fullName.split(" ")[0] || '';
+      const lastName = fullName.split(" ").slice(1).join(" ") || '';
 
-      const authUser: AuthUser = {
-        id: loginData.userId,
-        name: loginData.userName,
-        username: loginData.userName.split(" ")[0],
-        email: loginData.userEmail,
-        profilePicture:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        role: loginData.role as any,
+      const backendRole = String(loginData.role || '').toUpperCase();
+      const roleMap: Record<string, UserRole> = {
+        'ADMIN': UserRole.ADMIN,
+        'EMPLOYEE': UserRole.EMPLOYEE,
+        'CUSTOMER': UserRole.CUSTOMER,
+        'DELIVERY_PARTNER': UserRole.DELIVERY_PARTNER,
+        'DELIVERY_AGENT': UserRole.DELIVERY_PARTNER,
       };
 
-      safeLocalStorage.setItem("authToken", loginData.token);
-      safeLocalStorage.setItem("user", JSON.stringify(authUser));
+      const user: User = {
+        id: String(loginData.userId),
+        email: String(loginData.userEmail),
+        firstName,
+        lastName,
+        role: roleMap[backendRole] ?? UserRole.CUSTOMER,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+      };
 
-      return { user: authUser, token: loginData.token };
+      safeLocalStorage.setItem("authToken", String(loginData.token));
+      safeLocalStorage.setItem("user", JSON.stringify(user));
+
+      return { user, token: String(loginData.token) };
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || error.message || "Login failed");
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
+      throw new Error(backendMessage || error.message || "Login failed");
     }
   },
 
-  async register({
-    firstName,
-    lastName,
-    username,
-    email,
-    password,
-    phoneNumber,
-    profilePicture,
-  }: RegisterRequest): Promise<{ id: string; message: string }> {
+  async register(data: RegisterData): Promise<{ user: User; token: string }> {
     try {
-      const formData = new FormData();
-      formData.append("firstName", firstName);
-      formData.append("lastName", lastName);
-      formData.append("username", username);
-      formData.append("email", email);
-      formData.append("password", password);
-      if (phoneNumber) formData.append("phoneNumber", phoneNumber);
-      if (profilePicture) formData.append("profilePicture", profilePicture);
+      // Only send the fields that the backend expects
+      const requestData: any = {
+        firstName: (data.firstName || '').trim(),
+        lastName: (data.lastName || '').trim(),
+        email: (data.email || '').trim(),
+        password: (data.password || '').trim(),
+      };
 
-      const response = await api.post<AuthResponse>("/v1/auth/users/register", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (data && (data as any).phoneNumber) {
+        requestData.phoneNumber = String((data as any).phoneNumber).trim();
+      }
+
+      if (!requestData.firstName || requestData.firstName.length < 2) {
+        throw new Error('First name must be at least 2 characters');
+      }
+      if (!requestData.lastName || requestData.lastName.length < 2) {
+        throw new Error('Last name must be at least 2 characters');
+      }
+      if (!requestData.email) {
+        throw new Error('Email is required');
+      }
+      if (!requestData.password || requestData.password.length < 8) {
+        throw new Error('Password must be at least 8 characters');
+      }
+
+      // Note: The backend currently only supports basic registration
+      // Additional fields like username, payment info, business info, etc.
+      // will need to be handled in a separate update endpoint or
+      // the backend registration endpoint needs to be extended
+
+      const response = await api.post<AuthResponse>("/api/v1/auth/users/register", requestData);
 
       if (!response.data.success) {
         throw new Error(response.data.message || "Registration failed");
       }
 
-      return {
-        id: response.data.data?.user?.id || "new-user",
-        message:
-          response.data.message ||
-          "Registration successful! Please check your email to verify your account before signing in.",
+      // Create user object from registration response
+      const userData = response.data.data;
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role as UserRole,
+        isActive: true,
+        createdAt: userData.createdAt || new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
       };
+
+      // Backend now returns token directly, no need for separate login
+      return { user, token: userData.token };
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || error.message || "Registration failed");
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
+      throw new Error(backendMessage || error.message || "Registration failed");
     }
+  },
+
+  async getCurrentUser(_token: string): Promise<User> {
+    // Backend does not expose /auth/me; return stored profile
+    const stored = safeLocalStorage.getItem("user");
+    if (!stored) throw new Error("No user session");
+    return JSON.parse(stored) as User;
   },
 
   async forgotPassword({ email }: PasswordResetRequest): Promise<{ message: string }> {
     try {
-      const response = await api.post<AuthResponse>("/v1/auth/users/request-password-reset", { email });
+      const response = await api.post<AuthResponse>("/api/v1/auth/users/request-password-reset", { email });
       if (!response.data.success) throw new Error(response.data.message || "Request failed");
       return { message: response.data.message || "Password reset email sent" };
     } catch (error: any) {
@@ -163,7 +217,7 @@ export const authService = {
 
   async verifyResetCode({ email, code }: VerifyCodeRequest): Promise<{ message: string }> {
     try {
-      const response = await api.post<AuthResponse>("/v1/auth/users/verify-reset-code", { email, code });
+      const response = await api.post<AuthResponse>("/api/v1/auth/users/verify-reset-code", { email, code });
       if (!response.data.success) throw new Error(response.data.message || "Invalid verification code");
       return { message: response.data.message || "Code verified successfully" };
     } catch (error: any) {
@@ -173,7 +227,7 @@ export const authService = {
 
   async resetPassword({ email, newPassword }: ResetPasswordRequest): Promise<{ message: string }> {
     try {
-      const response = await api.post<AuthResponse>("/v1/auth/users/reset-password", { email, newPassword });
+      const response = await api.post<AuthResponse>("/api/v1/auth/users/reset-password", { email, newPassword });
       if (!response.data.success) throw new Error(response.data.message || "Password reset failed");
       return { message: response.data.message || "Password reset successfully" };
     } catch (error: any) {
@@ -185,7 +239,7 @@ export const authService = {
     try {
       const token = safeLocalStorage.getItem("authToken");
       if (token) {
-        await api.post("/v1/auth/users/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
+        await api.post("/api/v1/auth/users/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
       }
       safeLocalStorage.removeItem("authToken");
       safeLocalStorage.removeItem("user");
@@ -197,31 +251,15 @@ export const authService = {
     }
   },
 
-  async me(): Promise<AuthUser | null> {
+  async me(): Promise<User | null> {
     try {
       const token = safeLocalStorage.getItem("authToken");
       if (!token) return null;
-
-      const response = await api.get<AuthResponse>("/v1/auth/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.data.success || !response.data.data) return null;
-
-      const user = response.data.data;
-      const authUser: AuthUser = {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        profilePicture:
-          user.profilePicture ||
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        role: user.role as any,
-      };
-
-      safeLocalStorage.setItem("user", JSON.stringify(authUser));
-      return authUser;
+      try {
+        return await this.getCurrentUser(token);
+      } catch {
+        return this.getStoredUser();
+      }
     } catch {
       safeLocalStorage.removeItem("authToken");
       safeLocalStorage.removeItem("user");
@@ -230,18 +268,10 @@ export const authService = {
   },
 
   async validateToken(token: string): Promise<boolean> {
-    if (!token) return false;
-    try {
-      const response = await api.get<AuthResponse>("/v1/auth/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data.success;
-    } catch {
-      return false;
-    }
+    return !!token; // no /me endpoint to validate server-side
   },
 
-  getStoredUser(): AuthUser | null {
+  getStoredUser(): User | null {
     try {
       const userStr = safeLocalStorage.getItem("user");
       return userStr ? JSON.parse(userStr) : null;
@@ -254,31 +284,33 @@ export const authService = {
     return safeLocalStorage.getItem("authToken");
   },
 
-  async googleLogin(): Promise<{ user: AuthUser; token: string }> {
+  async googleLogin(): Promise<{ user: User; token: string }> {
     try {
       await googleAuthService.initialize();
       const googleUser = await googleAuthService.signIn();
       const idToken = googleUser.getAuthResponse().id_token;
 
-      const response = await api.post<LoginResponse>("/v1/auth/google/login", { idToken });
+      const response = await api.post<LoginResponse>("/api/v1/auth/google/login", { idToken });
       if (!response.data.success || !response.data.data) throw new Error("Google login failed");
 
       const loginData = response.data.data;
       const profile = googleUser.getBasicProfile();
 
-      const authUser: AuthUser = {
+      const user: User = {
         id: loginData.userId,
-        name: loginData.userName,
-        username: loginData.userName.split(" ")[0],
         email: loginData.userEmail,
-        profilePicture: profile.getImageUrl() || undefined,
-        role: loginData.role as any,
+        firstName: profile.getName()?.split(" ")[0] || "",
+        lastName: profile.getName()?.split(" ").slice(1).join(" ") || "",
+        role: loginData.role as UserRole,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
       };
 
       safeLocalStorage.setItem("authToken", loginData.token);
-      safeLocalStorage.setItem("user", JSON.stringify(authUser));
+      safeLocalStorage.setItem("user", JSON.stringify(user));
 
-      return { user: authUser, token: loginData.token };
+      return { user, token: loginData.token };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || error.message || "Google login failed");
     }

@@ -50,11 +50,11 @@ export default function ReportsPage() {
     repeatCustomers: 66,
     averageLifetimeValue: 508.21,
     topCustomers: [
-      { name: 'John Doe', email: 'john@example.com', totalSpent: 2899.99, orders: 8 },
-      { name: 'Jane Smith', email: 'jane@example.com', totalSpent: 1899.99, orders: 6 },
-      { name: 'Mike Johnson', email: 'mike@example.com', totalSpent: 1599.99, orders: 5 },
-      { name: 'Sarah Wilson', email: 'sarah@example.com', totalSpent: 1299.99, orders: 4 },
-      { name: 'David Brown', email: 'david@example.com', totalSpent: 999.99, orders: 3 }
+      { name: 'NIYONKURU', email: 'niyonkuru@gmail.com', totalSpent: 2899.99, orders: 8 },
+      { name: 'UWASE', email: 'atukunda@gmail.com', totalSpent: 1899.99, orders: 6 },
+      { name: 'KABUGA', email: 'kabuga@gmail.com', totalSpent: 1599.99, orders: 5 },
+      { name: 'KABUGA', email: 'kabuga@gmail.com', totalSpent: 1299.99, orders: 4 },
+      { name: 'KABUGA', email: 'kabuga@gmail.com', totalSpent: 999.99, orders: 3 }
     ]
   };
 

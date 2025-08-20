@@ -68,7 +68,19 @@ function CheckoutForm({ amount, currency = 'usd', onSuccess, onError }: StripePa
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create payment intent');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `HTTP ${response.status}: Failed to create payment intent`;
+        
+        // Handle specific error cases
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in to continue.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Please check your permissions.');
+        } else if (response.status === 400) {
+          throw new Error(errorMessage);
+        } else {
+          throw new Error(errorMessage);
+        }
       }
 
       const { clientSecret } = await response.json();

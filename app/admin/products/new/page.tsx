@@ -1,66 +1,51 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiArrowLeft, FiUpload, FiX, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiUpload, FiX, FiSave, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { productService, CreateProductData } from '../../../../services/productService';
 
 export default function NewProductPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [categories, setCategories] = useState<Array<{id: number, name: string, slug: string}>>([]);
+  
   const [formData, setFormData] = useState({
     name: '',
-    shortDescription: '',
     description: '',
-    price: '',
-    originalPrice: '',
-    category: '',
-    subcategory: '',
-    brand: '',
+    sku: '',
+    basePrice: '',
+    salePrice: '',
     stockQuantity: '',
-    rating: '',
-    reviewCount: '',
-    tags: '',
-    weight: '',
-    length: '',
-    width: '',
-    height: '',
-    isNew: false,
-    isOnSale: false,
+    category: '',
+    brandId: '',
+    slug: '',
+    isActive: true,
     isFeatured: false,
+    isNewArrival: false,
+    isOnSale: false,
   });
 
-  const [variants, setVariants] = useState<Array<{
-    id: string;
-    sku: string;
-    price: string;
-    originalPrice: string;
-    stockQuantity: string;
-    attributes: Array<{ type: string; name: string; value: string }>;
-    warehouseAssignments: Array<{ warehouseId: string; quantity: string }>;
-  }>>([]);
 
-  const [warehouses, setWarehouses] = useState<Array<{
-    id: string;
-    name: string;
-    code: string;
-    location: string;
-  }>>([
-    { id: '1', name: 'Main Warehouse', code: 'WH-MAIN-001', location: 'New York, NY' },
-    { id: '2', name: 'West Coast Hub', code: 'WH-WEST-002', location: 'Los Angeles, CA' },
-    { id: '3', name: 'Central Distribution', code: 'WH-CENT-003', location: 'Chicago, IL' },
-  ]);
 
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-  const categories = [
-    { value: 'electronics', label: 'Electronics', subcategories: ['Smartphones', 'Laptops', 'Audio', 'Tablets', 'Accessories'] },
-    { value: 'fashion', label: 'Fashion', subcategories: ['Men', 'Women', 'Kids', 'Accessories'] },
-    { value: 'home-garden', label: 'Home & Garden', subcategories: ['Furniture', 'Decor', 'Kitchen', 'Garden'] },
-    { value: 'sports-outdoors', label: 'Sports & Outdoors', subcategories: ['Fitness', 'Outdoor', 'Team Sports', 'Camping'] },
-    { value: 'beauty-health', label: 'Beauty & Health', subcategories: ['Skincare', 'Makeup', 'Haircare', 'Wellness'] },
-  ];
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await productService.getCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    
+    loadCategories();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -88,109 +73,90 @@ export default function NewProductPage() {
     setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Variant management functions
-  const addVariant = () => {
-    const newVariant = {
-      id: Date.now().toString(),
-      sku: '',
-      price: '',
-      originalPrice: '',
-      stockQuantity: '',
-      attributes: [],
-      warehouseAssignments: []
-    };
-    setVariants(prev => [...prev, newVariant]);
+  // Generate SKU from product name
+  const generateSKU = (name: string): string => {
+    const timestamp = Date.now().toString().slice(-6);
+    const namePart = name.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 6);
+    return `${namePart}-${timestamp}`;
   };
 
-  const removeVariant = (index: number) => {
-    setVariants(prev => prev.filter((_, i) => i !== index));
+  // Get category ID from selected category
+  const getCategoryId = (categorySlug: string): number => {
+    const category = categories.find(cat => cat.slug === categorySlug);
+    if (!category) {
+      console.error('Category not found for slug:', categorySlug);
+      console.log('Available categories:', categories);
+      throw new Error(`Category not found: ${categorySlug}`);
+    }
+    return category.id;
   };
 
-  const updateVariant = (index: number, field: string, value: string) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === index ? { ...variant, [field]: value } : variant
-    ));
-  };
 
-  const addVariantAttribute = (variantIndex: number) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? { ...variant, attributes: [...variant.attributes, { type: '', name: '', value: '' }] }
-        : variant
-    ));
-  };
-
-  const removeVariantAttribute = (variantIndex: number, attrIndex: number) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? { ...variant, attributes: variant.attributes.filter((_, j) => j !== attrIndex) }
-        : variant
-    ));
-  };
-
-  const updateVariantAttribute = (variantIndex: number, attrIndex: number, field: string, value: string) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? {
-            ...variant,
-            attributes: variant.attributes.map((attr, j) => 
-              j === attrIndex ? { ...attr, [field]: value } : attr
-            )
-          }
-        : variant
-    ));
-  };
-
-  const addWarehouseAssignment = (variantIndex: number) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? { ...variant, warehouseAssignments: [...variant.warehouseAssignments, { warehouseId: '', quantity: '' }] }
-        : variant
-    ));
-  };
-
-  const removeWarehouseAssignment = (variantIndex: number, assignmentIndex: number) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? { ...variant, warehouseAssignments: variant.warehouseAssignments.filter((_, j) => j !== assignmentIndex) }
-        : variant
-    ));
-  };
-
-  const updateWarehouseAssignment = (variantIndex: number, assignmentIndex: number, field: string, value: string) => {
-    setVariants(prev => prev.map((variant, i) => 
-      i === variantIndex 
-        ? {
-            ...variant,
-            warehouseAssignments: variant.warehouseAssignments.map((assignment, j) => 
-              j === assignmentIndex ? { ...assignment, [field]: value } : assignment
-            )
-          }
-        : variant
-    ));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setMessage(null);
 
     try {
-      // Here you would typically upload images to your storage service
-      // and then create the product in your database
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Redirect to products list
-      router.push('/admin/products');
-    } catch (error) {
+      // Validate required fields
+      if (!formData.name || !formData.basePrice || !formData.category) {
+        throw new Error('Please fill in all required fields: Name, Base Price, and Category');
+      }
+
+      // Set default values for optional fields
+      const defaultStockQuantity = formData.stockQuantity ? parseInt(formData.stockQuantity) : 0;
+      const defaultDescription = formData.description || `${formData.name} - Product description coming soon`;
+
+      // Prepare product data
+      const productData: CreateProductData = {
+        name: formData.name,
+        description: defaultDescription,
+        sku: formData.sku || generateSKU(formData.name),
+        basePrice: parseFloat(formData.basePrice),
+        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : undefined,
+        stockQuantity: defaultStockQuantity,
+        categoryId: getCategoryId(formData.category),
+        brandId: formData.brandId || undefined,
+        slug: formData.slug || undefined,
+        isActive: formData.isActive,
+        isFeatured: formData.isFeatured,
+        isNewArrival: formData.isNewArrival,
+        isOnSale: formData.isOnSale,
+        productImages: images.length > 0 ? images : undefined,
+        imageMetadata: images.map((_, index) => ({
+          altText: `${formData.name} - Image ${index + 1}`,
+          isPrimary: index === 0,
+          sortOrder: index
+        }))
+      };
+
+      // Create product
+      const createdProduct = await productService.createProduct(productData);
+
+      // Show success message
+      setMessage({
+        type: 'success',
+        text: `Product "${createdProduct.name}" created successfully! Redirecting to products list...`
+      });
+
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        router.push('/admin/products');
+      }, 2000);
+
+    } catch (error: any) {
       console.error('Error creating product:', error);
+      setMessage({
+        type: 'error',
+        text: error.message || 'Failed to create product. Please try again.'
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const selectedCategory = categories.find(cat => cat.value === formData.category);
+  const selectedCategory = categories.find(cat => cat.slug === formData.category);
 
   return (
     <div className="space-y-6">
@@ -199,16 +165,32 @@ export default function NewProductPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/admin/products"
-            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors"
           >
-            <FiArrowLeft className="h-5 w-5 text-neutral-600" />
+            <FiArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-neutral-800">Add New Product</h1>
-            <p className="text-neutral-600 mt-1">Create a new product for your store</p>
+            <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">Add New Product</h1>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1">Create a new product for your catalog</p>
           </div>
         </div>
       </div>
+
+      {/* Success/Error Message */}
+      {message && (
+        <div className={`p-4 rounded-lg flex items-center gap-2 ${
+          message.type === 'success' 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-red-100 text-red-800 border border-red-200'
+        }`}>
+          {message.type === 'success' ? (
+            <FiCheckCircle className="h-5 w-5 text-green-600" />
+          ) : (
+            <FiAlertCircle className="h-5 w-5 text-red-600" />
+          )}
+          <span className="font-medium">{message.text}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
@@ -232,16 +214,15 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Brand *
+                Brand ID(Optional)
               </label>
               <input
                 type="text"
-                name="brand"
-                value={formData.brand}
+                name="brandId"
+                value={formData.brandId}
                 onChange={handleInputChange}
-                required
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="Enter brand name"
+                placeholder="Enter brand ID "
               />
             </div>
 
@@ -258,8 +239,8 @@ export default function NewProductPage() {
               >
                 <option value="">Select category</option>
                 {categories.map(category => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
+                  <option key={category.id} value={category.slug}>
+                    {category.name}
                   </option>
                 ))}
               </select>
@@ -267,29 +248,26 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Subcategory
+                SKU (optional)
               </label>
-              <select
-                name="subcategory"
-                value={formData.subcategory}
+              <input
+                type="text"
+                name="sku"
+                value={formData.sku}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              >
-                <option value="">Select subcategory</option>
-                {selectedCategory?.subcategories.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
+                placeholder="Auto-generated if left empty"
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Price *
+                Base Price *
               </label>
               <input
                 type="number"
-                name="price"
-                value={formData.price}
+                name="basePrice"
+                value={formData.basePrice}
                 onChange={handleInputChange}
                 required
                 step="0.01"
@@ -301,12 +279,12 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Original Price
+                Sale Price
               </label>
               <input
                 type="number"
-                name="originalPrice"
-                value={formData.originalPrice}
+                name="salePrice"
+                value={formData.salePrice}
                 onChange={handleInputChange}
                 step="0.01"
                 min="0"
@@ -317,31 +295,30 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Stock Quantity *
+                Stock Quantity
               </label>
               <input
                 type="number"
                 name="stockQuantity"
                 value={formData.stockQuantity}
                 onChange={handleInputChange}
-                required
                 min="0"
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="0"
+                placeholder="0 (optional)"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Tags
+                Slug
               </label>
               <input
                 type="text"
-                name="tags"
-                value={formData.tags}
+                name="slug"
+                value={formData.slug}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="tag1, tag2, tag3"
+                placeholder="product-url-slug"
               />
             </div>
           </div>
@@ -353,31 +330,15 @@ export default function NewProductPage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Short Description *
-              </label>
-              <textarea
-                name="shortDescription"
-                value={formData.shortDescription}
-                onChange={handleInputChange}
-                required
-                rows={3}
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="Brief product description"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Full Description *
+                Product Description
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                required
                 rows={6}
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="Detailed product description"
+                placeholder="Detailed product description (optional)"
               />
             </div>
           </div>
@@ -431,166 +392,6 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Product Variants */}
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-neutral-800">Product Variants</h2>
-            <button
-              type="button"
-              onClick={() => addVariant()}
-              className="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-            >
-              Add Variant
-            </button>
-          </div>
-          
-          {variants.length === 0 ? (
-            <p className="text-neutral-500 text-center py-8">No variants added yet. Click "Add Variant" to create product variations.</p>
-          ) : (
-            <div className="space-y-4">
-              {variants.map((variant, index) => (
-                <div key={variant.id} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium text-neutral-800">Variant {index + 1}</h3>
-                    <button
-                      type="button"
-                      onClick={() => removeVariant(index)}
-                      className="text-red-600 hover:text-red-800 text-sm"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">SKU</label>
-                      <input
-                        type="text"
-                        value={variant.sku}
-                        onChange={(e) => updateVariant(index, 'sku', e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        placeholder="Variant SKU"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={variant.price}
-                        onChange={(e) => updateVariant(index, 'price', e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">Original Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={variant.originalPrice}
-                        onChange={(e) => updateVariant(index, 'originalPrice', e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Variant Attributes */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Attributes</label>
-                    <div className="space-y-2">
-                      {variant.attributes.map((attr, attrIndex) => (
-                        <div key={attrIndex} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={attr.type}
-                            onChange={(e) => updateVariantAttribute(index, attrIndex, 'type', e.target.value)}
-                            className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="Type (e.g., Color, Size)"
-                          />
-                          <input
-                            type="text"
-                            value={attr.name}
-                            onChange={(e) => updateVariantAttribute(index, attrIndex, 'name', e.target.value)}
-                            className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="Name (e.g., Red, Large)"
-                          />
-                          <input
-                            type="text"
-                            value={attr.value}
-                            onChange={(e) => updateVariantAttribute(index, attrIndex, 'value', e.target.value)}
-                            className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="Value"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeVariantAttribute(index, attrIndex)}
-                            className="px-3 py-2 text-red-600 hover:text-red-800 border border-red-300 rounded-lg"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => addVariantAttribute(index)}
-                        className="text-primary hover:text-primary-600 text-sm"
-                      >
-                        + Add Attribute
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Warehouse Assignments */}
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Warehouse Stock</label>
-                    <div className="space-y-2">
-                      {variant.warehouseAssignments.map((assignment, assignmentIndex) => (
-                        <div key={assignmentIndex} className="flex gap-2">
-                          <select
-                            value={assignment.warehouseId}
-                            onChange={(e) => updateWarehouseAssignment(index, assignmentIndex, 'warehouseId', e.target.value)}
-                            className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                          >
-                            <option value="">Select Warehouse</option>
-                            {warehouses.map(warehouse => (
-                              <option key={warehouse.id} value={warehouse.id}>
-                                {warehouse.name} - {warehouse.location}
-                              </option>
-                            ))}
-                          </select>
-                          <input
-                            type="number"
-                            value={assignment.quantity}
-                            onChange={(e) => updateWarehouseAssignment(index, assignmentIndex, 'quantity', e.target.value)}
-                            className="w-32 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            placeholder="Quantity"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeWarehouseAssignment(index, assignmentIndex)}
-                            className="px-3 py-2 text-red-600 hover:text-red-800 border border-red-300 rounded-lg"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => addWarehouseAssignment(index)}
-                        className="text-primary hover:text-primary-600 text-sm"
-                      >
-                        + Add Warehouse
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         {/* Product Status */}
         <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
           <h2 className="text-xl font-semibold text-neutral-800 mb-4">Product Status</h2>
@@ -598,12 +399,12 @@ export default function NewProductPage() {
             <label className="flex items-center gap-3">
               <input
                 type="checkbox"
-                name="isNew"
-                checked={formData.isNew}
+                name="isNewArrival"
+                checked={formData.isNewArrival}
                 onChange={handleInputChange}
                 className="w-4 h-4 text-primary border-neutral-300 rounded focus:ring-primary"
               />
-              <span className="text-sm font-medium text-neutral-700">Mark as New Product</span>
+              <span className="text-sm font-medium text-neutral-700">Mark as New Arrival</span>
             </label>
 
             <label className="flex items-center gap-3">
@@ -626,6 +427,17 @@ export default function NewProductPage() {
                 className="w-4 h-4 text-primary border-neutral-300 rounded focus:ring-primary"
               />
               <span className="text-sm font-medium text-neutral-700">Mark as Featured</span>
+            </label>
+
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleInputChange}
+                className="w-4 h-4 text-primary border-neutral-300 rounded focus:ring-primary"
+              />
+              <span className="text-sm font-medium text-neutral-700">Product is Active</span>
             </label>
           </div>
         </div>

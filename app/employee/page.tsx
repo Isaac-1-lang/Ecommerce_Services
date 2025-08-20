@@ -1,34 +1,23 @@
-import { FiPackage, FiUsers, FiShoppingCart, FiMessageSquare, FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
+import { FiBell, FiList, FiFileText, FiHelpCircle, FiBookOpen, FiCalendar } from 'react-icons/fi';
 import Link from 'next/link';
 
 export default function EmployeeDashboard() {
   // Mock data - replace with real data from your backend
-  const stats = {
-    pendingOrders: 12,
-    activeCustomers: 89,
-    totalProducts: 30,
-    supportTickets: 5,
-    returnsPending: 3,
-    todayRevenue: 1250.75
-  };
-
-  const recentOrders = [
-    { id: '#ORD-001', customer: 'John Doe', amount: 299.99, status: 'Processing', priority: 'High' },
-    { id: '#ORD-002', customer: 'Jane Smith', amount: 149.99, status: 'Ready to Ship', priority: 'Medium' },
-    { id: '#ORD-003', customer: 'Mike Johnson', amount: 89.99, status: 'Shipped', priority: 'Low' },
+  const announcements = [
+    { id: 'AN-001', title: 'Quarterly Town Hall', date: '2025-08-10' },
+    { id: 'AN-002', title: 'Office Maintenance Schedule', date: '2025-08-12' },
   ];
 
-  const supportTickets = [
-    { id: '#TKT-001', customer: 'Sarah Wilson', issue: 'Order not received', status: 'Open', priority: 'High' },
-    { id: '#TKT-002', customer: 'David Brown', issue: 'Product quality concern', status: 'In Progress', priority: 'Medium' },
-    { id: '#TKT-003', customer: 'Lisa Davis', issue: 'Return request', status: 'Pending', priority: 'Low' },
+  const myTasks = [
+    { id: 'TSK-101', title: 'Update onboarding checklist', due: '2025-08-15', status: 'In Progress' },
+    { id: 'TSK-102', title: 'Prepare weekly report', due: '2025-08-16', status: 'Pending' },
   ];
 
   const quickActions = [
-    { title: 'Process Orders', href: '/employee/orders', icon: FiShoppingCart, color: 'bg-primary' },
-    { title: 'Customer Support', href: '/employee/support', icon: FiMessageSquare, color: 'bg-secondary' },
-    { title: 'Handle Returns', href: '/employee/returns', icon: FiPackage, color: 'bg-warning' },
-    { title: 'View Reports', href: '/employee/reports', icon: FiTrendingUp, color: 'bg-success' },
+    { title: 'Submit Leave Request', href: '/employee/requests?type=leave', icon: FiCalendar, color: 'bg-primary' },
+    { title: 'Open Helpdesk Ticket', href: '/employee/requests?type=helpdesk', icon: FiFileText, color: 'bg-secondary-500' },
+    { title: 'View Announcements', href: '/employee/announcements', icon: FiBell, color: 'bg-warning-500' },
+    { title: 'Browse Catalog', href: '/employee/catalog', icon: FiBookOpen, color: 'bg-success-500' },
   ];
 
   return (
@@ -37,23 +26,23 @@ export default function EmployeeDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">Employee Dashboard</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-1">Welcome back! Here's what needs your attention today.</p>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-1">Welcome back! Here are your updates and actions.</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-neutral-500 dark:text-neutral-400">Last updated: {new Date().toLocaleString()}</span>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Pending Orders</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.pendingOrders}</p>
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Announcements</p>
+              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{announcements.length}</p>
             </div>
             <div className="p-3 bg-primary/10 rounded-lg">
-              <FiShoppingCart className="h-6 w-6 text-primary" />
+              <FiBell className="h-6 w-6 text-primary" />
             </div>
           </div>
         </div>
@@ -61,23 +50,11 @@ export default function EmployeeDashboard() {
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Support Tickets</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.supportTickets}</p>
-            </div>
-            <div className="p-3 bg-secondary/10 rounded-lg">
-              <FiMessageSquare className="h-6 w-6 text-secondary" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Returns Pending</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.returnsPending}</p>
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">My Tasks</p>
+              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{myTasks.length}</p>
             </div>
             <div className="p-3 bg-warning/10 rounded-lg">
-              <FiPackage className="h-6 w-6 text-warning" />
+              <FiList className="h-6 w-6 text-warning-600" />
             </div>
           </div>
         </div>
@@ -85,11 +62,11 @@ export default function EmployeeDashboard() {
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Today's Revenue</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">${stats.todayRevenue}</p>
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Pending Requests</p>
+              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">2</p>
             </div>
             <div className="p-3 bg-success/10 rounded-lg">
-              <FiTrendingUp className="h-6 w-6 text-success" />
+              <FiFileText className="h-6 w-6 text-success-600" />
             </div>
           </div>
         </div>
@@ -118,79 +95,44 @@ export default function EmployeeDashboard() {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Latest Updates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders */}
+        {/* Announcements */}
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200">Recent Orders</h2>
-            <Link href="/employee/orders" className="text-sm text-primary hover:text-primary-600 font-medium">
+            <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200">Recent Announcements</h2>
+            <Link href="/employee/announcements" className="text-sm text-primary hover:text-primary-600 font-medium">
               View All
             </Link>
           </div>
           <div className="space-y-3">
-            {recentOrders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-3 border border-neutral-100 dark:border-neutral-700 rounded-lg">
+            {announcements.map((a) => (
+              <div key={a.id} className="flex items-center justify-between p-3 border border-neutral-100 dark:border-neutral-700 rounded-lg">
                 <div>
-                  <p className="font-medium text-neutral-800 dark:text-neutral-200">{order.id}</p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">{order.customer}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-neutral-800 dark:text-neutral-200">${order.amount}</p>
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      order.status === 'Processing' ? 'bg-warning/10 text-warning-600' :
-                      order.status === 'Ready to Ship' ? 'bg-primary/10 text-primary-600' :
-                      'bg-success/10 text-success-600'
-                    }`}>
-                      {order.status}
-                    </span>
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      order.priority === 'High' ? 'bg-error/10 text-error-600' :
-                      order.priority === 'Medium' ? 'bg-warning/10 text-warning-600' :
-                      'bg-success/10 text-success-600'
-                    }`}>
-                      {order.priority}
-                    </span>
-                  </div>
+                  <p className="font-medium text-neutral-800 dark:text-neutral-200">{a.title}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{a.date}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Support Tickets */}
+        {/* My Tasks */}
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200">Support Tickets</h2>
-            <Link href="/employee/support" className="text-sm text-primary hover:text-primary-600 font-medium">
+            <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200">My Tasks</h2>
+            <Link href="/employee/tasks" className="text-sm text-primary hover:text-primary-600 font-medium">
               View All
             </Link>
           </div>
           <div className="space-y-3">
-            {supportTickets.map((ticket) => (
-              <div key={ticket.id} className="flex items-center justify-between p-3 border border-neutral-100 dark:border-neutral-700 rounded-lg">
+            {myTasks.map((t) => (
+              <div key={t.id} className="flex items-center justify-between p-3 border border-neutral-100 dark:border-neutral-700 rounded-lg">
                 <div>
-                  <p className="font-medium text-neutral-800 dark:text-neutral-200">{ticket.id}</p>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">{ticket.customer}</p>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{ticket.issue}</p>
+                  <p className="font-medium text-neutral-800 dark:text-neutral-200">{t.title}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Due {t.due}</p>
                 </div>
-                <div className="text-right">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    ticket.status === 'Open' ? 'bg-error/10 text-error-600' :
-                    ticket.status === 'In Progress' ? 'bg-warning/10 text-warning-600' :
-                    'bg-info/10 text-info-600'
-                  }`}>
-                    {ticket.status}
-                  </span>
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                    ticket.priority === 'High' ? 'bg-error/10 text-error-600' :
-                    ticket.priority === 'Medium' ? 'bg-warning/10 text-warning-600' :
-                    'bg-success/10 text-success-600'
-                  }`}>
-                    {ticket.priority}
-                  </span>
-                </div>
+                <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">{t.status}</span>
               </div>
             ))}
           </div>

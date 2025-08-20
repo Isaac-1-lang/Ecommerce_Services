@@ -75,12 +75,12 @@ curl -X POST http://localhost:8080/api/v1/auth/users/login \
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "userName": "John Doe",
     "userEmail": "john.doe@example.com",
-    "message": "Login successful",
+    "message": "Login s",
     "userId": "uuid-here",
     "userPhone": "+1234567890",
     "role": "CUSTOMER"
   },
-  "message": "Login successful"
+  "message": "Login s"
 }
 
 # Test invalid credentials

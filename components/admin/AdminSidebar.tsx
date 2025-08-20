@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { 
   FiHome, 
   FiPackage, 
-  FiShoppingCart, 
   FiUsers, 
   FiBarChart, 
   FiSettings,
@@ -20,7 +19,6 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: FiHome },
   { name: 'Products', href: '/admin/products', icon: FiPackage },
   { name: 'Categories', href: '/admin/categories', icon: FiGrid },
-  { name: 'Orders', href: '/admin/orders', icon: FiShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: FiUsers },
   { name: 'Warehouses', href: '/admin/warehouses', icon: FiMapPin },
   { name: 'Inventory', href: '/admin/inventory', icon: FiTruck },

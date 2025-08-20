@@ -15,7 +15,7 @@ export default function DeliveryDashboard() {
   const activeDeliveries = [
     { 
       id: '#DEL-001', 
-      customer: 'John Doe', 
+      customer: 'NIYOBYOSE Isaac Precieux', 
       address: '123 Main St, Downtown', 
       status: 'In Transit', 
       eta: '2:30 PM',
@@ -24,7 +24,7 @@ export default function DeliveryDashboard() {
     },
     { 
       id: '#DEL-002', 
-      customer: 'Jane Smith', 
+      customer: 'UWASE', 
       address: '456 Oak Ave, Midtown', 
       status: 'Out for Delivery', 
       eta: '3:15 PM',
@@ -33,7 +33,7 @@ export default function DeliveryDashboard() {
     },
     { 
       id: '#DEL-003', 
-      customer: 'Mike Johnson', 
+      customer: 'KABUGA', 
       address: '789 Pine Rd, Uptown', 
       status: 'At Location', 
       eta: '3:45 PM',
@@ -43,9 +43,9 @@ export default function DeliveryDashboard() {
   ];
 
   const recentCompleted = [
-    { id: '#DEL-004', customer: 'Sarah Wilson', time: '1:45 PM', rating: 5 },
-    { id: '#DEL-005', customer: 'David Brown', time: '1:20 PM', rating: 4 },
-    { id: '#DEL-006', customer: 'Lisa Davis', time: '12:55 PM', rating: 5 },
+    { id: '#DEL-004', customer: 'KABUGA', time: '1:45 PM', rating: 5 },
+    { id: '#DEL-005', customer: 'KABUGA', time: '1:20 PM', rating: 4 },
+    { id: '#DEL-006', customer: 'KABUGA', time: '12:55 PM', rating: 5 },
   ];
 
   const quickActions = [

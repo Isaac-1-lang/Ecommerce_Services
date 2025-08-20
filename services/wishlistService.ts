@@ -18,7 +18,10 @@ export interface Wishlist {
 }
 
 export interface AddToWishlistRequest {
-  productId: string;
+  userId: string; // UUID
+  variantId: number;
+  notes?: string;
+  priority?: number;
 }
 
 export interface JavaWishlistResponse<T = any> {
@@ -92,9 +95,11 @@ const transformJavaWishlist = (javaWishlist: JavaWishlist): Wishlist => {
 };
 
 export const wishlistService = {
-  async getWishlist(): Promise<Wishlist | null> {
+  async getWishlist(userId: string, page = 0, size = 10, sortBy = 'addedAt', sortDirection: 'desc'): Promise<Wishlist | null> {
     try {
-      const response = await api.get<JavaWishlistResponse<JavaWishlist>>('/v1/wishlist');
+      const response = await api.get<JavaWishlistResponse<JavaWishlist>>('/api/v1/wishlist/view', {
+        params: { userId, page, size, sortBy, sortDirection }
+      });
 
       if (response.data.success && response.data.data) {
         return transformJavaWishlist(response.data.data);
@@ -107,10 +112,12 @@ export const wishlistService = {
     }
   },
 
-  async addToWishlist({ productId }: AddToWishlistRequest): Promise<Wishlist> {
+  async addToWishlist({ userId, variantId, notes, priority }: AddToWishlistRequest): Promise<Wishlist> {
     try {
-      const response = await api.post<JavaWishlistResponse<JavaWishlist>>('/v1/wishlist/add', {
-        productId
+      const response = await api.post<JavaWishlistResponse<JavaWishlist>>('/api/v1/wishlist/add', {
+        variantId, notes, priority
+      }, {
+        params: { userId }
       });
 
       if (response.data.success && response.data.data) {
@@ -126,7 +133,7 @@ export const wishlistService = {
 
   async removeFromWishlist(itemId: string): Promise<Wishlist> {
     try {
-      const response = await api.delete<JavaWishlistResponse<JavaWishlist>>(`/v1/wishlist/items/${itemId}`);
+      const response = await api.delete<JavaWishlistResponse<JavaWishlist>>(`/api/v1/wishlist/items/${itemId}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaWishlist(response.data.data);
@@ -139,9 +146,9 @@ export const wishlistService = {
     }
   },
 
-  async clearWishlist(): Promise<Wishlist> {
+  async clearWishlist(userId: string): Promise<Wishlist> {
     try {
-      const response = await api.delete<JavaWishlistResponse<JavaWishlist>>('/v1/wishlist/clear');
+      const response = await api.delete<JavaWishlistResponse<JavaWishlist>>('/api/v1/wishlist/clear', { params: { userId } });
 
       if (response.data.success && response.data.data) {
         return transformJavaWishlist(response.data.data);
@@ -154,9 +161,9 @@ export const wishlistService = {
     }
   },
 
-  async isInWishlist(productId: string): Promise<boolean> {
+  async isInWishlist(userId: string, productId: string): Promise<boolean> {
     try {
-      const wishlist = await this.getWishlist();
+      const wishlist = await this.getWishlist(userId);
       return wishlist?.items.some(item => item.productId === productId) || false;
     } catch (error: any) {
       console.error('Error checking if product is in wishlist:', error);
@@ -164,9 +171,9 @@ export const wishlistService = {
     }
   },
 
-  async getWishlistItemCount(): Promise<number> {
+  async getWishlistItemCount(userId: string): Promise<number> {
     try {
-      const wishlist = await this.getWishlist();
+      const wishlist = await this.getWishlist(userId);
       return wishlist?.totalItems || 0;
     } catch (error: any) {
       console.error('Error getting wishlist item count:', error);

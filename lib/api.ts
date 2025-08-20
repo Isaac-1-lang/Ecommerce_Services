@@ -2,7 +2,7 @@ import axios from "axios";
 import { handleJavaApiError } from "./javaIntegration";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8095",
   timeout: parseInt(process.env.NEXT_PUBLIC_JAVA_TIMEOUT || "10000"),
   headers: {
     'Content-Type': 'application/json',
@@ -12,20 +12,20 @@ export const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use((config) => {
-  // Add auth token if available
-  const token = localStorage.getItem('authToken');
+ // Add auth token if available (support both keys)
+  const token = localStorage.getItem('authToken') || localStorage.getItem('now_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   
   // Log request in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, config.data);
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, config.data);
   }
   
   return config;
 }, (error) => {
-  console.error('❌ Request Error:', error);
+  console.error('Request Error:', error);
   return Promise.reject(error);
 });
 
@@ -51,17 +51,17 @@ api.interceptors.response.use((response) => {
   
   if (error.response?.status === 403) {
     // Forbidden - user doesn't have permission
-    console.error('🚫 Access forbidden:', errorMessage);
+    console.error('Access forbidden:', errorMessage);
   }
   
   if (error.response?.status === 404) {
     // Not found
-    console.error('🔍 Resource not found:', errorMessage);
+    console.error('Resource not found:', errorMessage);
   }
   
   if (error.response?.status >= 500) {
     // Server error
-    console.error('💥 Server error:', errorMessage);
+    console.error('Server error:', errorMessage);
   }
   
   return Promise.reject(error);

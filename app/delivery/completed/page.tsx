@@ -6,7 +6,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-001',
       orderId: '#ORD-001',
-      customer: 'John Doe',
+      customer: 'NIYONKURU',
       address: '123 Main St, Downtown',
       completedAt: '2024-01-15T14:30:00',
       rating: 5,
@@ -18,7 +18,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-002',
       orderId: '#ORD-002',
-      customer: 'Jane Smith',
+      customer: 'UWASE',
       address: '456 Oak Ave, Midtown',
       completedAt: '2024-01-15T15:15:00',
       rating: 4,
@@ -30,7 +30,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-003',
       orderId: '#ORD-003',
-      customer: 'Mike Johnson',
+      customer: 'KABUGA',
       address: '789 Pine Rd, Uptown',
       completedAt: '2024-01-15T15:45:00',
       rating: 5,
@@ -42,7 +42,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-004',
       orderId: '#ORD-004',
-      customer: 'Sarah Wilson',
+      customer: 'KABUGA',
       address: '321 Elm St, Downtown',
       completedAt: '2024-01-14T13:45:00',
       rating: 5,
@@ -54,7 +54,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-005',
       orderId: '#ORD-005',
-      customer: 'David Brown',
+      customer: 'KABUGA',
       address: '654 Maple Dr, Midtown',
       completedAt: '2024-01-14T14:20:00',
       rating: 4,
@@ -66,7 +66,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-006',
       orderId: '#ORD-006',
-      customer: 'Lisa Davis',
+      customer: 'KABUGA',
       address: '987 Cedar Ln, Uptown',
       completedAt: '2024-01-14T15:00:00',
       rating: 5,
@@ -78,7 +78,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-007',
       orderId: '#ORD-007',
-      customer: 'Tom Wilson',
+      customer: 'KABUGA',
       address: '147 Birch Ave, Downtown',
       completedAt: '2024-01-13T14:15:00',
       rating: 4,
@@ -90,7 +90,7 @@ export default function CompletedDeliveriesPage() {
     {
       id: '#DEL-008',
       orderId: '#ORD-008',
-      customer: 'Emma Taylor',
+      customer: 'KABUGA',
       address: '258 Spruce St, Midtown',
       completedAt: '2024-01-13T15:30:00',
       rating: 5,

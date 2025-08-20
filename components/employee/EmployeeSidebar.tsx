@@ -3,28 +3,23 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  FiHome, 
-  FiPackage, 
-  FiShoppingCart, 
-  FiUsers, 
-  FiMessageSquare, 
-  FiSettings,
-  FiTruck,
-  FiRefreshCw,
+  FiHome,
+  FiMessageSquare,
   FiFileText,
-  FiHelpCircle
+  FiHelpCircle,
+  FiCalendar,
+  FiBell,
+  FiList,
+  FiBookOpen
 } from 'react-icons/fi';
 
 const navigation = [
   { name: 'Dashboard', href: '/employee', icon: FiHome },
-  { name: 'Orders', href: '/employee/orders', icon: FiShoppingCart },
-  { name: 'Customers', href: '/employee/customers', icon: FiUsers },
-  { name: 'Products', href: '/employee/products', icon: FiPackage },
-  { name: 'Support', href: '/employee/support', icon: FiMessageSquare },
-  { name: 'Returns', href: '/employee/returns', icon: FiRefreshCw },
-  { name: 'Reports', href: '/employee/reports', icon: FiFileText },
+  { name: 'Announcements', href: '/employee/announcements', icon: FiBell },
+  { name: 'My Tasks', href: '/employee/tasks', icon: FiList },
+  { name: 'Requests', href: '/employee/requests', icon: FiFileText },
+  { name: 'Catalog', href: '/employee/catalog', icon: FiBookOpen },
   { name: 'Help', href: '/employee/help', icon: FiHelpCircle },
-  { name: 'Settings', href: '/employee/settings', icon: FiSettings },
 ];
 
 export default function EmployeeSidebar() {
@@ -35,8 +30,8 @@ export default function EmployeeSidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
         <Link href="/employee" className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
-            <FiUsers className="h-5 w-5 text-white" />
+          <div className="w-8 h-8 bg-secondary-500 rounded-lg flex items-center justify-center">
+            <FiHome className="h-5 w-5 text-white" />
           </div>
           <span className="text-xl font-bold text-neutral-800 dark:text-neutral-200">Employee Portal</span>
         </Link>
@@ -52,7 +47,7 @@ export default function EmployeeSidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
-                  ? 'bg-secondary text-white shadow-soft'
+                  ? 'bg-secondary-500 text-white shadow-soft'
                   : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-800 dark:hover:text-neutral-200'
               }`}
             >

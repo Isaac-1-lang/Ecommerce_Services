@@ -179,7 +179,7 @@ export default function Navbar() {
             >
               <FiShoppingCart className="h-5 w-5 text-neutral-600 dark:text-neutral-300 group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-secondary text-xs font-semibold text-white animate-bounce-gentle">
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-secondary-500 text-xs font-semibold text-white ring-2 ring-white dark:ring-neutral-900 animate-bounce-gentle">
                   {cartItemCount}
                 </span>
               )}

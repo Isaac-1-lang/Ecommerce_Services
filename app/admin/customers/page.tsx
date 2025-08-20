@@ -8,12 +8,10 @@ export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
-
-  // Mock customers data - replace with real data from your backend
   const customers = [
     {
       id: 'CUST-001',
-      name: 'John Doe',
+      name: 'John D',
       email: 'john@example.com',
       phone: '+1 (555) 123-4567',
       joinDate: '2024-01-15',

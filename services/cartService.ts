@@ -21,7 +21,8 @@ export interface Cart {
 }
 
 export interface AddToCartRequest {
-  productId: string;
+  userId: string; // UUID
+  variantId: number;
   quantity: number;
 }
 
@@ -107,9 +108,11 @@ const transformJavaCart = (javaCart: JavaCart): Cart => {
 };
 
 export const cartService = {
-  async getCart(): Promise<Cart | null> {
+  async getCart(userId: string, page = 0, size = 10, sortBy = 'addedAt', sortDirection: 'desc'): Promise<Cart | null> {
     try {
-      const response = await api.get<JavaCartResponse<JavaCart>>('/v1/cart');
+      const response = await api.get<JavaCartResponse<JavaCart>>(`/api/v1/cart/view`, {
+        params: { userId, page, size, sortBy, sortDirection }
+      });
 
       if (response.data.success && response.data.data) {
         return transformJavaCart(response.data.data);
@@ -122,11 +125,10 @@ export const cartService = {
     }
   },
 
-  async addToCart({ productId, quantity }: AddToCartRequest): Promise<Cart> {
+  async addToCart({ userId, variantId, quantity }: AddToCartRequest): Promise<Cart> {
     try {
-      const response = await api.post<JavaCartResponse<JavaCart>>('/v1/cart/add', {
-        productId,
-        quantity
+      const response = await api.post<JavaCartResponse<JavaCart>>(`/api/v1/cart/add`, { variantId, quantity }, {
+        params: { userId }
       });
 
       if (response.data.success && response.data.data) {
@@ -142,7 +144,7 @@ export const cartService = {
 
   async updateCartItem({ itemId, quantity }: UpdateCartItemRequest): Promise<Cart> {
     try {
-      const response = await api.put<JavaCartResponse<JavaCart>>(`/v1/cart/items/${itemId}`, {
+      const response = await api.put<JavaCartResponse<JavaCart>>(`/api/v1/cart/items/${itemId}`, {
         quantity
       });
 
@@ -159,7 +161,7 @@ export const cartService = {
 
   async removeFromCart(itemId: string): Promise<Cart> {
     try {
-      const response = await api.delete<JavaCartResponse<JavaCart>>(`/v1/cart/items/${itemId}`);
+      const response = await api.delete<JavaCartResponse<JavaCart>>(`/api/v1/cart/items/${itemId}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaCart(response.data.data);
@@ -172,9 +174,9 @@ export const cartService = {
     }
   },
 
-  async clearCart(): Promise<Cart> {
+  async clearCart(userId: string): Promise<Cart> {
     try {
-      const response = await api.delete<JavaCartResponse<JavaCart>>('/v1/cart/clear');
+      const response = await api.delete<JavaCartResponse<JavaCart>>('/api/v1/cart/clear', { params: { userId } });
 
       if (response.data.success && response.data.data) {
         return transformJavaCart(response.data.data);
@@ -187,23 +189,7 @@ export const cartService = {
     }
   },
 
-  async validateItem(product: Product, quantity: number): Promise<boolean> {
-    try {
-      const response = await api.post<JavaCartResponse<{ valid: boolean }>>('/v1/cart/validate', {
-        productId: product.id,
-        quantity
-      });
-
-      if (response.data.success && response.data.data) {
-        return response.data.data.valid;
-      }
-      
-      return false;
-    } catch (error: any) {
-      console.error('Error validating cart item:', error);
-      return false;
-    }
-  },
+  // validateItem: endpoint not present on backend; remove or implement later
 
   async getCartItemCount(): Promise<number> {
     try {

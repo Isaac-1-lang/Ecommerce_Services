@@ -13,8 +13,8 @@ export default function OrdersPage() {
     {
       id: 'ORD-001',
       customer: {
-        name: 'John Doe',
-        email: 'john@example.com'
+        name: 'NIYONKURU',
+        email: 'niyonkuru@gmail.com'
       },
       items: [
         { name: 'Apple iPhone 15 Pro', quantity: 1, price: 1199.99 }
@@ -27,8 +27,8 @@ export default function OrdersPage() {
     {
       id: 'ORD-002',
       customer: {
-        name: 'Jane Smith',
-        email: 'jane@example.com'
+        name: 'UWASE',
+        email: 'atukunda@gmail.com'
       },
       items: [
         { name: 'Nike Air Max 270', quantity: 1, price: 129.99 },
@@ -42,8 +42,8 @@ export default function OrdersPage() {
     {
       id: 'ORD-003',
       customer: {
-        name: 'Mike Johnson',
-        email: 'mike@example.com'
+        name: 'KABUGA',
+        email: 'kabuga@gmail.com'
       },
       items: [
         { name: 'Sony WH-1000XM5 Headphones', quantity: 1, price: 399.99 }
@@ -56,8 +56,8 @@ export default function OrdersPage() {
     {
       id: 'ORD-004',
       customer: {
-        name: 'Sarah Wilson',
-        email: 'sarah@example.com'
+        name: 'KABUGA',
+        email: 'kabuga@gmail.com'
       },
       items: [
         { name: 'MacBook Pro 16"', quantity: 1, price: 2499.99 }

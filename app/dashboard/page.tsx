@@ -1,11 +1,23 @@
 "use client";
 
 import { useAuthStore } from "../../features/auth/store";
+import { useEffect } from "react";
 import Link from "next/link";
 import { FiUser, FiShoppingBag, FiHeart, FiSettings } from "react-icons/fi";
 
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
+
+  if (!isInitialized) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <div className="text-center">
+          <div className="w-6 h-6 border-2 border-gray-300 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

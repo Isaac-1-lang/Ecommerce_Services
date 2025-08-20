@@ -10,9 +10,9 @@ export default function EmployeeHeader() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const notifications = [
-    { id: 1, message: 'New order assigned', time: '5 min ago', type: 'order' },
-    { id: 2, message: 'Customer inquiry received', time: '1 hour ago', type: 'inquiry' },
-    { id: 3, message: 'Return request pending', time: '2 hours ago', type: 'return' },
+    { id: 1, message: 'New company announcement posted', time: '5 min ago', type: 'announcement' },
+    { id: 2, message: 'Task assigned: Prepare weekly report', time: '1 hour ago', type: 'task' },
+    { id: 3, message: 'Your leave request is being reviewed', time: '2 hours ago', type: 'request' },
   ];
 
   return (
@@ -23,7 +23,7 @@ export default function EmployeeHeader() {
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <input
             type="text"
-            placeholder="Search orders, customers, products..."
+            placeholder="Search announcements, tasks, or catalog..."
             className="w-full pl-10 pr-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400"
           />
         </div>
@@ -59,8 +59,8 @@ export default function EmployeeHeader() {
                   <div key={notification.id} className="p-4 border-b border-neutral-100 dark:border-neutral-700 last:border-b-0 hover:bg-neutral-50 dark:hover:bg-neutral-700">
                     <div className="flex items-start gap-3">
                       <div className={`w-2 h-2 rounded-full mt-2 ${
-                        notification.type === 'order' ? 'bg-primary' :
-                        notification.type === 'inquiry' ? 'bg-info' :
+                        notification.type === 'announcement' ? 'bg-primary' :
+                        notification.type === 'task' ? 'bg-success' :
                         'bg-warning'
                       }`}></div>
                       <div className="flex-1">

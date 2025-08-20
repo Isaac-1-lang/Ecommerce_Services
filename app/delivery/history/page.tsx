@@ -6,7 +6,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-001',
       orderId: '#ORD-001',
-      customer: 'John Doe',
+      customer: 'BYIRINGIRO',
       address: '123 Main St, Downtown',
       date: '2024-01-15',
       time: '2:30 PM',
@@ -19,7 +19,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-002',
       orderId: '#ORD-002',
-      customer: 'Jane Smith',
+      customer: 'UWASE',
       address: '456 Oak Ave, Midtown',
       date: '2024-01-15',
       time: '3:15 PM',
@@ -32,7 +32,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-003',
       orderId: '#ORD-003',
-      customer: 'Mike Johnson',
+      customer: 'KABUGA',
       address: '789 Pine Rd, Uptown',
       date: '2024-01-15',
       time: '3:45 PM',
@@ -45,7 +45,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-004',
       orderId: '#ORD-004',
-      customer: 'Sarah Wilson',
+      customer: 'KABUGA',
       address: '321 Elm St, Downtown',
       date: '2024-01-14',
       time: '1:45 PM',
@@ -58,7 +58,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-005',
       orderId: '#ORD-005',
-      customer: 'David Brown',
+      customer: 'KABUGA',
       address: '654 Maple Dr, Midtown',
       date: '2024-01-14',
       time: '2:20 PM',
@@ -71,7 +71,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-006',
       orderId: '#ORD-006',
-      customer: 'Lisa Davis',
+      customer: 'KABUGA',
       address: '987 Cedar Ln, Uptown',
       date: '2024-01-14',
       time: '3:00 PM',
@@ -84,7 +84,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-007',
       orderId: '#ORD-007',
-      customer: 'Tom Wilson',
+      customer: 'KABUGA',
       address: '147 Birch Ave, Downtown',
       date: '2024-01-13',
       time: '2:15 PM',
@@ -97,7 +97,7 @@ export default function DeliveryHistoryPage() {
     {
       id: '#DEL-008',
       orderId: '#ORD-008',
-      customer: 'Emma Taylor',
+      customer: 'KABUGA',
       address: '258 Spruce St, Midtown',
       date: '2024-01-13',
       time: '3:30 PM',
