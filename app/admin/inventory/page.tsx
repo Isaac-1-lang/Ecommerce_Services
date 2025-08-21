@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiPackage, FiAlertTriangle, FiTrendingUp, FiTrendingDown, FiSearch, FiFilter, FiDownload, FiPlus, FiEye, FiEdit } from 'react-icons/fi';
+import { FiPackage, FiAlertTriangle, FiTrendingUp, FiTrendingDown, FiSearch, FiFilter, FiDownload, FiPlus, FiEye, FiEdit, FiDollarSign, FiGrid } from 'react-icons/fi';
 
 export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,6 +23,8 @@ export default function InventoryPage() {
       unitCost: 899.99,
       totalValue: 40499.55,
       status: 'In Stock',
+      lowStock: 10,
+      outOfStock: 0,
       lastUpdated: '2024-01-25',
       supplier: 'Apple Inc.',
       location: 'Warehouse A'
@@ -38,6 +40,8 @@ export default function InventoryPage() {
       unitCost: 129.99,
       totalValue: 1039.92,
       status: 'Low Stock',
+      lowStock: 10,
+      outOfStock: 0,
       lastUpdated: '2024-01-24',
       supplier: 'Nike Inc.',
       location: 'Warehouse B'
@@ -53,6 +57,8 @@ export default function InventoryPage() {
       unitCost: 399.99,
       totalValue: 0,
       status: 'Out of Stock',
+      lowStock: 10,
+      outOfStock: 0,
       lastUpdated: '2024-01-23',
       supplier: 'Sony Corporation',
       location: 'Warehouse A'
@@ -68,6 +74,8 @@ export default function InventoryPage() {
       unitCost: 89.99,
       totalValue: 6029.33,
       status: 'In Stock',
+      lowStock: 10,
+      outOfStock: 0,
       lastUpdated: '2024-01-25',
       supplier: 'Levi Strauss & Co.',
       location: 'Warehouse B'
@@ -80,9 +88,11 @@ export default function InventoryPage() {
       currentStock: 12,
       minStock: 8,
       maxStock: 30,
-      unitCost: 2499.99,
-      totalValue: 29999.88,
+      unitCost: 24.99,
+      totalValue: 299.88,
       status: 'In Stock',
+      lowStock: 10,
+      outOfStock: 0,
       lastUpdated: '2024-01-25',
       supplier: 'Apple Inc.',
       location: 'Warehouse A'
@@ -127,119 +137,128 @@ export default function InventoryPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'In Stock':
-        return 'bg-success/10 text-success';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
       case 'Low Stock':
-        return 'bg-warning/10 text-warning';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
       case 'Out of Stock':
-        return 'bg-danger/10 text-danger';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
       default:
-        return 'bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">Inventory Management</h1>
-          <p className="text-neutral-600 dark:text-neutral-400">Monitor and manage your product inventory</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Inventory Management</h1>
+          <p className="text-gray-600 dark:text-gray-400">Monitor and manage your product inventory</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             <FiDownload className="h-4 w-4" />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </button>
-          <Link href="/admin/inventory/add" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+          <Link href="/admin/inventory/add" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <FiPlus className="h-4 w-4" />
-            Add Item
+            <span className="hidden sm:inline">Add Item</span>
           </Link>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Items</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.totalItems}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Items</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalItems}</p>
             </div>
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <FiPackage className="h-6 w-6 text-primary" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+              <FiPackage className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Value</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">${stats.totalValue.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Value</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.totalValue)}</p>
             </div>
-            <div className="p-3 bg-success/10 rounded-lg">
-              <FiTrendingUp className="h-6 w-6 text-success" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+              <FiDollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Low Stock</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.lowStockItems}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Low Stock</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.lowStockItems}</p>
             </div>
-            <div className="p-3 bg-warning/10 rounded-lg">
-              <FiAlertTriangle className="h-6 w-6 text-warning" />
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+              <FiAlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Out of Stock</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.outOfStockItems}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Out of Stock</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.outOfStockItems}</p>
             </div>
-            <div className="p-3 bg-danger/10 rounded-lg">
-              <FiTrendingDown className="h-6 w-6 text-danger" />
+            <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
+              <FiTrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Categories</p>
-              <p className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">{stats.categories}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Categories</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.categories}</p>
             </div>
-            <div className="p-3 bg-info/10 rounded-lg">
-              <FiPackage className="h-6 w-6 text-info" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+              <FiGrid className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search inventory by name, SKU, or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <select
               value={stockFilter}
               onChange={(e) => setStockFilter(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="all">All Stock Levels</option>
               <option value="in">In Stock</option>
@@ -249,7 +268,7 @@ export default function InventoryPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="all">All Categories</option>
               <option value="electronics">Electronics</option>
@@ -259,7 +278,7 @@ export default function InventoryPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               <option value="name">Sort by Name</option>
               <option value="stock">Sort by Stock</option>
@@ -271,58 +290,58 @@ export default function InventoryPage() {
       </div>
 
       {/* Inventory Table */}
-      <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-neutral-50 dark:bg-neutral-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Value</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Product</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Value</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {sortedInventory.map((item) => (
-                <tr key={item.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{item.name}</div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">{item.sku}</div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">{item.category}</div>
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{item.sku}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{item.category}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{item.currentStock} units</div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">Min: {item.minStock} | Max: {item.maxStock}</div>
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{item.currentStock} units</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Min: {item.minStock} | Max: {item.maxStock}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-neutral-800 dark:text-neutral-200">${item.totalValue.toFixed(2)}</div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">${item.unitCost}/unit</div>
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{formatCurrency(item.totalValue)}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{formatCurrency(item.unitCost)}/unit</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}>
                       {item.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm text-neutral-800 dark:text-neutral-200">{item.location}</div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">{item.supplier}</div>
+                  <td className="px-4 py-4">
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-900 dark:text-white">{item.location}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{item.supplier}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/admin/inventory/${item.id}`} className="text-primary hover:text-primary/80 transition-colors">
+                  <td className="px-4 py-4 text-sm font-medium">
+                    <div className="flex items-center gap-3">
+                      <Link href={`/admin/inventory/${item.id}`} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
                         <FiEye className="h-4 w-4" />
                       </Link>
-                      <Link href={`/admin/inventory/${item.id}/edit`} className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+                      <Link href={`/admin/inventory/${item.id}/edit`} className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 transition-colors">
                         <FiEdit className="h-4 w-4" />
                       </Link>
                     </div>

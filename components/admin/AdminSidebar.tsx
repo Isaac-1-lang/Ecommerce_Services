@@ -12,13 +12,15 @@ import {
   FiTag,
   FiTruck,
   FiFileText,
-  FiMapPin
+  FiMapPin,
+  FiPercent
 } from 'react-icons/fi';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: FiHome },
   { name: 'Products', href: '/admin/products', icon: FiPackage },
   { name: 'Categories', href: '/admin/categories', icon: FiGrid },
+  { name: 'Discounts', href: '/admin/discounts', icon: FiPercent },
   { name: 'Customers', href: '/admin/customers', icon: FiUsers },
   { name: 'Warehouses', href: '/admin/warehouses', icon: FiMapPin },
   { name: 'Inventory', href: '/admin/inventory', icon: FiTruck },

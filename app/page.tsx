@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock } from "react-icons/fi";
+import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock, FiEye, FiShare2 } from "react-icons/fi";
 import { getProducts } from "../services/productService";
 import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
 import { formatPrice } from "../lib/formatPrice";
 import { Product } from "../types/product";
+import { ALL_PRODUCTS } from "../data/dummyProducts";
 
 // Hero slider data
 const heroSlides = [
@@ -54,7 +55,7 @@ const testimonials = [
     role: "Fashion Enthusiast",
     content: "Amazing quality products and fast delivery. I love shopping here!",
     rating: 5,
-    avatar: ""
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: 2,
@@ -62,7 +63,7 @@ const testimonials = [
     role: "Tech Reviewer",
     content: "Best prices for electronics and excellent customer service. Highly recommended!",
     rating: 5,
-    avatar: ""
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: 3,
@@ -70,39 +71,289 @@ const testimonials = [
     role: "Home Decor Blogger",
     content: "Found perfect items for my home renovation. The quality exceeded my expectations.",
     rating: 5,
-    avatar: ""
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
   }
 ];
 
 // Brands data
 const brands = [
-  { name: "Nike", logo: "" },
-  { name: "Apple", logo: "" },
-  { name: "Samsung", logo: "" },
-  { name: "Adidas", logo: "" },
-  { name: "Sony", logo: "" },
-  { name: "LG", logo: "" }
+  { name: "Nike", logo: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=100&fit=crop" },
+  { name: "Apple", logo: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=200&h=100&fit=crop" },
+  { name: "Samsung", logo: "https://images.unsplash.com/photo-1610945265064-0ea8d51c8c3b?w=200&h=100&fit=crop" },
+  { name: "Adidas", logo: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=200&h=100&fit=crop" },
+  { name: "Sony", logo: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=200&h=100&fit=crop" },
+  { name: "LG", logo: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=200&h=100&fit=crop" }
 ];
+
+// Product Card Component
+function ProductCard({ product }: { product: Product }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  const addToCart = useCartStore((s) => s.addItem);
+  const addToWishlist = useWishlistStore((s) => s.addItem);
+  const removeFromWishlist = useWishlistStore((s) => s.removeItem);
+  const isInWishlist = useWishlistStore((s) => s.isInWishlist);
+
+  // Fallback images for different categories
+  const getFallbackImage = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'electronics':
+        return 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop&crop=center';
+      case 'fashion':
+        return 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop&crop=center';
+      case 'home-garden':
+        return 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop&crop=center';
+      case 'sports-outdoors':
+        return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center';
+      case 'audio':
+        return 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center';
+      default:
+        return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center';
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image || "",
+      quantity: 1,
+    });
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Implement quick view modal
+    console.log('Quick view:', product.name);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Check out this amazing product: ${product.name}`,
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  const renderRating = () => {
+    const rating = product.rating || 4.5; // Default rating if none
+    const reviewCount = product.reviewCount || Math.floor(Math.random() * 100) + 10; // Default review count
+    
+    return (
+      <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-center">
+          {[...Array(5)].map((_, i) => (
+            <FiStar
+              key={i}
+              className={`h-3 w-3 ${
+                i < Math.floor(rating)
+                  ? "text-yellow-400 fill-current"
+                  : i < rating
+                  ? "text-yellow-400 fill-current opacity-50"
+                  : "text-gray-300"
+              }`}
+            />
+          ))}
+        </div>
+        <span className="text-xs text-gray-500 ml-1">
+          ({reviewCount})
+        </span>
+      </div>
+    );
+  };
+
+  const renderPrice = () => {
+    const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+    
+    return (
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg font-bold text-gray-900 dark:text-white">
+          {formatPrice(product.price)}
+        </span>
+        {hasDiscount && (
+          <>
+            <span className="text-sm text-gray-500 line-through">
+              {formatPrice(product.originalPrice!)}
+            </span>
+            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full font-medium">
+              {Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}% OFF
+            </span>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // Ensure we have a valid product image
+  const productImage = product.image && !imageError ? product.image : getFallbackImage(product.category);
+  const productCategory = product.category || 'General';
+  const stockQuantity = product.stockQuantity || 10;
+
+  return (
+    <div 
+      className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Product Image */}
+      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
+        <Link href={`/products/${product.slug}`}>
+          <Image
+            src={productImage}
+            alt={product.name}
+            width={400}
+            height={400}
+            className={`h-full w-full object-cover transition-transform duration-300 ${
+              isHovered ? 'scale-110' : 'scale-100'
+            }`}
+            onError={() => setImageError(true)}
+          />
+        </Link>
+        
+        {/* Quick Actions Overlay */}
+        <div className={`absolute top-3 right-3 flex flex-col gap-2 transition-all duration-300 ${
+          isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+        }`}>
+          <button
+            onClick={handleWishlistToggle}
+            className={`p-2 rounded-full shadow-lg transition-all cursor-pointer ${
+              isInWishlist(product.id)
+                ? 'bg-red-500 text-white'
+                : 'bg-white text-gray-600 hover:bg-red-500 hover:text-white'
+            }`}
+            title={isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <FiHeart className="h-4 w-4" />
+          </button>
+          
+          <button
+            onClick={handleQuickView}
+            className="p-2 rounded-full bg-white text-gray-600 shadow-lg hover:bg-blue-500 hover:text-white transition-colors cursor-pointer"
+            title="Quick View"
+          >
+            <FiEye className="h-4 w-4" />
+          </button>
+          
+          <button
+            onClick={handleShare}
+            className="p-2 rounded-full bg-white text-gray-600 shadow-lg hover:bg-green-500 hover:text-white transition-colors cursor-pointer"
+            title="Share Product"
+          >
+            <FiShare2 className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {product.isNew && (
+            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+              NEW
+            </span>
+          )}
+          {product.isOnSale && (
+            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+              SALE
+            </span>
+          )}
+          {stockQuantity === 0 && (
+            <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+              OUT OF STOCK
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="p-4 flex-1 flex flex-col">
+        {/* Category */}
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
+          {productCategory}
+        </div>
+
+        {/* Product Name */}
+        <Link href={`/products/${product.slug}`} className="cursor-pointer">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+
+        {/* Rating */}
+        {renderRating()}
+
+        {/* Price */}
+        {renderPrice()}
+
+        {/* Stock Status */}
+        {stockQuantity > 0 && (
+          <div className="text-xs text-gray-500 mb-3">
+            {stockQuantity < 10 ? (
+              <span className="text-yellow-600">Only {stockQuantity} left!</span>
+            ) : (
+              <span className="text-green-600">In Stock</span>
+            )}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 mt-auto">
+          <button
+            onClick={handleAddToCart}
+            disabled={stockQuantity === 0}
+            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <FiShoppingCart className="h-4 w-4" />
+            {stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const addToCart = useCartStore((s) => s.addItem);
-  const addToWishlist = useWishlistStore((s) => s.addItem);
-  const removeFromWishlist = useWishlistStore((s) => s.removeItem);
-  const isInWishlist = useWishlistStore((s) => s.isInWishlist);
-
   useEffect(() => {
     const loadFeaturedProducts = async () => {
       setLoading(true);
       try {
         const products = await getProducts();
-        // Take first 8 products as featured
-        setFeaturedProducts(products.slice(0, 8));
+        if (products && products.length > 0) {
+          // Take first 8 products as featured
+          setFeaturedProducts(products.slice(0, 8));
+        } else {
+          // Fallback to dummy products if API returns empty
+          const fallbackProducts = ALL_PRODUCTS.filter(p => p.isFeatured || p.isNew || p.isOnSale).slice(0, 8);
+          setFeaturedProducts(fallbackProducts);
+        }
       } catch (error) {
         console.error("Failed to load featured products:", error);
+        // Fallback to dummy products on error
+        const fallbackProducts = ALL_PRODUCTS.filter(p => p.isFeatured || p.isNew || p.isOnSale).slice(0, 8);
+        setFeaturedProducts(fallbackProducts);
       } finally {
         setLoading(false);
       }
@@ -130,24 +381,6 @@ export default function HomePage() {
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
-  };
-
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image || "",
-      quantity: 1,
-    });
-  };
-
-  const handleWishlistToggle = (product: Product) => {
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
-    } else {
-      addToWishlist(product);
-    }
   };
 
   return (
@@ -185,15 +418,15 @@ export default function HomePage() {
                   <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 animate-fade-in-delay text-white drop-shadow-md">
                     {slide.subtitle}
                   </p>
-                                     <div className="animate-fade-in-delay-2">
-                     <Link
-                       href={slide.link}
-                       className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 text-lg shadow-2xl border-2 border-white/20 backdrop-blur-sm"
-                     >
-                       {slide.cta}
-                       <FiArrowRight className="h-5 w-5" />
-                     </Link>
-                   </div>
+                  <div className="animate-fade-in-delay-2">
+                    <Link
+                      href={slide.link}
+                      className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 text-lg shadow-2xl border-2 border-white/20 backdrop-blur-sm"
+                    >
+                      {slide.cta}
+                      <FiArrowRight className="h-5 w-5" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -238,7 +471,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <FiTruck className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -249,7 +482,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <FiShield className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -260,7 +493,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <FiRefreshCw className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -271,7 +504,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <FiClock className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -303,82 +536,34 @@ export default function HomePage() {
                 <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-80 animate-pulse" />
               ))}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100 relative">
-                    {product.image ? (
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        width={400}
-                        height={400}
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        priority={false}
-                        onError={(e) => {
-                          // Fallback to placeholder if image fails to load
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    {/* Fallback placeholder */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-400" style={{ display: product.image ? 'none' : 'flex' }}>
-                      <FiImage className="w-16 h-16" />
-                    </div>
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <FiStar
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < (product.rating || 0)
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                      <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
-                        ({product.reviewCount})
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                      {product.name}
-                    </h3>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">
-                        {formatPrice(product.price)}
-                      </span>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleWishlistToggle(product)}
-                          className={`p-2 rounded-full transition-colors cursor-pointer ${
-                            isInWishlist(product.id)
-                              ? "text-primary bg-primary/10"
-                              : "text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700"
-                          }`}
-                        >
-                          <FiHeart className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(product)}
-                          className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
-                        >
-                          <FiShoppingCart className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard key={product.id} product={product} />
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 mb-4">No featured products available</p>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                Browse All Products
+                <FiArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
+          )}
+          
+          {featuredProducts.length > 0 && (
+            <div className="text-center mt-12">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                View All Products
+                <FiArrowRight className="h-5 w-5" />
+              </Link>
             </div>
           )}
         </div>
@@ -400,17 +585,17 @@ export default function HomePage() {
             {[
               { 
                 name: "Electronics", 
-                image: "", 
+                image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&h=400&fit=crop", 
                 href: "/products?category=electronics" 
               },
               { 
                 name: "Fashion", 
-                image: "", 
+                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop", 
                 href: "/products?category=fashion" 
               },
               { 
                 name: "Home & Garden", 
-                image: "", 
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop", 
                 href: "/products?category=home-garden" 
               },
             ].map((category) => (
@@ -423,8 +608,8 @@ export default function HomePage() {
                   <Image
                     src={category.image}
                     alt={category.name}
-                    width={400}
-                    height={300}
+                    width={600}
+                    height={400}
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
@@ -524,7 +709,7 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-16 bg-primary text-white">
+      <section className="py-16 bg-blue-600 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">
@@ -539,7 +724,7 @@ export default function HomePage() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
               />
-              <button className="bg-white text-primary px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
+              <button className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
                 Subscribe
               </button>
             </div>

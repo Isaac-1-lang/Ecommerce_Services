@@ -9,6 +9,7 @@ import CategoryFilter from "../../components/CategoryFilter";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProductsStore } from "../../features/products/store";
 import { getProducts } from "../../services/productService";
+import { ALL_PRODUCTS } from "../../data/dummyProducts";
 import type { ProductFilters } from "../../features/products/store";
 import type { Product } from "../../types/product";
 import { FiFilter } from "react-icons/fi";
@@ -37,9 +38,16 @@ export default function ProductsContent() {
       setLoading(true);
       try {
         const productData = await getProducts();
-        setProducts(productData);
+        if (productData && productData.length > 0) {
+          setProducts(productData);
+        } else {
+          // Fallback to dummy products if API returns empty
+          setProducts(ALL_PRODUCTS);
+        }
       } catch (error) {
         console.error("Failed to load products:", error);
+        // Fallback to dummy products on error
+        setProducts(ALL_PRODUCTS);
       } finally {
         setLoading(false);
       }
@@ -95,10 +103,10 @@ export default function ProductsContent() {
     return (
       <div className="container-responsive py-6 lg:py-10">
         <div className="animate-pulse">
-          <div className="h-8 bg-neutral-200 dark:bg-neutral-700 rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-fr">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-neutral-200 dark:bg-neutral-700 rounded-lg h-64"></div>
+              <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-80"></div>
             ))}
           </div>
         </div>
@@ -116,8 +124,8 @@ export default function ProductsContent() {
       />
       
       <div className="mb-4 lg:mb-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-neutral-800 dark:text-neutral-200">All Products</h1>
-        <p className="text-sm lg:text-base text-neutral-600 dark:text-neutral-400 mt-1 lg:mt-2">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">All Products</h1>
+        <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mt-1 lg:mt-2">
           Discover our collection of amazing products
         </p>
       </div>
@@ -127,11 +135,11 @@ export default function ProductsContent() {
         <div className="lg:hidden">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-soft mobile-touch-target"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mobile-touch-target"
           >
             <FiFilter className="h-4 w-4" />
             <span className="text-sm font-medium">Filters</span>
-            <span className="text-xs text-neutral-500">({getActiveFilterCount()})</span>
+            <span className="text-xs text-gray-500">({getActiveFilterCount()})</span>
           </button>
         </div>
 
@@ -165,13 +173,13 @@ export default function ProductsContent() {
                 selectedCategory={filters.category}
                 onCategoryChange={handleCategoryChange}
               />
-              <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">
+              <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
                 {products.length} products
               </span>
             </div>
             
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-xs lg:text-sm text-neutral-600 dark:text-neutral-400">Sort by:</span>
+              <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
               <SortDropdown 
                 value={sortBy}
                 onChange={handleSortChange}
@@ -181,15 +189,15 @@ export default function ProductsContent() {
 
           {products.length === 0 ? (
             <div className="text-center py-8 lg:py-12">
-              <h3 className="text-base lg:text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-2">
+              <h3 className="text-base lg:text-lg font-medium text-gray-900 dark:text-white mb-2">
                 No products found
               </h3>
-              <p className="text-sm lg:text-base text-neutral-600 dark:text-neutral-400 mb-4">
+              <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-4">
                 Try adjusting your filters or search terms
               </p>
               <button
                 onClick={clearFilters}
-                className="text-primary hover:underline text-sm lg:text-base mobile-touch-target"
+                className="text-blue-600 hover:underline text-sm lg:text-base mobile-touch-target"
               >
                 Clear all filters
               </button>

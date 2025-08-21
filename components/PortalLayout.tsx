@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import DiscountBanner from './DiscountBanner';
 
 interface PortalLayoutProps {
   children: ReactNode;
@@ -31,6 +32,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+      <DiscountBanner />
       <main className="flex-1">
         {children}
       </main>

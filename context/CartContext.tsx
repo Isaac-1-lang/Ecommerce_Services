@@ -1,162 +1,276 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useCartStore } from '../features/cart/store';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { discountService, DiscountValidationResult } from '../services/discountService';
 
 interface CartItem {
   id: string;
-  productId: string;
   name: string;
   price: number;
-  originalPrice?: number;
   image: string;
   quantity: number;
-  variant?: {
-    id: string;
-    name: string;
-    value: string;
-  };
 }
 
-interface CartContextType {
+interface CartState {
   items: CartItem[];
-  totalItems: number;
   subtotal: number;
-  total: number;
   shipping: number;
   tax: number;
   discount: number;
   discountCode: string | null;
-  isLoading: boolean;
-  error: string | null;
-  addToCart: (item: Omit<CartItem, 'id'>) => Promise<void>;
-  removeFromCart: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
+  total: number;
+}
+
+type CartAction =
+  | { type: 'ADD_ITEM'; payload: CartItem }
+  | { type: 'REMOVE_ITEM'; payload: string }
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'CLEAR_CART' }
+  | { type: 'SET_DISCOUNT'; payload: DiscountValidationResult }
+  | { type: 'REMOVE_DISCOUNT' }
+  | { type: 'SET_SHIPPING'; payload: number }
+  | { type: 'SET_TAX'; payload: number };
+
+const initialState: CartState = {
+  items: [],
+  subtotal: 0,
+  shipping: 0,
+  tax: 0,
+  discount: 0,
+  discountCode: null,
+  total: 0,
+};
+
+const cartReducer = (state: CartState, action: CartAction): CartState => {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const existingItem = state.items.find(item => item.id === action.payload.id);
+      let newItems;
+      
+      if (existingItem) {
+        newItems = state.items.map(item =>
+          item.id === action.payload.id
+            ? { ...item, quantity: item.quantity + action.payload.quantity }
+            : item
+        );
+      } else {
+        newItems = [...state.items, action.payload];
+      }
+      
+      const newSubtotal = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const newTotal = newSubtotal + state.shipping + state.tax - state.discount;
+      
+      return {
+        ...state,
+        items: newItems,
+        subtotal: newSubtotal,
+        total: newTotal,
+      };
+    }
+    
+    case 'REMOVE_ITEM': {
+      const newItems = state.items.filter(item => item.id !== action.payload);
+      const newSubtotal = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const newTotal = newSubtotal + state.shipping + state.tax - state.discount;
+      
+      return {
+        ...state,
+        items: newItems,
+        subtotal: newSubtotal,
+        total: newTotal,
+      };
+    }
+    
+    case 'UPDATE_QUANTITY': {
+      const newItems = state.items.map(item =>
+        item.id === action.payload.id
+          ? { ...item, quantity: Math.max(1, action.payload.quantity) }
+          : item
+      );
+      const newSubtotal = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const newTotal = newSubtotal + state.shipping + state.tax - state.discount;
+      
+      return {
+        ...state,
+        items: newItems,
+        subtotal: newSubtotal,
+        total: newTotal,
+      };
+    }
+    
+    case 'CLEAR_CART': {
+      return {
+        ...initialState,
+        shipping: state.shipping,
+        tax: state.tax,
+      };
+    }
+    
+    case 'SET_DISCOUNT': {
+      const discountAmount = action.payload.discountAmount || 0;
+      const newTotal = state.subtotal + state.shipping + state.tax - discountAmount;
+      
+      return {
+        ...state,
+        discount: discountAmount,
+        discountCode: action.payload.discount?.discountCode || null,
+        total: newTotal,
+      };
+    }
+    
+    case 'REMOVE_DISCOUNT': {
+      const newTotal = state.subtotal + state.shipping + state.tax;
+      
+      return {
+        ...state,
+        discount: 0,
+        discountCode: null,
+        total: newTotal,
+      };
+    }
+    
+    case 'SET_SHIPPING': {
+      const newTotal = state.subtotal + action.payload + state.tax - state.discount;
+      
+      return {
+        ...state,
+        shipping: action.payload,
+        total: newTotal,
+      };
+    }
+    
+    case 'SET_TAX': {
+      const newTotal = state.subtotal + state.shipping + action.payload - state.discount;
+      
+      return {
+        ...state,
+        tax: action.payload,
+        total: newTotal,
+      };
+    }
+    
+    default:
+      return state;
+  }
+};
+
+interface CartContextType {
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  discountCode: string | null;
+  total: number;
+  addItem: (item: CartItem) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   applyDiscount: (code: string) => Promise<void>;
   removeDiscount: () => void;
-  calculateShipping: (address: any) => Promise<number>;
-  clearError: () => void;
+  setShipping: (amount: number) => void;
+  setTax: (amount: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: ReactNode }) {
-  const {
-    items,
-    loading,
-    error,
-    addToCart: storeAddToCart,
-    removeFromCart: storeRemoveFromCart,
-    updateQuantity: storeUpdateQuantity,
-    clearCart: storeClearCart,
-    clearError: storeClearError,
-  } = useCartStore();
+export const useCart = (): CartContextType => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+};
 
-  const [discountCode, setDiscountCode] = useState<string | null>(null);
-  const [discount, setDiscount] = useState(0);
-  const [shipping, setShipping] = useState(0);
-  const [tax, setTax] = useState(0);
+interface CartProviderProps {
+  children: ReactNode;
+}
 
-  // Calculate totals
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const total = subtotal + shipping + tax - discount;
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  const addToCart = async (item: Omit<CartItem, 'id'>) => {
-    try {
-      await storeAddToCart(item);
-    } catch (error) {
-      throw error;
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        if (parsedCart.items && Array.isArray(parsedCart.items)) {
+          parsedCart.items.forEach((item: CartItem) => {
+            dispatch({ type: 'ADD_ITEM', payload: item });
+          });
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      }
     }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(state));
+  }, [state]);
+
+  const addItem = (item: CartItem) => {
+    dispatch({ type: 'ADD_ITEM', payload: item });
   };
 
-  const removeFromCart = (itemId: string) => {
-    storeRemoveFromCart(itemId);
+  const removeItem = (id: string) => {
+    dispatch({ type: 'REMOVE_ITEM', payload: id });
   };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(itemId);
-    } else {
-      storeUpdateQuantity(itemId, quantity);
-    }
+  const updateQuantity = (id: string, quantity: number) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
   };
 
   const clearCart = () => {
-    storeClearCart();
-    setDiscountCode(null);
-    setDiscount(0);
+    dispatch({ type: 'CLEAR_CART' });
   };
 
   const applyDiscount = async (code: string) => {
     try {
-      // Mock discount calculation - replace with actual API call
-      const discountAmount = subtotal * 0.1; // 10% discount
-      setDiscount(discountAmount);
-      setDiscountCode(code);
-    } catch (error) {
-      throw error;
+      const result = await discountService.validateDiscountCode(code, state.subtotal);
+      
+      if (result.isValid && result.discount) {
+        dispatch({ type: 'SET_DISCOUNT', payload: result });
+      } else {
+        throw new Error(result.error || 'Invalid discount code');
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to apply discount');
     }
   };
 
   const removeDiscount = () => {
-    setDiscount(0);
-    setDiscountCode(null);
+    dispatch({ type: 'REMOVE_DISCOUNT' });
   };
 
-  const calculateShipping = async (address: any) => {
-    try {
-      // Mock shipping calculation - replace with actual API call
-      const shippingCost = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
-      setShipping(shippingCost);
-      return shippingCost;
-    } catch (error) {
-      throw error;
-    }
+  const setShipping = (amount: number) => {
+    dispatch({ type: 'SET_SHIPPING', payload: amount });
   };
 
-  const clearError = () => {
-    storeClearError();
+  const setTax = (amount: number) => {
+    dispatch({ type: 'SET_TAX', payload: amount });
   };
-
-  // Calculate tax based on subtotal (mock calculation)
-  useEffect(() => {
-    const taxRate = 0.08; // 8% tax rate
-    setTax(subtotal * taxRate);
-  }, [subtotal]);
 
   const value: CartContextType = {
-    items,
-    totalItems,
-    subtotal,
-    total,
-    shipping,
-    tax,
-    discount,
-    discountCode,
-    isLoading: loading,
-    error,
-    addToCart,
-    removeFromCart,
+    ...state,
+    addItem,
+    removeItem,
     updateQuantity,
     clearCart,
     applyDiscount,
     removeDiscount,
-    calculateShipping,
-    clearError,
+    setShipping,
+    setTax,
   };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
-}
-
-export function useCart() {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
-}
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
+};
 
 // Cart Summary Component
 interface CartSummaryProps {

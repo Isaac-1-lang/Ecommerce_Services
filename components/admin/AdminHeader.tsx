@@ -116,7 +116,9 @@ export default function AdminHeader() {
                 </Link>
                 <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error hover:bg-error-50 dark:hover:bg-error-900 rounded-md transition-colors text-left">
                   <FiLogOut className="h-4 w-4" />
-                  Logout
+                  <Link href="/auth/login">
+                    Logout
+                  </Link>
                 </button>
               </div>
             </div>
