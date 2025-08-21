@@ -61,7 +61,8 @@ export const useCartStore = create<CartState>()(
             );
           }
         }
-        set({ items, ...calculateTotals(items) });
+        const totals = calculateTotals(items);
+        set({ items, ...totals });
       },
       removeItem: (itemId) => {
         const items = get().items;
@@ -78,13 +79,15 @@ export const useCartStore = create<CartState>()(
           );
         }
         
-        set({ items: filteredItems, ...calculateTotals(filteredItems) });
+        const totals = calculateTotals(filteredItems);
+        set({ items: filteredItems, ...totals });
       },
       updateQuantity: (itemId, quantity) => {
         const items = get().items.map((item) => 
           item.id === itemId ? { ...item, quantity: Math.max(1, quantity) } : item
         );
-        set({ items, ...calculateTotals(items) });
+        const totals = calculateTotals(items);
+        set({ items, ...totals });
       },
       increase: (itemId) => {
         const items = get().items;
@@ -101,7 +104,8 @@ export const useCartStore = create<CartState>()(
             );
           }
         }
-        set({ items, ...calculateTotals(items) });
+        const totals = calculateTotals(items);
+        set({ items, ...totals });
       },
       decrease: (itemId) => {
         const items = get().items;
@@ -118,7 +122,8 @@ export const useCartStore = create<CartState>()(
             );
           }
         }
-        set({ items, ...calculateTotals(items) });
+        const totals = calculateTotals(items);
+        set({ items, ...totals });
       },
       clearCart: () => {
         // Show toast for cart cleared

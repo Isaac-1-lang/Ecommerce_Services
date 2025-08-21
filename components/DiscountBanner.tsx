@@ -37,10 +37,10 @@ export default function DiscountBanner() {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3">
+      <div className="bg-gradient-to-r from-primary to-primary/90 text-white py-3">
         <div className="container mx-auto px-4 text-center">
           <div className="animate-pulse">
-            <div className="h-4 bg-blue-400 rounded w-1/3 mx-auto"></div>
+            <div className="h-4 bg-primary/60 rounded w-1/3 mx-auto"></div>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function DiscountBanner() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 relative overflow-hidden">
+    <div className="bg-gradient-to-r from-primary to-primary/90 text-white py-3 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -130,7 +130,7 @@ export default function DiscountBanner() {
           {/* CTA Button */}
           <Link
             href="/products"
-            className="bg-white text-blue-600 px-4 py-1 rounded-full text-xs font-semibold hover:bg-gray-100 transition-colors whitespace-nowrap"
+            className="bg-white text-primary px-4 py-1 rounded-full text-xs font-semibold hover:bg-neutral-100 transition-colors whitespace-nowrap"
           >
             Shop Now
           </Link>

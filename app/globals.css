@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  
+  /* Base */
   --background: #ffffff;
   --foreground: #1c1917;
-  --primary: #14b8a6;
+
+  /* Primary and secondary (muted, professional) */
+  --primary: #0f766e; /* teal-700 */
   --primary-foreground: #ffffff;
-  
-  
-  --secondary: #f97316;
+  --secondary: #ea580c; /* orange-600 */
   --secondary-foreground: #ffffff;
-  
-  
+
+  /* Ecommerce accents */
   --price: #dc2626;
   --deal: #f59e0b;
   --sale: #ef4444;
@@ -20,17 +20,17 @@
   --shipping: #14b8a6;
   --trust: #059669;
   --accent: #f97316;
-  --highlight: #f0fdfa;
-  --subtle: #f8fafc;
-  
-  
-  --muted: #f5f5f4;
-  --muted-foreground: #78716c;
-  --border: #e7e5e4;
+  --highlight: #effdf9; /* softer highlight */
+  --subtle: #f6f7f8; /* soft gray */
+
+  /* UI neutrals */
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
   --input: #ffffff;
-  --ring: #14b8a6;
-  
- 
+  --ring: #0f766e;
+
+  /* Feedback */
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
@@ -70,8 +70,8 @@
   --foreground: #fafaf9;
   --muted: #292524;
   --muted-foreground: #a8a29e;
-  --border: #44403c;
-  --input: #292524;
+  --border: #3f3f46;
+  --input: #18181b;
 }
 
 * {

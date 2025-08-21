@@ -79,57 +79,88 @@ function NotificationContainer() {
   const getIcon = (type: Notification['type']) => {
     switch (type) {
       case 'success':
-        return <FiCheckCircle className="h-5 w-5 text-success" />;
+        return <FiCheckCircle className="h-5 w-5 text-green-600" />;
       case 'error':
-        return <FiAlertCircle className="h-5 w-5 text-danger" />;
+        return <FiAlertCircle className="h-5 w-5 text-red-600" />;
       case 'warning':
-        return <FiAlertTriangle className="h-5 w-5 text-warning" />;
+        return <FiAlertTriangle className="h-5 w-5 text-yellow-600" />;
       case 'info':
-        return <FiInfo className="h-5 w-5 text-info" />;
+        return <FiInfo className="h-5 w-5 text-blue-600" />;
       default:
-        return <FiInfo className="h-5 w-5 text-info" />;
+        return <FiInfo className="h-5 w-5 text-blue-600" />;
     }
   };
 
   const getBackgroundColor = (type: Notification['type']) => {
     switch (type) {
       case 'success':
-        return 'bg-success/10 border-success/20';
+        return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800';
       case 'error':
-        return 'bg-danger/10 border-danger/20';
+        return 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800';
       case 'warning':
-        return 'bg-warning/10 border-warning/20';
+        return 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800';
       case 'info':
-        return 'bg-info/10 border-info/20';
+        return 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
       default:
-        return 'bg-info/10 border-info/20';
+        return 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
+    }
+  };
+
+  const getTextColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'success':
+        return 'text-green-800 dark:text-green-200';
+      case 'error':
+        return 'text-red-800 dark:text-red-200';
+      case 'warning':
+        return 'text-yellow-800 dark:text-yellow-200';
+      case 'info':
+        return 'text-blue-800 dark:text-blue-200';
+      default:
+        return 'text-blue-800 dark:text-blue-200';
+    }
+  };
+
+  const getMessageColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'success':
+        return 'text-green-600 dark:text-green-300';
+      case 'error':
+        return 'text-red-600 dark:text-red-300';
+      case 'warning':
+        return 'text-yellow-600 dark:text-yellow-300';
+      case 'info':
+        return 'text-blue-600 dark:text-blue-300';
+      default:
+        return 'text-blue-600 dark:text-blue-300';
     }
   };
 
   if (notifications.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+    <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm pointer-events-none">
       {notifications.map((notification) => (
         <div
           key={notification.id}
-          className={`${getBackgroundColor(notification.type)} border rounded-lg p-4 shadow-lg backdrop-blur-sm animate-in slide-in-from-right-2 duration-300`}
+          className={`${getBackgroundColor(notification.type)} border rounded-xl p-4 shadow-lg backdrop-blur-sm animate-in slide-in-from-right-2 duration-300 pointer-events-auto`}
+          style={{ minWidth: '320px', maxWidth: '400px' }}
         >
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-0.5">
               {getIcon(notification.type)}
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+              <h4 className={`text-sm font-semibold ${getTextColor(notification.type)}`}>
                 {notification.title}
               </h4>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className={`text-sm ${getMessageColor(notification.type)} mt-1 leading-relaxed`}>
                 {notification.message}
               </p>
               {notification.action && (
                 <button
                   onClick={notification.action.onClick}
-                  className="text-sm text-primary hover:text-primary/80 font-medium mt-2"
+                  className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium mt-2 transition-colors"
                 >
                   {notification.action.label}
                 </button>
@@ -137,7 +168,7 @@ function NotificationContainer() {
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className="flex-shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <FiX className="h-4 w-4" />
             </button>
@@ -151,15 +182,16 @@ function NotificationContainer() {
 // Notification Bell Component for Header
 export function NotificationBell() {
   const { notifications } = useNotifications();
-  const unreadCount = notifications.length;
 
   return (
     <div className="relative">
-      <button className="relative p-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
-        <FiAlertCircle className="h-5 w-5" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 h-5 w-5 bg-danger text-white text-xs rounded-full flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+      <button className="relative p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10 17h5l-5 5v-5zM5 17h5l-5 5v-5z" />
+        </svg>
+        {notifications.length > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {notifications.length}
           </span>
         )}
       </button>

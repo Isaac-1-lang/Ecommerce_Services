@@ -31,9 +31,11 @@ export function ToastContainer({ children }: ToastContainerProps) {
   return (
     <>
       {children}
-      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm pointer-events-none">
         {toasts.map((toast) => (
-          <Toast key={toast.id} toast={toast} onRemove={removeToast} />
+          <div key={toast.id} className="pointer-events-auto">
+            <Toast toast={toast} onRemove={removeToast} />
+          </div>
         ))}
       </div>
     </>
@@ -43,6 +45,6 @@ export function ToastContainer({ children }: ToastContainerProps) {
 // Utility function to show toasts
 export const showToast = (type: ToastType, title: string, message?: string, duration?: number) => {
   if (typeof window !== 'undefined' && (window as any).showToast) {
-    (window as any).showToast({ type, title, message, duration });
+    (window as any).showToast(type, title, message, duration);
   }
 };

@@ -149,7 +149,7 @@ export const authService = {
         password: (data.password || '').trim(),
       };
 
-      if (data && (data as any).phoneNumber) {
+      if ((data as any)?.phoneNumber) {
         requestData.phoneNumber = String((data as any).phoneNumber).trim();
       }
 
@@ -166,35 +166,21 @@ export const authService = {
         throw new Error('Password must be at least 8 characters');
       }
 
-      // Note: The backend currently only supports basic registration
-      // Additional fields like username, payment info, business info, etc.
-      // will need to be handled in a separate update endpoint or
-      // the backend registration endpoint needs to be extended
+      // Backend returns a plain string on success (not a JSON envelope)
+      await api.post("/api/v1/auth/users/register", requestData);
 
-      const response = await api.post<AuthResponse>("/api/v1/auth/users/register", requestData);
+      // Immediately log the user in to obtain token and normalized user
+      const { user, token } = await this.login({
+        email: requestData.email,
+        password: requestData.password,
+      } as LoginCredentials);
 
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Registration failed");
-      }
-
-      // Create user object from registration response
-      const userData = response.data.data;
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        role: userData.role as UserRole,
-        isActive: true,
-        createdAt: userData.createdAt || new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-      };
-
-      // Backend now returns token directly, no need for separate login
-      return { user, token: userData.token };
+      return { user, token };
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
-      throw new Error(backendMessage || error.message || "Registration failed");
+      // Extract message from various backend shapes (string or object)
+      const raw = error?.response?.data;
+      const backendMessage = typeof raw === 'string' ? raw : (raw?.message || raw?.error);
+      throw new Error(backendMessage || error.message || 'Registration failed');
     }
   },
 

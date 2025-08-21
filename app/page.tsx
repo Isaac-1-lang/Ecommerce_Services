@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock, FiEye, FiShare2 } from "react-icons/fi";
+import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock, FiEye, FiShare2, FiMinus, FiPlus } from "react-icons/fi";
 import { getProducts } from "../services/productService";
 import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
@@ -89,11 +89,20 @@ const brands = [
 function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   
   const addToCart = useCartStore((s) => s.addItem);
+  const removeFromCart = useCartStore((s) => s.removeItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const cartItems = useCartStore((s) => s.items);
   const addToWishlist = useWishlistStore((s) => s.addItem);
   const removeFromWishlist = useWishlistStore((s) => s.removeItem);
   const isInWishlist = useWishlistStore((s) => s.isInWishlist);
+
+  // Check if item is in cart and get current quantity
+  const cartItem = cartItems.find(item => item.id === product.id);
+  const isInCart = !!cartItem;
+  const currentQuantity = cartItem?.quantity || 0;
 
   // Fallback images for different categories
   const getFallbackImage = (category: string) => {
@@ -121,8 +130,27 @@ function ProductCard({ product }: { product: Product }) {
       name: product.name,
       price: product.price,
       image: product.image || "",
-      quantity: 1,
+      quantity: quantity,
     });
+  };
+
+  const handleRemoveFromCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeFromCart(product.id);
+    setQuantity(1);
+  };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity < 1) return;
+    if (newQuantity > 99) return; // Limit to 99 items
+    
+    setQuantity(newQuantity);
+    
+    // If item is already in cart, update the cart quantity
+    if (isInCart) {
+      updateQuantity(product.id, newQuantity);
+    }
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -282,6 +310,15 @@ function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
+
+        {/* Cart Status Badge */}
+        {isInCart && (
+          <div className="absolute bottom-3 left-3">
+            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+              In Cart ({currentQuantity})
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
@@ -315,16 +352,49 @@ function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
+        {/* Quantity Controls */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
+            <button
+              onClick={() => handleQuantityChange(quantity - 1)}
+              disabled={quantity <= 1}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <FiMinus className="h-3 w-3" />
+            </button>
+            <span className="px-3 py-2 text-sm font-medium min-w-[2rem] text-center">
+              {isInCart ? currentQuantity : quantity}
+            </span>
+            <button
+              onClick={() => handleQuantityChange(quantity + 1)}
+              disabled={quantity >= 99 || (stockQuantity > 0 && quantity >= stockQuantity)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <FiPlus className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+
         {/* Actions */}
         <div className="flex items-center gap-2 mt-auto">
-          <button
-            onClick={handleAddToCart}
-            disabled={stockQuantity === 0}
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <FiShoppingCart className="h-4 w-4" />
-            {stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}
-          </button>
+          {isInCart ? (
+            <button
+              onClick={handleRemoveFromCart}
+              className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FiShoppingCart className="h-4 w-4" />
+              Remove from Cart
+            </button>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={stockQuantity === 0}
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FiShoppingCart className="h-4 w-4" />
+              {stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -471,7 +541,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
                 <FiTruck className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -482,7 +552,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
                 <FiShield className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -493,7 +563,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
                 <FiRefreshCw className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -504,7 +574,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-4">
                 <FiClock className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -547,7 +617,7 @@ export default function HomePage() {
               <p className="text-gray-500 dark:text-gray-400 mb-4">No featured products available</p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 Browse All Products
                 <FiArrowRight className="h-5 w-5" />
@@ -559,7 +629,7 @@ export default function HomePage() {
             <div className="text-center mt-12">
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
               >
                 View All Products
                 <FiArrowRight className="h-5 w-5" />
@@ -709,7 +779,7 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-primary text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">
@@ -724,7 +794,7 @@ export default function HomePage() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
               />
-              <button className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
+              <button className="bg-white text-primary px-6 py-3 rounded-md font-medium hover:bg-neutral-100 transition-colors">
                 Subscribe
               </button>
             </div>

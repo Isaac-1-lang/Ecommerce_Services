@@ -192,7 +192,10 @@ const transformJavaOrder = (javaOrder: JavaOrder): Order => {
 export const orderService = {
   async getOrders(): Promise<Order[]> {
     try {
-      const response = await api.get<JavaOrderResponse<JavaOrder[]>>('/v1/orders');
+      const userId = typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('user') || '{}')?.id) : undefined;
+      const response = await api.get<JavaOrderResponse<JavaOrder[]>>('/api/v1/orders', {
+        params: userId ? { userId } : undefined,
+      });
 
       if (response.data.success && response.data.data) {
         return response.data.data.map(transformJavaOrder);
@@ -207,7 +210,10 @@ export const orderService = {
 
   async getOrderById(orderId: string): Promise<Order | null> {
     try {
-      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/v1/orders/${orderId}`);
+      const userId = typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('user') || '{}')?.id) : undefined;
+      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/${orderId}` , {
+        params: userId ? { userId } : undefined,
+      });
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);
@@ -225,7 +231,7 @@ export const orderService = {
 
   async getOrderByNumber(orderNumber: string): Promise<Order | null> {
     try {
-      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/v1/orders/number/${orderNumber}`);
+      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/number/${orderNumber}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);
@@ -243,7 +249,7 @@ export const orderService = {
 
   async createOrder(orderData: CreateOrderRequest): Promise<Order> {
     try {
-      const response = await api.post<JavaOrderResponse<JavaOrder>>('/v1/orders', orderData);
+      const response = await api.post<JavaOrderResponse<JavaOrder>>('/api/v1/orders', orderData);
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);
@@ -258,7 +264,7 @@ export const orderService = {
 
   async cancelOrder(orderId: string): Promise<Order> {
     try {
-      const response = await api.put<JavaOrderResponse<JavaOrder>>(`/v1/orders/${orderId}/cancel`);
+      const response = await api.put<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/${orderId}/cancel`);
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);
@@ -273,7 +279,7 @@ export const orderService = {
 
   async updateOrderStatus(orderId: string, status: Order['status']): Promise<Order> {
     try {
-      const response = await api.put<JavaOrderResponse<JavaOrder>>(`/v1/orders/${orderId}/status`, {
+      const response = await api.put<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/${orderId}/status`, {
         status
       });
 
@@ -290,7 +296,7 @@ export const orderService = {
 
   async getOrderTracking(orderId: string): Promise<{ trackingNumber?: string; status: string; estimatedDelivery?: string }> {
     try {
-      const response = await api.get<JavaOrderResponse<{ trackingNumber?: string; status: string; estimatedDelivery?: string }>>(`/v1/orders/${orderId}/tracking`);
+      const response = await api.get<JavaOrderResponse<{ trackingNumber?: string; status: string; estimatedDelivery?: string }>>(`/api/v1/orders/${orderId}/tracking`);
 
       if (response.data.success && response.data.data) {
         return response.data.data;

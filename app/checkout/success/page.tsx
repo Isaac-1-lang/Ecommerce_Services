@@ -1,101 +1,213 @@
 "use client";
 
-import Link from "next/link";
-import { FiCheckCircle, FiHome, FiPackage, FiMail } from "react-icons/fi";
-import Breadcrumbs from "../../../components/Breadcrumbs";
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { FiCheck, FiHome, FiShoppingBag, FiMail, FiTruck, FiShield } from 'react-icons/fi';
 
 export default function CheckoutSuccessPage() {
-  const breadcrumbs = [
-    { name: "Home", href: "/" },
-    { name: "Checkout", href: "/checkout" },
-    { name: "Success", href: "/checkout/success" },
-  ];
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (sessionId) {
+      // In a real app, you would verify the session with your backend
+      // For now, we'll simulate success
+      setTimeout(() => {
+        setOrderDetails({
+          orderId: `ORDER-${Date.now()}`,
+          sessionId: sessionId,
+          total: 99.99, // This would come from your backend
+          estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        });
+        setLoading(false);
+      }, 1000);
+    }
+  }, [sessionId]);
+
+  // Persist guest order locally so guests can view orders later
+  useEffect(() => {
+    if (!loading && orderDetails && !saved) {
+      try {
+        const newOrder = {
+          id: orderDetails.orderId || orderDetails.sessionId || `ORDER-${Date.now()}`,
+          total: Number(orderDetails.total) || 0,
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+        };
+        const key = 'guest_orders';
+        const existing = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+        const list: any[] = existing ? JSON.parse(existing) : [];
+        // de-duplicate by id
+        const already = list.some((o) => o.id === newOrder.id);
+        if (!already) {
+          list.unshift(newOrder);
+          localStorage.setItem(key, JSON.stringify(list.slice(0, 50)));
+        }
+        setSaved(true);
+      } catch {
+        // ignore storage errors
+      }
+    }
+  }, [loading, orderDetails, saved]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Processing your order...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
-        <Breadcrumbs items={breadcrumbs} />
-        
-        <div className="mt-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-6">
-            <FiCheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Success Header */}
+        <div className="text-center mb-12">
+          <div className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-6">
+            <FiCheck className="h-10 w-10 text-green-600" />
           </div>
-          
-          <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">
-            Order Confirmed!
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Payment Successful!
           </h1>
-          
-          <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-8">
-            Thank you for your purchase. Your order has been successfully placed and is being processed.
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Thank you for your purchase. Your order has been confirmed.
           </p>
+        </div>
 
-          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 mb-8">
-            <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
-              What's Next?
-            </h2>
+        {/* Order Details */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Order Details
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                  <FiShoppingBag className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Order ID</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {orderDetails?.orderId}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                  <FiShield className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Payment Status</p>
+                  <p className="font-semibold text-green-600">Paid</p>
+                </div>
+              </div>
+            </div>
             
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <FiMail className="h-5 w-5 text-primary mt-0.5" />
-                <div className="text-left">
-                  <h3 className="font-medium text-neutral-800 dark:text-neutral-200">
-                    Order Confirmation Email
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    You'll receive a confirmation email with your order details and tracking information.
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                  <FiTruck className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Estimated Delivery</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {orderDetails?.estimatedDelivery}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <FiPackage className="h-5 w-5 text-primary mt-0.5" />
-                <div className="text-left">
-                  <h3 className="font-medium text-neutral-800 dark:text-neutral-200">
-                    Order Processing
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Your order is being prepared and will be shipped within 1-2 business days.
-                  </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                  <FiMail className="h-5 w-5 text-orange-600" />
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <FiCheckCircle className="h-5 w-5 text-primary mt-0.5" />
-                <div className="text-left">
-                  <h3 className="font-medium text-neutral-800 dark:text-neutral-200">
-                    Payment Processed
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Your payment has been securely processed through Stripe.
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Confirmation Email</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    Sent to your email
                   </p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/"
-              className="flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 transition-colors"
-            >
-              <FiHome className="h-5 w-5" />
-              Continue Shopping
-            </Link>
-            
-            <Link
-              href="/account/orders"
-              className="flex items-center justify-center gap-2 bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 px-6 py-3 rounded-lg font-medium hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
-            >
-              <FiPackage className="h-5 w-5" />
-              View Orders
-            </Link>
+        {/* Next Steps */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-8 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            What happens next?
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
+                1
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Order Confirmation</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  You'll receive an email confirmation with your order details.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
+                2
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Order Processing</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  We'll process your order and prepare it for shipping.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
+                3
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Shipping</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  You'll receive tracking information once your order ships.
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              <strong>Need help?</strong> If you have any questions about your order, please contact our customer support team.
-            </p>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/"
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            <FiHome className="h-5 w-5" />
+            Continue Shopping
+          </Link>
+          <Link
+            href="/orders"
+            className="flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 border border-gray-300 dark:border-gray-600"
+          >
+            <FiShoppingBag className="h-5 w-5" />
+            View Orders
+          </Link>
+        </div>
+
+        {/* Support Info */}
+        <div className="text-center mt-8">
+          <p className="text-gray-600 dark:text-gray-400">
+            Need help? Contact our support team at{' '}
+            <a href="mailto:support@example.com" className="text-blue-600 hover:text-blue-700">
+              support@example.com
+            </a>
+          </p>
         </div>
       </div>
     </div>

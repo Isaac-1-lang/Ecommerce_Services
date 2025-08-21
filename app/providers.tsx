@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import { ReactNode, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../context/AuthContext";
-import { CartProvider } from "../context/CartContext";
 import { NotificationProvider } from "../components/ui/Notifications";
 import { useAuthStore } from "../features/auth/store";
 
@@ -21,9 +20,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <NotificationProvider>
           <AuthProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
+            {children}
           </AuthProvider>
         </NotificationProvider>
       </QueryClientProvider>

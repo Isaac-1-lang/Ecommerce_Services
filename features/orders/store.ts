@@ -17,11 +17,23 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
   loading: false,
   fetchOrders: async () => {
     set({ loading: true });
-    const orders = await orderService.listOrders();
-    set({ orders, loading: false });
+    try {
+      const fullOrders = await orderService.getOrders();
+      const minimalOrders = fullOrders.map((o) => ({
+        id: o.id,
+        total: o.total,
+        status: o.status,
+        createdAt: o.createdAt,
+      }));
+      set({ orders: minimalOrders });
+    } catch (error) {
+      console.error('Failed to fetch orders', error);
+    } finally {
+      set({ loading: false });
+    }
   },
   cancelOrder: async (id: string) => {
-    await orderService.cancelOrder(id);
-    set({ orders: get().orders.map((o) => (o.id === id ? { ...o, status: "cancelled" } : o)) });
+    const updated = await orderService.cancelOrder(id);
+    set({ orders: get().orders.map((o) => (o.id === id ? { ...o, status: updated.status } : o)) });
   },
 }));
