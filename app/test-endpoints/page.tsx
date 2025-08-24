@@ -113,7 +113,7 @@ export default function TestEndpointsPage() {
       <div className="mt-6 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-semibold mb-2">Debug Information:</h3>
         <p className="text-sm text-gray-600">
-          API Base URL: {process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8095'}<br/>
+          API Base URL: {process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'}<br/>
           Categories Count: {categories.length}<br/>
           Warehouses Count: {warehouses.length}
         </p>

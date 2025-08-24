@@ -114,8 +114,7 @@ export const authService = {
         'ADMIN': UserRole.ADMIN,
         'EMPLOYEE': UserRole.EMPLOYEE,
         'CUSTOMER': UserRole.CUSTOMER,
-        'DELIVERY_PARTNER': UserRole.DELIVERY_PARTNER,
-        'DELIVERY_AGENT': UserRole.DELIVERY_PARTNER,
+        'DELIVERY_AGENT': UserRole.DELIVERY_AGENT,
       };
 
       const user: User = {

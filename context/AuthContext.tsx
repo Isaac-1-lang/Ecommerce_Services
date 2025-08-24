@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, UserRole, AuthState, LoginCredentials, RegisterData, AuthResponse, RolePermissions, Permission } from '../types/auth';
 import { authService } from '../services/authService';
+import { useAuthStore } from '../features/auth/store';
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -45,6 +46,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('authToken');
       if (token) {
         const user = await authService.getCurrentUser(token);
+        
+        // Update both AuthContext and Zustand store
+        const { setUser, setToken } = useAuthStore.getState();
+        setUser(user);
+        setToken(token);
+        
         setAuthState({
           user,
           token,
@@ -67,6 +74,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(credentials);
       
       localStorage.setItem('authToken', response.token);
+      
+      // Update both AuthContext and Zustand store
+      const { setUser, setToken } = useAuthStore.getState();
+      setUser(response.user);
+      setToken(response.token);
+      
       setAuthState({
         user: response.user,
         token: response.token,
@@ -90,6 +103,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(data);
       
       localStorage.setItem('authToken', response.token);
+      
+      // Update both AuthContext and Zustand store
+      const { setUser, setToken } = useAuthStore.getState();
+      setUser(response.user);
+      setToken(response.token);
+      
       setAuthState({
         user: response.user,
         token: response.token,
@@ -109,6 +128,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('authToken');
+    
+    // Update both AuthContext and Zustand store
+    const { setUser, setToken } = useAuthStore.getState();
+    setUser(null);
+    setToken(null);
+    
     setAuthState({
       user: null,
       token: null,

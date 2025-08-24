@@ -93,7 +93,7 @@ export const RoleBasedNav: React.FC = () => {
         return renderAdminNav();
       case UserRole.EMPLOYEE:
         return renderEmployeeNav();
-      case UserRole.DELIVERY_PARTNER:
+      case UserRole.DELIVERY_AGENT:
         return renderDeliveryNav();
       case UserRole.CUSTOMER:
         return renderCustomerNav();

@@ -5,7 +5,14 @@ import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types/auth';
 
 export const RegisterForm: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    role: UserRole;
+  }>({
     firstName: '',
     lastName: '',
     email: '',
@@ -131,7 +138,7 @@ export const RegisterForm: React.FC = () => {
               >
                 <option value={UserRole.CUSTOMER}>Customer</option>
                 <option value={UserRole.EMPLOYEE}>Employee</option>
-                <option value={UserRole.DELIVERY_PARTNER}>Delivery Partner</option>
+                <option value={UserRole.DELIVERY_AGENT}>Delivery Agent</option>
               </select>
             </div>
 

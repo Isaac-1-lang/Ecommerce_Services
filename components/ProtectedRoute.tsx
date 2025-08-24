@@ -6,7 +6,7 @@ import { useAuthStore } from '../features/auth/store';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ('admin' | 'employee' | 'delivery')[];
+  allowedRoles?: ('admin' | 'employee' | 'delivery' | 'delivery_agent')[];
   redirectTo?: string;
 }
 
@@ -49,9 +49,7 @@ export default function ProtectedRoute({
           
           if (normalizedRole === 'admin') {
             redirectPath = '/admin';
-          } else if (normalizedRole === 'employee') {
-            redirectPath = '/employee';
-          } else if (normalizedRole === 'delivery' || normalizedRole === 'delivery_partner') {
+          } else if (normalizedRole === 'delivery' || normalizedRole === 'delivery_partner' || normalizedRole === 'delivery_agent') {
             redirectPath = '/delivery';
           }
           
@@ -108,7 +106,7 @@ export function EmployeeProtected({ children }: { children: React.ReactNode }) {
 
 export function DeliveryProtected({ children }: { children: React.ReactNode }) {
   return (
-    <ProtectedRoute allowedRoles={['delivery']} redirectTo="/auth/login">
+    <ProtectedRoute allowedRoles={['delivery', 'delivery_agent']} redirectTo="/auth/login">
       {children}
     </ProtectedRoute>
   );

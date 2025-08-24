@@ -96,11 +96,11 @@ export const EmployeeOnly: React.FC<{ children: React.ReactNode; fallback?: Reac
   </ProtectedRoute>
 );
 
-export const DeliveryPartnerOnly: React.FC<{ children: React.ReactNode; fallback?: React.ReactNode }> = ({
+export const DeliveryAgentOnly: React.FC<{ children: React.ReactNode; fallback?: React.ReactNode }> = ({
   children,
   fallback,
 }) => (
-  <ProtectedRoute requiredRole={UserRole.DELIVERY_PARTNER} fallback={fallback}>
+  <ProtectedRoute requiredRole={UserRole.DELIVERY_AGENT} fallback={fallback}>
     {children}
   </ProtectedRoute>
 );

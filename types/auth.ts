@@ -3,7 +3,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   CUSTOMER = 'CUSTOMER',
   EMPLOYEE = 'EMPLOYEE',
-  DELIVERY_PARTNER = 'DELIVERY_PARTNER'
+  DELIVERY_AGENT = 'DELIVERY_AGENT'
 }
 
 export interface User {
@@ -67,8 +67,16 @@ export interface EmployeeRegisterData extends BaseRegisterData {
   position?: string;
 }
 
+// Delivery Agent registration
+export interface DeliveryAgentRegisterData extends BaseRegisterData {
+  role: UserRole.DELIVERY_AGENT;
+  vehicleType?: string;
+  licenseNumber?: string;
+  serviceArea?: string;
+}
+
 // Union type for all registration data
-export type RegisterData = CustomerRegisterData | AdminRegisterData | EmployeeRegisterData;
+export type RegisterData = CustomerRegisterData | AdminRegisterData | EmployeeRegisterData | DeliveryAgentRegisterData;
 
 export interface AuthResponse {
   user: User;
@@ -98,7 +106,7 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     { resource: 'requests', action: 'read' },
     { resource: 'products', action: 'read' },
   ],
-  [UserRole.DELIVERY_PARTNER]: [
+  [UserRole.DELIVERY_AGENT]: [
     { resource: 'orders', action: 'read' },
     { resource: 'orders', action: 'update' },
     { resource: 'delivery', action: 'all' }
@@ -113,12 +121,12 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
 };
 
 // Registration flow types
-export type RegistrationFlow = 'customer' | 'admin' | 'employee';
+export type RegistrationFlow = 'customer' | 'admin' | 'employee' | 'delivery';
 
 // Role-specific redirect paths
 export const RoleRedirectPaths: Record<UserRole, string> = {
   [UserRole.CUSTOMER]: '/dashboard',
   [UserRole.ADMIN]: '/admin',
   [UserRole.EMPLOYEE]: '/employee',
-  [UserRole.DELIVERY_PARTNER]: '/delivery'
+  [UserRole.DELIVERY_AGENT]: '/delivery'
 };

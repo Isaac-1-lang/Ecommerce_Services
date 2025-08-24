@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_BASE_URL = 'http://localhost:8095';
+const API_BASE_URL = 'http://localhost:8081';
 
 async function testInventoryEndpoints() {
   console.log('🧪 Testing Warehouse Inventory Endpoints...\n');

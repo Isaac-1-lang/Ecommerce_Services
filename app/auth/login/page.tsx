@@ -18,7 +18,7 @@ export default function LoginPage() {
 
       if (role === 'admin') redirect = '/admin';
       else if (role === 'employee') redirect = '/employee';
-      else if (role === 'delivery' || role === 'delivery_partner') redirect = '/delivery';
+              else if (role === 'delivery' || role === 'delivery_partner' || role === 'delivery_agent') redirect = '/delivery';
 
       router.replace(redirect);
     }
