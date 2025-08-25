@@ -47,6 +47,23 @@ export default function CheckoutSuccessPage() {
           setLoading(false);
           return;
         }
+        // Validate shipping information before creating order
+        if (!shippingInfo.address?.trim() || !shippingInfo.city?.trim() || 
+            !shippingInfo.state?.trim() || !shippingInfo.zipCode?.trim() || 
+            !shippingInfo.phone?.trim()) {
+          console.warn('Incomplete shipping information, skipping backend order creation');
+          setOrderDetails({
+            orderId: `ORDER-${Date.now()}`,
+            sessionId: sessionId,
+            total: 0,
+            estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+            warning: 'Order created locally due to incomplete shipping information. Please complete your profile for future orders.',
+          });
+          clearCart();
+          setLoading(false);
+          return;
+        }
+
         // Build order request payload expected by backend
         const items = cartItems.map((ci) => ({
           productId: ci.id,
@@ -54,12 +71,12 @@ export default function CheckoutSuccessPage() {
         }));
 
         const shippingAddress = {
-          street: shippingInfo.address,
-          city: shippingInfo.city,
-          state: shippingInfo.state,
-          zipCode: shippingInfo.zipCode,
+          street: shippingInfo.address.trim(),
+          city: shippingInfo.city.trim(),
+          state: shippingInfo.state.trim(),
+          zipCode: shippingInfo.zipCode.trim(),
           country: shippingInfo.country,
-          phone: shippingInfo.phone,
+          phone: shippingInfo.phone.trim(),
         };
 
         const request = {
@@ -157,6 +174,23 @@ export default function CheckoutSuccessPage() {
             Thank you for your purchase. Your order has been confirmed.
           </p>
         </div>
+
+        {/* Warning Message */}
+        {orderDetails?.warning && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-6 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center">
+                <svg className="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">Notice</h3>
+                <p className="text-yellow-700 dark:text-yellow-300">{orderDetails.warning}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Order Details */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 mb-8">

@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { FiArrowLeft, FiTrash2, FiPlus, FiMinus, FiShoppingBag, FiCreditCard, FiTruck } from 'react-icons/fi';
 import { useCartStore } from '../../features/cart/store';
 import DiscountCodeInput from '../../components/DiscountCodeInput';
-import StripeCheckout from '../../components/StripeCheckout';
 import { DiscountValidationResult } from '../../services/discountService';
 import { formatPrice } from '../../lib/formatPrice';
 
@@ -248,15 +247,18 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* Stripe Checkout */}
+            {/* Checkout Button */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-              <StripeCheckout 
-                items={items}
-                onError={(error) => {
-                  console.error('Checkout error:', error);
-                  // You can add toast notification here
-                }}
-              />
+              <Link
+                href="/checkout"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <FiCreditCard className="h-5 w-5" />
+                Proceed to Checkout
+              </Link>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 text-center">
+                Complete your shipping information and payment securely.
+              </p>
             </div>
           </div>
         </div>

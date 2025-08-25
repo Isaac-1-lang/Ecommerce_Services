@@ -38,6 +38,9 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
       newErrors.email = "Please enter a valid email";
     }
     if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    else if (!/^\+?[1-9]\d{1,14}$/.test(formData.phone.trim())) {
+      newErrors.phone = "Please enter a valid phone number (e.g., +1234567890 or 1234567890)";
+    }
     if (!formData.address.trim()) newErrors.address = "Address is required";
     if (!formData.city.trim()) newErrors.city = "City is required";
     if (!formData.state.trim()) newErrors.state = "State is required";
@@ -124,10 +127,14 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
             id="phone"
             value={formData.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
+            placeholder="+1234567890"
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white ${
               errors.phone ? 'border-red-500' : ''
             }`}
           />
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Format: +1234567890 or 1234567890 (no spaces, dashes, or parentheses)
+          </p>
           {errors.phone && (
             <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
           )}
