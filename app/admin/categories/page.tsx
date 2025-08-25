@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { PRODUCT_CATEGORIES } from '../../../data/dummyProducts';
+// Dummy categories removed; start with empty list or fetch from backend when available
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState(PRODUCT_CATEGORIES);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -142,7 +142,7 @@ export default function CategoriesPage() {
               <div className="mt-4 pt-4 border-t border-neutral-100">
                 <p className="text-xs text-neutral-500 mb-2">Subcategories:</p>
                 <div className="flex flex-wrap gap-1">
-                  {category.subcategories.slice(0, 3).map((sub, index) => (
+                  {category.subcategories.slice(0, 3).map((sub: string, index: number) => (
                     <span key={index} className="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">
                       {sub}
                     </span>

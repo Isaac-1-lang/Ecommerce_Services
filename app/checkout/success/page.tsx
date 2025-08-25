@@ -21,6 +21,32 @@ export default function CheckoutSuccessPage() {
   useEffect(() => {
     async function persistOrder() {
       try {
+        // Do not attempt server order creation with an empty cart
+        if (!cartItems || cartItems.length === 0) {
+          setOrderDetails({
+            orderId: `ORDER-${Date.now()}`,
+            sessionId: sessionId,
+            total: 0,
+            estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+          });
+          setLoading(false);
+          return;
+        }
+        // Ensure cart items reference real backend product IDs (UUID). If not, skip server creation.
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const allUuids = cartItems.every((ci) => uuidRegex.test(ci.id));
+
+        if (!allUuids) {
+          setOrderDetails({
+            orderId: `ORDER-${Date.now()}`,
+            sessionId: sessionId,
+            total: 0,
+            estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+          });
+          clearCart();
+          setLoading(false);
+          return;
+        }
         // Build order request payload expected by backend
         const items = cartItems.map((ci) => ({
           productId: ci.id,

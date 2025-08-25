@@ -9,7 +9,7 @@ import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
 import { formatPrice } from "../lib/formatPrice";
 import { Product } from "../types/product";
-import { ALL_PRODUCTS } from "../data/dummyProducts";
+// Removed dummy data import; always use backend products
 
 // Hero slider data
 const heroSlides = [
@@ -411,19 +411,11 @@ export default function HomePage() {
       setLoading(true);
       try {
         const products = await getProducts();
-        if (products && products.length > 0) {
-          // Take first 8 products as featured
-          setFeaturedProducts(products.slice(0, 8));
-        } else {
-          // Fallback to dummy products if API returns empty
-          const fallbackProducts = ALL_PRODUCTS.filter(p => p.isFeatured || p.isNew || p.isOnSale).slice(0, 8);
-          setFeaturedProducts(fallbackProducts);
-        }
+        // Take first 8 products as featured (no dummy fallback)
+        setFeaturedProducts((products || []).slice(0, 8));
       } catch (error) {
         console.error("Failed to load featured products:", error);
-        // Fallback to dummy products on error
-        const fallbackProducts = ALL_PRODUCTS.filter(p => p.isFeatured || p.isNew || p.isOnSale).slice(0, 8);
-        setFeaturedProducts(fallbackProducts);
+        setFeaturedProducts([]);
       } finally {
         setLoading(false);
       }

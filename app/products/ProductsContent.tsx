@@ -9,7 +9,6 @@ import CategoryFilter from "../../components/CategoryFilter";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProductsStore } from "../../features/products/store";
 import { getProducts } from "../../services/productService";
-import { ALL_PRODUCTS } from "../../data/dummyProducts";
 import type { ProductFilters } from "../../features/products/store";
 import type { Product } from "../../types/product";
 import { FiFilter } from "react-icons/fi";
@@ -38,16 +37,10 @@ export default function ProductsContent() {
       setLoading(true);
       try {
         const productData = await getProducts();
-        if (productData && productData.length > 0) {
-          setProducts(productData);
-        } else {
-          // Fallback to dummy products if API returns empty
-          setProducts(ALL_PRODUCTS);
-        }
+        setProducts(productData || []);
       } catch (error) {
         console.error("Failed to load products:", error);
-        // Fallback to dummy products on error
-        setProducts(ALL_PRODUCTS);
+        setProducts([]);
       } finally {
         setLoading(false);
       }

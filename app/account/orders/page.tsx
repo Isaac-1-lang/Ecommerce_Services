@@ -138,7 +138,7 @@ export default function OrdersPage() {
         <div className="rounded-lg border border-neutral-200 p-6 bg-white text-center">
           <p className="text-neutral-700 mb-2">No orders to display.</p>
           <p className="text-sm text-neutral-500">
-            If you checked out as a guest, your recent orders will appear here on this device.
+            No recent orders found.
           </p>
         </div>
       )}
