@@ -2,38 +2,117 @@
 
 import { create } from "zustand";
 import { orderService } from "../../services/orderService";
-
-type Order = { id: string; total: number; status: string; createdAt: string };
+import { Order, CreateOrderRequest } from "../../types/order";
 
 type OrdersState = {
   orders: Order[];
   loading: boolean;
+  error: string | null;
   fetchOrders: () => Promise<void>;
-  cancelOrder: (id: string) => Promise<void>;
+  fetchOrderById: (id: string) => Promise<Order | null>;
+  createOrder: (orderData: CreateOrderRequest) => Promise<Order>;
+  cancelOrder: (id: string, reason: string) => Promise<void>;
+  updateOrderStatus: (id: string, status: Order['status']) => Promise<void>;
+  clearError: () => void;
 };
 
 export const useOrdersStore = create<OrdersState>((set, get) => ({
   orders: [],
   loading: false,
+  error: null,
+
   fetchOrders: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
-      const fullOrders = await orderService.getOrders();
-      const minimalOrders = fullOrders.map((o) => ({
-        id: o.id,
-        total: o.total,
-        status: o.status,
-        createdAt: o.createdAt,
-      }));
-      set({ orders: minimalOrders });
-    } catch (error) {
+      const orders = await orderService.getOrders();
+      set({ orders, loading: false });
+    } catch (error: any) {
       console.error('Failed to fetch orders', error);
-    } finally {
-      set({ loading: false });
+      set({ 
+        error: error.message || 'Failed to fetch orders', 
+        loading: false 
+      });
     }
   },
-  cancelOrder: async (id: string) => {
-    const updated = await orderService.cancelOrder(id);
-    set({ orders: get().orders.map((o) => (o.id === id ? { ...o, status: updated.status } : o)) });
+
+  fetchOrderById: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const order = await orderService.getOrderById(id);
+      set({ loading: false });
+      return order;
+    } catch (error: any) {
+      console.error('Failed to fetch order', error);
+      set({ 
+        error: error.message || 'Failed to fetch order', 
+        loading: false 
+      });
+      return null;
+    }
   },
+
+  createOrder: async (orderData: CreateOrderRequest) => {
+    set({ loading: true, error: null });
+    try {
+      const newOrder = await orderService.createOrder(orderData);
+      set(state => ({
+        orders: [newOrder, ...state.orders],
+        loading: false
+      }));
+      return newOrder;
+    } catch (error: any) {
+      console.error('Failed to create order', error);
+      set({ 
+        error: error.message || 'Failed to create order', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  cancelOrder: async (id: string, reason: string) => {
+    set({ loading: true, error: null });
+    try {
+      await orderService.cancelOrder(id);
+      set(state => ({
+        orders: state.orders.map(order => 
+          order.id === id 
+            ? { ...order, status: 'CANCELLED' as const }
+            : order
+        ),
+        loading: false
+      }));
+    } catch (error: any) {
+      console.error('Failed to cancel order', error);
+      set({ 
+        error: error.message || 'Failed to cancel order', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  updateOrderStatus: async (id: string, status: Order['status']) => {
+    set({ loading: true, error: null });
+    try {
+      await orderService.updateOrderStatus(id, status);
+      set(state => ({
+        orders: state.orders.map(order => 
+          order.id === id 
+            ? { ...order, status }
+            : order
+        ),
+        loading: false
+      }));
+    } catch (error: any) {
+      console.error('Failed to update order status', error);
+      set({ 
+        error: error.message || 'Failed to update order status', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  clearError: () => set({ error: null }),
 }));

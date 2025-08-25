@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FiCheck, FiHome, FiShoppingBag, FiMail, FiTruck, FiShield } from 'react-icons/fi';
+import { orderService } from '../../../services/orderService';
+import { useCartStore } from '../../../features/cart/store';
+import { useCheckoutStore } from '../../../features/checkout/store';
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
@@ -11,22 +14,70 @@ export default function CheckoutSuccessPage() {
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const cartItems = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const { shippingInfo, paymentInfo } = useCheckoutStore();
 
   useEffect(() => {
-    if (sessionId) {
-      // In a real app, you would verify the session with your backend
-      // For now, we'll simulate success
-      setTimeout(() => {
+    async function persistOrder() {
+      try {
+        // Build order request payload expected by backend
+        const items = cartItems.map((ci) => ({
+          productId: ci.id,
+          quantity: ci.quantity,
+        }));
+
+        const shippingAddress = {
+          street: shippingInfo.address,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          zipCode: shippingInfo.zipCode,
+          country: shippingInfo.country,
+          phone: shippingInfo.phone,
+        };
+
+        const request = {
+          items,
+          shippingAddress,
+          paymentMethod: paymentInfo.paymentMethod || 'stripe',
+          notes: 'Stripe checkout success',
+          billingAddress: shippingAddress,
+        } as any;
+
+        if (sessionId) {
+          (request as any).stripeSessionId = sessionId;
+        }
+
+        // Create order in backend
+        const created = await orderService.createOrder(request);
+
+        setOrderDetails({
+          orderId: created.id,
+          sessionId: sessionId,
+          total: created.total,
+          estimatedDelivery: created.estimatedDelivery || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        });
+
+        // Clear cart after successful order creation
+        clearCart();
+        setLoading(false);
+      } catch (err) {
+        // Fall back to local success if backend creation fails
         setOrderDetails({
           orderId: `ORDER-${Date.now()}`,
           sessionId: sessionId,
-          total: 99.99, // This would come from your backend
+          total: 0,
           estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
         });
         setLoading(false);
-      }, 1000);
+      }
     }
-  }, [sessionId]);
+
+    // Only attempt persistence once we have a session or if user navigated here directly
+    if (!saved) {
+      persistOrder();
+    }
+  }, [sessionId, saved, cartItems, shippingInfo, paymentInfo, clearCart]);
 
   // Persist guest order locally so guests can view orders later
   useEffect(() => {

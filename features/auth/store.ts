@@ -1,13 +1,13 @@
 // features/auth/store.ts
 import { create } from 'zustand';
 import { authService } from '../../services/authService';
-import { AuthUser } from '@/types/auth';
+import { User } from '@/types/auth';
 
 interface AuthState {
-  user: AuthUser | null;
+  user: User | null;
   token: string | null;
   isInitialized: boolean;
-  setUser: (user: AuthUser | null) => void;
+  setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   logout: () => void;
   initialize: () => void;
@@ -31,6 +31,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (typeof window !== 'undefined') {
       const storedUser = authService.getStoredUser();
       const storedToken = authService.getStoredToken();
+      
+      console.log('Auth Store Initializing:', {
+        storedUser: !!storedUser,
+        storedToken: !!storedToken,
+        tokenLength: storedToken ? storedToken.length : 0
+      });
+      
       set({ 
         user: storedUser, 
         token: storedToken,

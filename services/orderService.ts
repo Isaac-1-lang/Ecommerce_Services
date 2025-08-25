@@ -193,6 +193,7 @@ export const orderService = {
   async getOrders(): Promise<Order[]> {
     try {
       const userId = typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('user') || '{}')?.id) : undefined;
+      // Use the general orders endpoint with explicit userId to avoid backend context issues
       const response = await api.get<JavaOrderResponse<JavaOrder[]>>('/api/v1/orders', {
         params: userId ? { userId } : undefined,
       });
@@ -264,6 +265,7 @@ export const orderService = {
 
   async cancelOrder(orderId: string): Promise<Order> {
     try {
+      // Use the general orders cancel endpoint which works with role-based auth
       const response = await api.put<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/${orderId}/cancel`);
 
       if (response.data.success && response.data.data) {

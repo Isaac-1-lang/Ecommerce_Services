@@ -16,11 +16,15 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken') || localStorage.getItem('now_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('Token added to request:', token.substring(0, 20) + '...');
+  } else {
+    console.log('No token found in localStorage');
   }
   
   // Log request in development
   if (process.env.NODE_ENV === 'development') {
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, config.data);
+    console.log('Request headers:', config.headers);
   }
   
   return config;
@@ -41,12 +45,8 @@ api.interceptors.response.use((response) => {
   const errorMessage = handleJavaApiError(error);
   
   if (error.response?.status === 401) {
-    // Unauthorized - redirect to login
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    if (typeof window !== 'undefined') {
-      window.location.href = '/auth/login';
-    }
+    // Unauthorized - let the calling code handle it to avoid redirect loops
+    console.warn('API 401 Unauthorized:', errorMessage);
   }
   
   if (error.response?.status === 403) {

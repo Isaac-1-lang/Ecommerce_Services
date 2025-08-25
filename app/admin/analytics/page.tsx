@@ -1,256 +1,315 @@
 "use client";
 
-import { useState } from 'react';
-import { FiTrendingUp, FiTrendingDown, FiDollarSign, FiShoppingCart, FiUsers, FiPackage } from 'react-icons/fi';
+import { useEffect, useState } from "react";
+import { useAuthStore } from "../../../features/auth/store";
 
-export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState('30d');
+interface AnalyticsData {
+  totalOrders: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  ordersByStatus: Record<string, number>;
+}
 
-  // Mock analytics data - replace with real data from your backend
-  const metrics = {
-    revenue: {
-      current: 45230.50,
-      previous: 38950.25,
-      change: 16.1,
-      trend: 'up'
-    },
-    orders: {
-      current: 156,
-      previous: 142,
-      change: 9.9,
-      trend: 'up'
-    },
-    customers: {
-      current: 89,
-      previous: 76,
-      change: 17.1,
-      trend: 'up'
-    },
-    products: {
-      current: 30,
-      previous: 28,
-      change: 7.1,
-      trend: 'up'
+interface CustomerStats {
+  totalCustomers: number;
+  customersWithOrders: number;
+  averageOrdersPerCustomer: number;
+  topCustomers: Array<{
+    customerId: string;
+    orderCount: number;
+  }>;
+}
+
+interface ProductAnalytics {
+  productId: string;
+  totalSold: number;
+  productName?: string;
+  productSlug?: string;
+}
+
+interface DeliveryMetrics {
+  deliverySuccessRate: number;
+  totalDelivered: number;
+  totalCompleted: number;
+  averageDeliveryTimeHours: number;
+}
+
+interface RevenueTrend {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export default function AdminAnalyticsPage() {
+  const { user } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [customerStats, setCustomerStats] = useState<CustomerStats | null>(null);
+  const [topProducts, setTopProducts] = useState<ProductAnalytics[]>([]);
+  const [deliveryMetrics, setDeliveryMetrics] = useState<DeliveryMetrics | null>(null);
+  const [revenueTrend, setRevenueTrend] = useState<RevenueTrend[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAnalytics();
+    }
+  }, [user]);
+
+  const fetchAnalytics = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8095';
+      const token = localStorage.getItem('token');
+
+      // Fetch dashboard analytics
+      const dashboardResponse = await fetch(`${baseUrl}/api/v1/admin/analytics/dashboard`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (dashboardResponse.ok) {
+        const dashboardData = await dashboardResponse.json();
+        if (dashboardData.success && dashboardData.data) {
+          setAnalyticsData(dashboardData.data);
+        }
+      }
+
+      // Fetch customer analytics
+      const customerResponse = await fetch(`${baseUrl}/api/v1/admin/analytics/customers`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (customerResponse.ok) {
+        const customerData = await customerResponse.json();
+        if (customerData.success && customerData.data) {
+          setCustomerStats(customerData.data);
+        }
+      }
+
+      // Fetch product analytics
+      const productResponse = await fetch(`${baseUrl}/api/v1/admin/analytics/products?limit=5`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (productResponse.ok) {
+        const productData = await productResponse.json();
+        if (productData.success && productData.data) {
+          setTopProducts(productData.data);
+        }
+      }
+
+      // Fetch delivery analytics
+      const deliveryResponse = await fetch(`${baseUrl}/api/v1/admin/analytics/delivery`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (deliveryResponse.ok) {
+        const deliveryData = await deliveryResponse.json();
+        if (deliveryData.success && deliveryData.data) {
+          setDeliveryMetrics(deliveryData.data);
+        }
+      }
+
+      // Fetch revenue trends
+      const trendResponse = await fetch(`${baseUrl}/api/v1/admin/analytics/trends?days=7`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (trendResponse.ok) {
+        const trendData = await trendResponse.json();
+        if (trendData.success && trendData.data) {
+          setRevenueTrend(trendData.data);
+        }
+      }
+
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+      setError('Failed to load analytics data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const topProducts = [
-    { name: 'Apple iPhone 15 Pro', sales: 45, revenue: 53999.55 },
-    { name: 'Sony WH-1000XM5 Headphones', sales: 32, revenue: 12799.68 },
-    { name: 'Nike Air Max 270', sales: 28, revenue: 3639.72 },
-    { name: 'MacBook Pro 16"', sales: 12, revenue: 29999.88 },
-    { name: 'Levi\'s 501 Jeans', sales: 25, revenue: 2249.75 }
-  ];
-
-  const categoryPerformance = [
-    { category: 'Electronics', revenue: 85000, percentage: 45 },
-    { category: 'Fashion', revenue: 65000, percentage: 35 },
-    { category: 'Home & Garden', revenue: 25000, percentage: 13 },
-    { category: 'Sports & Outdoors', revenue: 15000, percentage: 7 }
-  ];
-
-  const getTrendIcon = (trend: string) => {
-    return trend === 'up' ? (
-      <FiTrendingUp className="h-4 w-4 text-success" />
-    ) : (
-      <FiTrendingDown className="h-4 w-4 text-error" />
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-neutral-600">Loading analytics...</span>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const getTrendColor = (trend: string) => {
-    return trend === 'up' ? 'text-success' : 'text-error';
-  };
+  if (error) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <div className="text-center py-20">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={fetchAnalytics}
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-800">Analytics</h1>
-          <p className="text-neutral-600 mt-1">Track your store&apos;s performance and insights</p>
-        </div>
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value)}
-          className="px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-        >
-          <option value="7d">Last 7 days</option>
-          <option value="30d">Last 30 days</option>
-          <option value="90d">Last 90 days</option>
-          <option value="1y">Last year</option>
-        </select>
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-neutral-900">Analytics Dashboard</h1>
+        <p className="mt-2 text-neutral-600">Comprehensive insights into your e-commerce performance</p>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-neutral-800">${metrics.revenue.current.toLocaleString()}</p>
-              <div className="flex items-center gap-2 mt-2">
-                {getTrendIcon(metrics.revenue.trend)}
-                <span className={`text-sm font-medium ${getTrendColor(metrics.revenue.trend)}`}>
-                  +{metrics.revenue.change}%
-                </span>
-                <span className="text-sm text-neutral-500">vs last period</span>
+      {analyticsData && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-neutral-500">Total Orders</h3>
+            <p className="text-3xl font-bold text-neutral-900">{analyticsData.totalOrders}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-neutral-500">Total Revenue</h3>
+            <p className="text-3xl font-bold text-primary">${analyticsData.totalRevenue.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-neutral-500">Average Order Value</h3>
+            <p className="text-3xl font-bold text-neutral-900">${analyticsData.averageOrderValue.toFixed(2)}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Orders by Status */}
+      {analyticsData?.ordersByStatus && (
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h3 className="text-lg font-medium text-neutral-900 mb-4">Orders by Status</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(analyticsData.ordersByStatus).map(([status, count]) => (
+              <div key={status} className="text-center">
+                <p className="text-2xl font-bold text-primary">{count}</p>
+                <p className="text-sm text-neutral-600 capitalize">{status}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Customer Analytics */}
+      {customerStats && (
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h3 className="text-lg font-medium text-neutral-900 mb-4">Customer Insights</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-neutral-500">Total Customers</p>
+              <p className="text-2xl font-bold text-neutral-900">{customerStats.totalCustomers}</p>
             </div>
-            <div className="p-3 bg-success/10 rounded-lg">
-              <FiDollarSign className="h-6 w-6 text-success" />
+            <div>
+              <p className="text-sm text-neutral-500">Customers with Orders</p>
+              <p className="text-2xl font-bold text-neutral-900">{customerStats.customersWithOrders}</p>
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500">Avg Orders per Customer</p>
+              <p className="text-2xl font-bold text-neutral-900">{customerStats.averageOrdersPerCustomer.toFixed(1)}</p>
             </div>
           </div>
         </div>
+      )}
 
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">Total Orders</p>
-              <p className="text-2xl font-bold text-neutral-800">{metrics.orders.current}</p>
-              <div className="flex items-center gap-2 mt-2">
-                {getTrendIcon(metrics.orders.trend)}
-                <span className={`text-sm font-medium ${getTrendColor(metrics.orders.trend)}`}>
-                  +{metrics.orders.change}%
-                </span>
-                <span className="text-sm text-neutral-500">vs last period</span>
-              </div>
-            </div>
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <FiShoppingCart className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">New Customers</p>
-              <p className="text-2xl font-bold text-neutral-800">{metrics.customers.current}</p>
-              <div className="flex items-center gap-2 mt-2">
-                {getTrendIcon(metrics.customers.trend)}
-                <span className={`text-sm font-medium ${getTrendColor(metrics.customers.trend)}`}>
-                  +{metrics.customers.change}%
-                </span>
-                <span className="text-sm text-neutral-500">vs last period</span>
-              </div>
-            </div>
-            <div className="p-3 bg-warning/10 rounded-lg">
-              <FiUsers className="h-6 w-6 text-warning" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">Active Products</p>
-              <p className="text-2xl font-bold text-neutral-800">{metrics.products.current}</p>
-              <div className="flex items-center gap-2 mt-2">
-                {getTrendIcon(metrics.products.trend)}
-                <span className={`text-sm font-medium ${getTrendColor(metrics.products.trend)}`}>
-                  +{metrics.products.change}%
-                </span>
-                <span className="text-sm text-neutral-500">vs last period</span>
-              </div>
-            </div>
-            <div className="p-3 bg-secondary/10 rounded-lg">
-              <FiPackage className="h-6 w-6 text-secondary" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts and Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Products */}
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Top Performing Products</h2>
-          <div className="space-y-4">
+      {/* Top Products */}
+      {topProducts.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h3 className="text-lg font-medium text-neutral-900 mb-4">Top Selling Products</h3>
+          <div className="space-y-3">
             {topProducts.map((product, index) => (
-              <div key={product.name} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center text-sm font-bold">
-                    {index + 1}
-                  </div>
+              <div key={product.productId} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg font-bold text-primary">#{index + 1}</span>
                   <div>
-                    <p className="font-medium text-neutral-800">{product.name}</p>
-                    <p className="text-sm text-neutral-500">{product.sales} sales</p>
+                    <p className="font-medium text-neutral-900">
+                      {product.productName || `Product ${product.productId}`}
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      {product.productSlug || 'No slug'}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-neutral-800">${product.revenue.toLocaleString()}</p>
-                  <p className="text-sm text-neutral-500">{((product.revenue / metrics.revenue.current) * 100).toFixed(1)}%</p>
+                  <p className="text-lg font-bold text-neutral-900">{product.totalSold}</p>
+                  <p className="text-sm text-neutral-500">units sold</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
+      )}
 
-        {/* Category Performance */}
-        <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-          <h2 className="text-xl font-semibold text-neutral-800 mb-4">Category Performance</h2>
-          <div className="space-y-4">
-            {categoryPerformance.map((category) => (
-              <div key={category.category} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-neutral-700">{category.category}</span>
-                  <span className="text-sm text-neutral-600">${category.revenue.toLocaleString()}</span>
+      {/* Delivery Performance */}
+      {deliveryMetrics && (
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h3 className="text-lg font-medium text-neutral-900 mb-4">Delivery Performance</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-neutral-500">Delivery Success Rate</p>
+              <p className="text-2xl font-bold text-green-600">{deliveryMetrics.deliverySuccessRate.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500">Total Delivered</p>
+              <p className="text-2xl font-bold text-neutral-900">{deliveryMetrics.totalDelivered}</p>
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500">Avg Delivery Time</p>
+              <p className="text-2xl font-bold text-neutral-900">{deliveryMetrics.averageDeliveryTimeHours.toFixed(1)}h</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revenue Trends */}
+      {revenueTrend.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-neutral-900 mb-4">Revenue Trends (Last 7 Days)</h3>
+          <div className="space-y-3">
+            {revenueTrend.map((day) => (
+              <div key={day.date} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-neutral-900">{day.date}</p>
+                  <p className="text-sm text-neutral-500">{day.orderCount} orders</p>
                 </div>
-                <div className="w-full bg-neutral-200 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${category.percentage}%` }}
-                  ></div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-neutral-500">{category.percentage}% of total revenue</span>
-                </div>
+                <p className="text-lg font-bold text-primary">${day.revenue.toFixed(2)}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
-        <h2 className="text-xl font-semibold text-neutral-800 mb-4">Recent Activity</h2>
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-3 bg-success/5 border border-success/20 rounded-lg">
-            <div className="w-2 h-2 bg-success rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-800">New order received</p>
-              <p className="text-xs text-neutral-500">Order #ORD-005 for $299.99</p>
-            </div>
-            <span className="text-xs text-neutral-500">2 min ago</span>
-          </div>
-
-          <div className="flex items-center gap-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-            <div className="w-2 h-2 bg-primary rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-800">Product stock updated</p>
-              <p className="text-xs text-neutral-500">iPhone 15 Pro stock increased to 50 units</p>
-            </div>
-            <span className="text-xs text-neutral-500">1 hour ago</span>
-          </div>
-
-          <div className="flex items-center gap-4 p-3 bg-warning/5 border border-warning/20 rounded-lg">
-            <div className="w-2 h-2 bg-warning rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-800">Low stock alert</p>
-              <p className="text-xs text-neutral-500">Sony headphones running low (5 units left)</p>
-            </div>
-            <span className="text-xs text-neutral-500">3 hours ago</span>
-          </div>
-
-          <div className="flex items-center gap-4 p-3 bg-info/5 border border-info/20 rounded-lg">
-            <div className="w-2 h-2 bg-info rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-800">New customer registered</p>
-              <p className="text-xs text-neutral-500">Customer ID: CUST-090</p>
-            </div>
-            <span className="text-xs text-neutral-500">5 hours ago</span>
-          </div>
-        </div>
+      {/* Refresh Button */}
+      <div className="mt-8 text-center">
+        <button
+          onClick={fetchAnalytics}
+          className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors"
+        >
+          Refresh Analytics
+        </button>
       </div>
     </div>
   );

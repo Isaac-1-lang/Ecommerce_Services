@@ -44,26 +44,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      if (token) {
-        const user = await authService.getCurrentUser(token);
-        
-        // Update both AuthContext and Zustand store
-        const { setUser, setToken } = useAuthStore.getState();
-        setUser(user);
-        setToken(token);
-        
-        setAuthState({
-          user,
-          token,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        });
+      const userStr = localStorage.getItem('user');
+      
+      console.log('AuthContext Initializing:', { 
+        hasToken: !!token, 
+        hasUser: !!userStr,
+        tokenLength: token ? token.length : 0
+      });
+      
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          
+          // Update both AuthContext and Zustand store
+          const { setUser, setToken } = useAuthStore.getState();
+          setUser(user);
+          setToken(token);
+          
+          setAuthState({
+            user,
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+          
+          console.log('AuthContext initialized successfully with stored data');
+        } catch (parseError) {
+          console.error('Failed to parse stored user:', parseError);
+          // Don't remove token on parse error, just mark as not authenticated
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+        }
       } else {
+        console.log('No stored auth data found');
         setAuthState(prev => ({ ...prev, isLoading: false }));
       }
     } catch (error) {
-      localStorage.removeItem('authToken');
+      console.error('AuthContext initialization error:', error);
+      // Don't remove token on initialization error, just mark as not authenticated
       setAuthState(prev => ({ ...prev, isLoading: false }));
     }
   };
