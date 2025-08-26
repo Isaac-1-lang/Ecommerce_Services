@@ -26,7 +26,7 @@ export const createPaymentIntent = async (amount: number, currency: string = 'us
 
     // Try backend first
     try {
-      const response = await fetch("http://localhost:8081/api/v1/payments/create-intent", {
+      const response = await fetch("http://44.201.144.244:8081/api/v1/payments/create-intent", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

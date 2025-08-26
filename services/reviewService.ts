@@ -98,13 +98,15 @@ export const reviewService = {
         if (resp.data.success && resp.data.data) return resp.data.data.map(transformJavaReview);
         return [];
       }
-      // Fallback: no generic list endpoint defined; return []
-      return [];
-
-      if (response.data.success && response.data.data) {
-        return response.data.data.map(transformJavaReview);
-      }
-      
+      // Search endpoint for broader queries
+      const searchResp = await api.post<JavaReviewResponse<JavaReview[]>>('/api/v1/reviews/search', {
+        productId: params?.productId,
+        rating: params?.rating,
+        sort: params?.sort,
+        page: params?.page ?? 0,
+        size: params?.size ?? 10,
+      });
+      if (searchResp.data.success && searchResp.data.data) return searchResp.data.data.map(transformJavaReview);
       return [];
     } catch (error: any) {
       console.error('Error fetching reviews:', error);
@@ -151,7 +153,8 @@ export const reviewService = {
 
   async updateReview(reviewId: string, reviewData: UpdateReviewRequest): Promise<Review> {
     try {
-      const response = await api.put<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}`, reviewData);
+      // Swagger shows PUT /api/v1/reviews/update accepting body
+      const response = await api.put<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/update`, { reviewId, ...reviewData });
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -179,8 +182,9 @@ export const reviewService = {
 
   async markReviewHelpful(reviewId: string, helpful: boolean): Promise<Review> {
     try {
-      const response = await api.post<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}/helpful`, {
-        helpful
+      // Swagger shows POST /api/v1/reviews/{reviewId}/vote with payload
+      const response = await api.post<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}/vote`, {
+        vote: helpful ? 'up' : 'down'
       });
 
       if (response.data.success && response.data.data) {
@@ -196,7 +200,8 @@ export const reviewService = {
 
   async getAverageRating(productId: string): Promise<{ averageRating: number; totalReviews: number }> {
     try {
-      const response = await api.get<JavaReviewResponse<{ averageRating: number; totalReviews: number }>>(`/api/v1/reviews/product/${productId}/rating`);
+      // Swagger shows GET /api/v1/reviews/product/{productId}/stats
+      const response = await api.get<JavaReviewResponse<{ averageRating: number; totalReviews: number }>>(`/api/v1/reviews/product/${productId}/stats`);
 
       if (response.data.success && response.data.data) {
         return response.data.data;

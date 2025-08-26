@@ -39,7 +39,7 @@ export default function OrdersPage() {
     if (typeof window !== 'undefined') {
       const storedToken = localStorage.getItem('authToken');
       const storedUser = localStorage.getItem('user');
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081';
+      const apiUrl = "http://44.201.144.244:8081";
 
       setDebugInfo(`
         Auth Store - User: ${!!user}, Token: ${!!token}

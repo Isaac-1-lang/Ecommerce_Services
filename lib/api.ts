@@ -2,7 +2,7 @@ import axios from "axios";
 import { handleJavaApiError } from "./javaIntegration";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081",
+  baseURL: "http://44.201.144.244:8081",
   timeout: parseInt(process.env.NEXT_PUBLIC_JAVA_TIMEOUT || "10000"),
   headers: {
     'Content-Type': 'application/json',

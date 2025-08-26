@@ -11,6 +11,9 @@ import { Product } from "../../../types/product";
 import { formatPrice } from "../../../lib/formatPrice";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import ProductReviews from "../../../components/ProductReviews";
+import ReviewForm from "../../../components/ReviewForm";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -20,6 +23,8 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [reviewsRefresh, setReviewsRefresh] = useState(0);
+  const { user } = useAuth();
 
   const addToCart = useCartStore((s) => s.addItem);
   const addToWishlist = useWishlistStore((s) => s.addItem);
@@ -346,6 +351,24 @@ export default function ProductDetailPage() {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12 border-t pt-8">
+        <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>
+            <ProductReviews productId={product.id} refreshToken={reviewsRefresh} />
+          </div>
+          <div>
+            <h3 className="text-lg font-medium mb-2">Write a review</h3>
+            {user ? (
+              <ReviewForm productId={product.id} onSubmitted={() => setReviewsRefresh(Date.now())} />
+            ) : (
+              <p className="text-sm text-gray-600">Please log in to write a review.</p>
+            )}
           </div>
         </div>
       </div>

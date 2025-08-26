@@ -45,7 +45,7 @@ export default function DeliveryOrdersPage() {
     setError(null);
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8095';
+      const baseUrl = "http://44.201.144.244:8081";
       const token = localStorage.getItem('token');
 
       const response = await fetch(`${baseUrl}/api/v1/delivery/orders`, {
@@ -74,7 +74,7 @@ export default function DeliveryOrdersPage() {
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdatingStatus(orderId);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8095';
+      const baseUrl = "http://44.201.144.244:8081";
       const token = localStorage.getItem('token');
 
       const response = await fetch(`${baseUrl}/api/v1/delivery/orders/${orderId}/status`, {
@@ -102,7 +102,7 @@ export default function DeliveryOrdersPage() {
 
   const updateTracking = async (orderId: string, trackingNumber: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8095';
+      const baseUrl = "http://44.201.144.244:8081";
       const token = localStorage.getItem('token');
 
       const response = await fetch(`${baseUrl}/api/v1/delivery/orders/${orderId}/tracking`, {

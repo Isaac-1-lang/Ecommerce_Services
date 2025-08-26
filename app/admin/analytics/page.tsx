@@ -61,7 +61,7 @@ export default function AdminAnalyticsPage() {
     setError(null);
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8095';
+      const baseUrl = "http://44.201.144.244:8081";
       const token = localStorage.getItem('token');
 
       // Fetch dashboard analytics
