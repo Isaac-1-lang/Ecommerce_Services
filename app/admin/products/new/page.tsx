@@ -25,9 +25,13 @@ export default function NewProductPage() {
     lowStockThreshold: '',
     category: '',
     brandId: '',
+    barcode: '',
+    discountId: '',
+    model: '',
     slug: '',
     isActive: true,
     isFeatured: false,
+    isBestseller: false,
     isNewArrival: false,
     isOnSale: false,
     salePercentage: '',
@@ -72,7 +76,11 @@ export default function NewProductPage() {
       material: string;
       color: string;
       size: string;
-    }>
+    }>,
+
+    // Product Videos
+    productVideos: '',
+    videoMetadata: ''
   });
 
 
@@ -166,21 +174,85 @@ export default function NewProductPage() {
         sku: formData.sku || generateSKU(formData.name),
         basePrice: parseFloat(formData.basePrice),
         salePrice: formData.salePrice ? parseFloat(formData.salePrice) : undefined,
+        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
         stockQuantity: defaultStockQuantity,
+        lowStockThreshold: formData.lowStockThreshold ? parseInt(formData.lowStockThreshold) : undefined,
         categoryId: getCategoryId(formData.category),
         brandId: formData.brandId || undefined,
         slug: formData.slug || undefined,
         isActive: formData.isActive,
         isFeatured: formData.isFeatured,
+        isBestseller: formData.isBestseller,
         isNewArrival: formData.isNewArrival,
         isOnSale: formData.isOnSale,
+        salePercentage: formData.salePercentage ? parseInt(formData.salePercentage) : undefined,
+        fullDescription: formData.fullDescription || undefined,
+        metaTitle: formData.metaTitle || undefined,
+        metaDescription: formData.metaDescription || undefined,
+        metaKeywords: formData.metaKeywords || undefined,
+        searchKeywords: formData.searchKeywords || undefined,
+        heightCm: formData.heightCm ? parseFloat(formData.heightCm) : undefined,
+        widthCm: formData.widthCm ? parseFloat(formData.widthCm) : undefined,
+        lengthCm: formData.lengthCm ? parseFloat(formData.lengthCm) : undefined,
+        weightKg: formData.weightKg ? parseFloat(formData.weightKg) : undefined,
+        material: formData.material || undefined,
+        careInstructions: formData.careInstructions || undefined,
+        warrantyInfo: formData.warrantyInfo || undefined,
+        shippingInfo: formData.shippingInfo || undefined,
+        returnPolicy: formData.returnPolicy || undefined,
+        barcode: formData.barcode || undefined,
+        discountId: formData.discountId || undefined,
+        model: formData.model || undefined,
+        warehouseStock: formData.warehouseStock.length > 0 ? formData.warehouseStock.map(ws => ({
+          warehouseId: parseInt(ws.warehouseId),
+          stockQuantity: parseInt(ws.stockQuantity),
+          lowStockThreshold: parseInt(ws.lowStockThreshold),
+          reorderPoint: parseInt(ws.reorderPoint),
+          warehousePrice: parseFloat(formData.basePrice),
+          warehouseCostPrice: formData.costPrice ? parseFloat(formData.costPrice) : parseFloat(formData.basePrice) * 0.7,
+          isAvailable: true,
+          notes: `Stock assigned from ${formData.name} creation`
+        })) : undefined,
         productImages: images.length > 0 ? images : undefined,
         imageMetadata: images.map((_, index) => ({
           altText: `${formData.name} - Image ${index + 1}`,
           isPrimary: index === 0,
           sortOrder: index
-        }))
+        })),
+        variants: formData.variants.length > 0 ? formData.variants.map((variant, index) => ({
+          variantSku: variant.variantSku || `${formData.sku || generateSKU(formData.name)}-VAR-${index + 1}`,
+          price: variant.price ? parseFloat(variant.price) : parseFloat(formData.basePrice),
+          stockQuantity: variant.stockQuantity ? parseInt(variant.stockQuantity) : 0,
+          lowStockThreshold: 5,
+          isActive: true,
+          sortOrder: index + 1,
+          attributes: {
+            color: variant.color || 'Default',
+            size: variant.size || 'Standard',
+            material: variant.material || formData.material || 'Standard'
+          },
+          heightCm: variant.heightCm ? parseFloat(variant.heightCm) : formData.heightCm ? parseFloat(formData.heightCm) : undefined,
+          widthCm: variant.widthCm ? parseFloat(variant.widthCm) : formData.widthCm ? parseFloat(formData.widthCm) : undefined,
+          lengthCm: variant.lengthCm ? parseFloat(variant.lengthCm) : formData.lengthCm ? parseFloat(formData.lengthCm) : undefined,
+          weightKg: variant.weightKg ? parseFloat(variant.weightKg) : formData.weightKg ? parseFloat(formData.weightKg) : undefined,
+          material: variant.material || formData.material || undefined,
+          color: variant.color || undefined,
+          size: variant.size || undefined,
+          isInStock: true,
+          isBackorderable: false
+        })) : undefined,
+        productVideos: formData.productVideos ? [formData.productVideos] : undefined,
+        videoMetadata: formData.videoMetadata || undefined
       };
+
+      // Debug logging - show exactly what we're sending
+      console.log('=== PRODUCT CREATION DEBUG ===');
+      console.log('Form Data:', formData);
+      console.log('Processed Product Data:', productData);
+      console.log('Images:', images);
+      console.log('Warehouse Stock:', formData.warehouseStock);
+      console.log('Variants:', formData.variants);
+      console.log('=== END DEBUG ===');
 
       // Create product
       const createdProduct = await productService.createProduct(productData);
@@ -274,6 +346,48 @@ export default function NewProductPage() {
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 placeholder="Enter brand ID "
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Barcode (Optional)
+              </label>
+              <input
+                type="text"
+                name="barcode"
+                value={formData.barcode || ''}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Enter barcode"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Discount ID (Optional)
+              </label>
+              <input
+                type="text"
+                name="discountId"
+                value={formData.discountId || ''}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Enter discount ID"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Model (Optional)
+              </label>
+              <input
+                type="text"
+                name="model"
+                value={formData.model || ''}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Enter model name"
               />
             </div>
 
@@ -1127,6 +1241,17 @@ export default function NewProductPage() {
                 className="w-4 h-4 text-primary border-neutral-300 rounded focus:ring-primary"
               />
               <span className="text-sm font-medium text-neutral-700">Mark as Featured</span>
+            </label>
+
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="isBestseller"
+                checked={formData.isBestseller || false}
+                onChange={handleInputChange}
+                className="w-4 h-4 text-primary border-neutral-300 rounded focus:ring-primary"
+              />
+              <span className="text-sm font-medium text-neutral-700">Mark as Bestseller</span>
             </label>
 
             <label className="flex items-center gap-3">

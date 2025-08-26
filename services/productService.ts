@@ -64,22 +64,97 @@ export interface CreateProductData {
   name: string;
   description: string;
   sku: string;
+  barcode?: string;
   basePrice: number;
   salePrice?: number;
+  costPrice?: number;
   stockQuantity: number;
+  lowStockThreshold?: number;
   categoryId: number;
   brandId?: string;
+  discountId?: string;
+  model?: string;
   slug?: string;
   isActive?: boolean;
   isFeatured?: boolean;
+  isBestseller?: boolean;
   isNewArrival?: boolean;
   isOnSale?: boolean;
+  salePercentage?: number;
+  fullDescription?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  searchKeywords?: string;
+  heightCm?: number;
+  widthCm?: number;
+  lengthCm?: number;
+  weightKg?: number;
+  material?: string;
+  careInstructions?: string;
+  warrantyInfo?: string;
+  shippingInfo?: string;
+  returnPolicy?: string;
+  warehouseStock?: Array<{
+    warehouseId: number;
+    stockQuantity: number;
+    lowStockThreshold: number;
+    reorderPoint: number;
+    warehousePrice?: number;
+    warehouseCostPrice?: number;
+    isAvailable?: boolean;
+    notes?: string;
+  }>;
   productImages?: File[];
   imageMetadata?: Array<{
     altText?: string;
     isPrimary?: boolean;
     sortOrder?: number;
   }>;
+  productVideos?: string[];
+  videoMetadata?: string;
+  variants?: Array<{
+    variantSku: string;
+    variantBarcode?: string;
+    price: number;
+    compareAtPrice?: number;
+    costPrice?: number;
+    stockQuantity: number;
+    lowStockThreshold?: number;
+    isActive?: boolean;
+    sortOrder?: number;
+    attributes: Record<string, string>;
+    variantImages?: string[];
+    imageMetadata?: string;
+    salePrice?: number;
+    heightCm?: number;
+    widthCm?: number;
+    lengthCm?: number;
+    weightKg?: number;
+    material?: string;
+    color?: string;
+    size?: string;
+    shape?: string;
+    style?: string;
+    isInStock?: boolean;
+    isBackorderable?: boolean;
+    backorderQuantity?: number;
+    backorderMessage?: string;
+    requiresSpecialShipping?: boolean;
+    shippingNotes?: string;
+    additionalShippingCost?: number;
+    warehouseStock?: Array<{
+      warehouseId: number;
+      stockQuantity: number;
+      lowStockThreshold: number;
+      reorderPoint: number;
+      warehousePrice?: number;
+      warehouseCostPrice?: number;
+      isAvailable?: boolean;
+      notes?: string;
+    }>;
+  }>;
+  dimensionsCm?: string;
 }
 
 // Transform Java product to frontend product format
@@ -389,16 +464,116 @@ export const productService = {
       formData.append('name', productData.name);
       formData.append('description', productData.description);
       formData.append('sku', productData.sku);
+      if (productData.barcode) formData.append('barcode', productData.barcode);
       formData.append('basePrice', productData.basePrice.toString());
       if (productData.salePrice) formData.append('salePrice', productData.salePrice.toString());
+      if (productData.costPrice) formData.append('costPrice', productData.costPrice.toString());
       formData.append('stockQuantity', productData.stockQuantity.toString());
+      if (productData.lowStockThreshold) formData.append('lowStockThreshold', productData.lowStockThreshold.toString());
       formData.append('categoryId', productData.categoryId.toString());
       if (productData.brandId) formData.append('brandId', productData.brandId);
+      if (productData.discountId) formData.append('discountId', productData.discountId);
+      if (productData.model) formData.append('model', productData.model);
       if (productData.slug) formData.append('slug', productData.slug);
       if (productData.isActive !== undefined) formData.append('isActive', productData.isActive.toString());
       if (productData.isFeatured !== undefined) formData.append('isFeatured', productData.isFeatured.toString());
+      if (productData.isBestseller !== undefined) formData.append('isBestseller', productData.isBestseller.toString());
       if (productData.isNewArrival !== undefined) formData.append('isNewArrival', productData.isNewArrival.toString());
       if (productData.isOnSale !== undefined) formData.append('isOnSale', productData.isOnSale.toString());
+      if (productData.salePercentage) formData.append('salePercentage', productData.salePercentage.toString());
+      if (productData.fullDescription) formData.append('fullDescription', productData.fullDescription);
+      if (productData.metaTitle) formData.append('metaTitle', productData.metaTitle);
+      if (productData.metaDescription) formData.append('metaDescription', productData.metaDescription);
+      if (productData.metaKeywords) formData.append('metaKeywords', productData.metaKeywords);
+      if (productData.searchKeywords) formData.append('searchKeywords', productData.searchKeywords);
+      if (productData.heightCm) formData.append('heightCm', productData.heightCm.toString());
+      if (productData.widthCm) formData.append('widthCm', productData.widthCm.toString());
+      if (productData.lengthCm) formData.append('lengthCm', productData.lengthCm.toString());
+      if (productData.weightKg) formData.append('weightKg', productData.weightKg.toString());
+      if (productData.material) formData.append('material', productData.material);
+      if (productData.careInstructions) formData.append('careInstructions', productData.careInstructions);
+      if (productData.warrantyInfo) formData.append('warrantyInfo', productData.warrantyInfo);
+      if (productData.shippingInfo) formData.append('shippingInfo', productData.shippingInfo);
+      if (productData.returnPolicy) formData.append('returnPolicy', productData.returnPolicy);
+
+      // Add warehouse stock data
+      if (productData.warehouseStock && productData.warehouseStock.length > 0) {
+        productData.warehouseStock.forEach((warehouse, index) => {
+          formData.append(`warehouseStock[${index}].warehouseId`, warehouse.warehouseId.toString());
+          formData.append(`warehouseStock[${index}].stockQuantity`, warehouse.stockQuantity.toString());
+          formData.append(`warehouseStock[${index}].lowStockThreshold`, warehouse.lowStockThreshold.toString());
+          formData.append(`warehouseStock[${index}].reorderPoint`, warehouse.reorderPoint.toString());
+          if (warehouse.warehousePrice) formData.append(`warehouseStock[${index}].warehousePrice`, warehouse.warehousePrice.toString());
+          if (warehouse.warehouseCostPrice) formData.append(`warehouseStock[${index}].warehouseCostPrice`, warehouse.warehouseCostPrice.toString());
+          if (warehouse.isAvailable !== undefined) formData.append(`warehouseStock[${index}].isAvailable`, warehouse.isAvailable.toString());
+          if (warehouse.notes) formData.append(`warehouseStock[${index}].notes`, warehouse.notes);
+        });
+      }
+
+      // Add variants data
+      if (productData.variants && productData.variants.length > 0) {
+        productData.variants.forEach((variant, index) => {
+          formData.append(`variants[${index}].variantSku`, variant.variantSku);
+          if (variant.variantBarcode) formData.append(`variants[${index}].variantBarcode`, variant.variantBarcode);
+          formData.append(`variants[${index}].price`, variant.price.toString());
+          if (variant.compareAtPrice) formData.append(`variants[${index}].compareAtPrice`, variant.compareAtPrice.toString());
+          if (variant.costPrice) formData.append(`variants[${index}].costPrice`, variant.costPrice.toString());
+          formData.append(`variants[${index}].stockQuantity`, variant.stockQuantity.toString());
+          if (variant.lowStockThreshold) formData.append(`variants[${index}].lowStockThreshold`, variant.lowStockThreshold.toString());
+          if (variant.isActive !== undefined) formData.append(`variants[${index}].isActive`, variant.isActive.toString());
+          if (variant.sortOrder) formData.append(`variants[${index}].sortOrder`, variant.sortOrder.toString());
+          
+          // Add variant attributes
+          Object.entries(variant.attributes).forEach(([key, value]) => {
+            formData.append(`variants[${index}].attributes.${key}`, value);
+          });
+          
+          if (variant.variantImages) {
+            variant.variantImages.forEach((image, imgIndex) => {
+              formData.append(`variants[${index}].variantImages[${imgIndex}]`, image);
+            });
+          }
+          
+          if (variant.imageMetadata) formData.append(`variants[${index}].imageMetadata`, variant.imageMetadata);
+          if (variant.salePrice) formData.append(`variants[${index}].salePrice`, variant.salePrice.toString());
+          if (variant.heightCm) formData.append(`variants[${index}].heightCm`, variant.heightCm.toString());
+          if (variant.widthCm) formData.append(`variants[${index}].widthCm`, variant.widthCm.toString());
+          if (variant.lengthCm) formData.append(`variants[${index}].lengthCm`, variant.lengthCm.toString());
+          if (variant.weightKg) formData.append(`variants[${index}].weightKg`, variant.weightKg.toString());
+          if (variant.material) formData.append(`variants[${index}].material`, variant.material);
+          if (variant.color) formData.append(`variants[${index}].color`, variant.color);
+          if (variant.size) formData.append(`variants[${index}].size`, variant.size);
+          if (variant.shape) formData.append(`variants[${index}].shape`, variant.shape);
+          if (variant.style) formData.append(`variants[${index}].style`, variant.style);
+          if (variant.isInStock !== undefined) formData.append(`variants[${index}].isInStock`, variant.isInStock.toString());
+          if (variant.isBackorderable !== undefined) formData.append(`variants[${index}].isBackorderable`, variant.isBackorderable.toString());
+          if (variant.backorderQuantity) formData.append(`variants[${index}].backorderQuantity`, variant.backorderQuantity.toString());
+          if (variant.backorderMessage) formData.append(`variants[${index}].backorderMessage`, variant.backorderMessage);
+          if (variant.requiresSpecialShipping !== undefined) formData.append(`variants[${index}].requiresSpecialShipping`, variant.requiresSpecialShipping.toString());
+          if (variant.shippingNotes) formData.append(`variants[${index}].shippingNotes`, variant.shippingNotes);
+          if (variant.additionalShippingCost) formData.append(`variants[${index}].additionalShippingCost`, variant.additionalShippingCost.toString());
+          
+          // Add variant warehouse stock
+          if (variant.warehouseStock && variant.warehouseStock.length > 0) {
+            variant.warehouseStock.forEach((warehouse, wIndex) => {
+              formData.append(`variants[${index}].warehouseStock[${wIndex}].warehouseId`, warehouse.warehouseId.toString());
+              formData.append(`variants[${index}].warehouseStock[${wIndex}].stockQuantity`, warehouse.stockQuantity.toString());
+              formData.append(`variants[${index}].warehouseStock[${wIndex}].lowStockThreshold`, warehouse.lowStockThreshold.toString());
+              formData.append(`variants[${index}].warehouseStock[${wIndex}].reorderPoint`, warehouse.reorderPoint.toString());
+              if (warehouse.warehousePrice) formData.append(`variants[${index}].warehouseStock[${wIndex}].warehousePrice`, warehouse.warehousePrice.toString());
+              if (warehouse.warehouseCostPrice) formData.append(`variants[${index}].warehouseStock[${wIndex}].warehouseCostPrice`, warehouse.warehouseCostPrice.toString());
+              if (warehouse.isAvailable !== undefined) formData.append(`variants[${index}].warehouseStock[${wIndex}].isAvailable`, warehouse.isAvailable.toString());
+              if (warehouse.notes) formData.append(`variants[${index}].warehouseStock[${wIndex}].notes`, warehouse.notes);
+            });
+          }
+        });
+      }
+
+      // Add dimensions string
+      if (productData.heightCm && productData.widthCm && productData.lengthCm) {
+        const dimensions = `${productData.heightCm} x ${productData.widthCm} x ${productData.lengthCm}`;
+        formData.append('dimensionsCm', dimensions);
+      }
 
       // Debug logging
       console.log('Creating product with data:', {
@@ -408,7 +583,9 @@ export const productService = {
         basePrice: productData.basePrice,
         stockQuantity: productData.stockQuantity,
         categoryId: productData.categoryId,
-        imagesCount: productData.productImages?.length || 0
+        imagesCount: productData.productImages?.length || 0,
+        warehouseStockCount: productData.warehouseStock?.length || 0,
+        variantsCount: productData.variants?.length || 0
       });
 
       // Add images
@@ -426,8 +603,6 @@ export const productService = {
           if (metadata.sortOrder !== undefined) formData.append(`imageMetadata[${index}].sortOrder`, metadata.sortOrder.toString());
         });
       }
-
-
 
       // Add authentication token if available
       const token = localStorage.getItem('authToken');

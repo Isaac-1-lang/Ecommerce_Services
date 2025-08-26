@@ -51,11 +51,11 @@ const heroSlides = [
 const testimonials = [
   {
     id: 1,
-    name: "Sarah Johnson",
+    name: "NIYOBYOSE Isaac",
     role: "Fashion Enthusiast",
     content: "Amazing quality products and fast delivery. I love shopping here!",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: 2,
@@ -79,7 +79,7 @@ const testimonials = [
 const brands = [
   { name: "Nike", logo: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=100&fit=crop" },
   { name: "Apple", logo: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=200&h=100&fit=crop" },
-  { name: "Samsung", logo: "https://images.unsplash.com/photo-1610945265064-0ea8d51c8c3b?w=200&h=100&fit=crop" },
+  { name: "Samsung", logo: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=200&h=100&fit=crop" },
   { name: "Adidas", logo: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=200&h=100&fit=crop" },
   { name: "Sony", logo: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=200&h=100&fit=crop" },
   { name: "LG", logo: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=200&h=100&fit=crop" }
@@ -238,18 +238,11 @@ function ProductCard({ product }: { product: Product }) {
   };
 
   // Ensure we have a valid product image
-  const getProductImage = (): string => {
-    if (imageError) {
-      return getFallbackImage(product.category);
-    }
-    
-    const imageUrl = product.primaryImage?.imageUrl || 
-      (typeof product.image === 'string' ? product.image : product.image?.imageUrl);
-    
-    return imageUrl || getFallbackImage(product.category);
-  };
-  
-  const productImage = getProductImage();
+  const productImage = !imageError && (product.primaryImage?.imageUrl || 
+    (typeof product.image === 'string' ? product.image : product.image?.imageUrl))
+    ? (product.primaryImage?.imageUrl || 
+        (typeof product.image === 'string' ? product.image : product.image?.imageUrl))
+    : getFallbackImage(product.category);
   const productCategory = product.category || 'General';
   const stockQuantity = product.stockQuantity || 10;
 
