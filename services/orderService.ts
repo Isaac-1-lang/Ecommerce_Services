@@ -192,29 +192,43 @@ const transformJavaOrder = (javaOrder: JavaOrder): Order => {
 export const orderService = {
   async getOrders(): Promise<Order[]> {
     try {
-      const userId = typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('user') || '{}')?.id) : undefined;
-      // Use the general orders endpoint with explicit userId to avoid backend context issues
-      const response = await api.get<JavaOrderResponse<JavaOrder[]>>('/api/v1/orders', {
-        params: userId ? { userId } : undefined,
-      });
-
-      if (response.data.success && response.data.data) {
-        return response.data.data.map(transformJavaOrder);
+      console.log('Fetching orders from customer endpoint...');
+      
+      // Use the customer-specific endpoint which handles authentication automatically
+      const response = await api.get<JavaOrderResponse<JavaOrder[]>>('/api/v1/customer/orders');
+      
+      // If customer endpoint fails, try admin endpoint as fallback
+      if (!response.data.success || !response.data.data) {
+        console.log('Customer endpoint failed, trying admin endpoint...');
+        const adminResponse = await api.get<JavaOrderResponse<JavaOrder[]>>('/api/v1/admin/orders');
+        if (adminResponse.data.success && adminResponse.data.data) {
+          console.log('Admin endpoint returned orders:', adminResponse.data.data.length);
+          return adminResponse.data.data.map(transformJavaOrder);
+        }
       }
       
+      console.log('Orders response:', response.data);
+
+      if (response.data.success && response.data.data) {
+        const orders = response.data.data.map(transformJavaOrder);
+        console.log('Transformed orders:', orders);
+        return orders;
+      }
+      
+      console.log('No orders found or response format incorrect');
       return [];
     } catch (error: any) {
       console.error('Error fetching orders:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       return [];
     }
   },
 
   async getOrderById(orderId: string): Promise<Order | null> {
     try {
-      const userId = typeof window !== 'undefined' ? (JSON.parse(localStorage.getItem('user') || '{}')?.id) : undefined;
-      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/${orderId}` , {
-        params: userId ? { userId } : undefined,
-      });
+      // Use the customer-specific endpoint which handles authentication automatically
+      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/customer/orders/${orderId}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);
@@ -232,7 +246,8 @@ export const orderService = {
 
   async getOrderByNumber(orderNumber: string): Promise<Order | null> {
     try {
-      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/orders/number/${orderNumber}`);
+      // Use the customer-specific endpoint which handles authentication automatically
+      const response = await api.get<JavaOrderResponse<JavaOrder>>(`/api/v1/customer/orders/number/${orderNumber}`);
 
       if (response.data.success && response.data.data) {
         return transformJavaOrder(response.data.data);

@@ -57,6 +57,10 @@ export default function OrdersPage() {
     }
 
     // Only fetch orders if authenticated
+    console.log('Fetching orders for user:', user?.email, 'with role:', user?.role);
+    console.log('User ID:', user?.id);
+    console.log('Token exists:', !!token);
+    console.log('Token preview:', token ? token.substring(0, 20) + '...' : 'No token');
     fetchOrders();
   }, [fetchOrders, user, token, isInitialized, router]);
 
@@ -94,6 +98,9 @@ export default function OrdersPage() {
     );
   }
 
+  // Debug: Log orders state
+  console.log('Orders state:', { loading, ordersCount: orders.length, error });
+  
   // Show loading while fetching orders
   if (loading && orders.length === 0) {
     return (
