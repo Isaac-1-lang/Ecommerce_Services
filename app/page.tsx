@@ -125,11 +125,15 @@ function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // Extract image URL from primaryImage or fallback to image field
+    const imageUrl = product.primaryImage?.imageUrl || 
+      (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || "";
+    
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image || undefined as any,
+      image: imageUrl,
       quantity: quantity,
     });
   };
@@ -234,7 +238,18 @@ function ProductCard({ product }: { product: Product }) {
   };
 
   // Ensure we have a valid product image
-  const productImage = product.image && !imageError ? product.image : getFallbackImage(product.category);
+  const getProductImage = (): string => {
+    if (imageError) {
+      return getFallbackImage(product.category);
+    }
+    
+    const imageUrl = product.primaryImage?.imageUrl || 
+      (typeof product.image === 'string' ? product.image : product.image?.imageUrl);
+    
+    return imageUrl || getFallbackImage(product.category);
+  };
+  
+  const productImage = getProductImage();
   const productCategory = product.category || 'General';
   const stockQuantity = product.stockQuantity || 10;
 

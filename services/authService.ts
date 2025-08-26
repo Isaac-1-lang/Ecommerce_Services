@@ -133,8 +133,53 @@ export const authService = {
 
       return { user, token: String(loginData.token) };
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
-      throw new Error(backendMessage || error.message || "Login failed");
+      // Extract detailed error message from backend response
+      let errorMessage = "Login failed. Please check your credentials.";
+      
+      if (error.response?.data) {
+        const responseData = error.response.data;
+        
+        // Handle different backend error response formats
+        if (typeof responseData === 'string') {
+          errorMessage = responseData;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (responseData.error) {
+          errorMessage = responseData.error;
+        } else if (responseData.details) {
+          errorMessage = responseData.details;
+        } else if (responseData.reason) {
+          errorMessage = responseData.reason;
+        }
+        
+        // Add specific error context based on status code
+        if (error.response.status === 400) {
+          if (errorMessage.toLowerCase().includes('password') || errorMessage.toLowerCase().includes('invalid')) {
+            errorMessage = "Invalid email or password. Please check your credentials.";
+          } else if (errorMessage.toLowerCase().includes('email')) {
+            errorMessage = "Invalid email format. Please enter a valid email address.";
+          } else {
+            errorMessage = `Invalid input: ${errorMessage}`;
+          }
+        } else if (error.response.status === 401) {
+          errorMessage = "Invalid email or password. Please check your credentials.";
+        } else if (error.response.status === 404) {
+          errorMessage = "User account not found. Please check your email or register a new account.";
+        } else if (error.response.status === 422) {
+          errorMessage = `Validation error: ${errorMessage}`;
+        } else if (error.response.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+      } else if (error.message) {
+        // Handle network or other errors
+        if (error.message.includes('Network Error') || error.message.includes('timeout')) {
+          errorMessage = "Connection failed. Please check your internet connection and try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
   },
 

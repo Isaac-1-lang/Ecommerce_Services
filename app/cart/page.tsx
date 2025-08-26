@@ -131,12 +131,19 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                     <div className="relative w-20 h-20">
-                      <Image
-                        src={item.image || "https://via.placeholder.com/80x80?text=Item"}
-                        alt={item.name}
-                        fill
-                        className="rounded-lg object-cover"
-                      />
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="rounded-lg object-cover"
+                          onError={() => console.error(`Failed to load cart item image: ${item.image}`)}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                          <span className="text-xs text-gray-500">No image</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex-1 min-w-0">
@@ -145,6 +152,10 @@ export default function CartPage() {
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {formatPrice(item.price)} each
+                      </p>
+                      {/* Debug info - remove this later */}
+                      <p className="text-xs text-gray-400 mt-1">
+                        Image: {item.image || 'No image URL'}
                       </p>
                     </div>
                     
