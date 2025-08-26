@@ -10,7 +10,19 @@ interface NewArrivalProduct {
   name: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  image?: string | {
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
   category: string;
   rating: number;
   reviewCount: number;
@@ -234,11 +246,11 @@ export default function NewArrivalsPage() {
                 {sortedProducts.map((product) => (
                   <div key={product.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700 overflow-hidden group">
                     <div className="relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                                             <img
+                         src={product.primaryImage?.imageUrl || (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || ''}
+                         alt={product.name}
+                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                       />
                       <div className="absolute top-3 left-3">
                         <span className="bg-primary text-white px-2 py-1 text-xs font-semibold rounded-full">
                           NEW
@@ -299,11 +311,11 @@ export default function NewArrivalsPage() {
                   <div key={product.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow-soft border border-neutral-200 dark:border-neutral-700 p-4">
                     <div className="flex gap-4">
                       <div className="relative w-24 h-24 flex-shrink-0">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                                                 <img
+                           src={product.primaryImage?.imageUrl || (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || ''}
+                           alt={product.name}
+                           className="w-full h-full object-cover rounded-lg"
+                         />
                         <div className="absolute top-1 left-1">
                           <span className="bg-primary text-white px-1 py-0.5 text-xs font-semibold rounded">
                             NEW

@@ -21,7 +21,19 @@ interface BrandProduct {
   name: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  image?: string | {
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
   rating: number;
   reviewCount: number;
   discount?: number;
@@ -335,11 +347,11 @@ export default function BrandsPage() {
               {mockBrandProducts.map((product) => (
                 <div key={product.id} className="bg-neutral-50 dark:bg-neutral-700 rounded-lg overflow-hidden group">
                   <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                                         <img
+                       src={product.primaryImage?.imageUrl || (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || ''}
+                       alt={product.name}
+                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                     />
                     {product.discount && (
                       <div className="absolute top-3 right-3">
                         <span className="bg-danger text-white px-2 py-1 text-xs font-semibold rounded-full">

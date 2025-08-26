@@ -129,7 +129,7 @@ function ProductCard({ product }: { product: Product }) {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image || "",
+      image: product.image || undefined as any,
       quantity: quantity,
     });
   };

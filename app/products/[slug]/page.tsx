@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import { FiStar, FiTruck, FiShield, FiRefreshCw } from "react-icons/fi";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import { getProductBySlug } from "../../../services/productService";
+import { getProductBySlug, getProductById } from "../../../services/productService";
 import { useCartStore } from "../../../features/cart/store";
 import { useWishlistStore } from "../../../features/wishlist/store";
 import { Product } from "../../../types/product";
@@ -21,7 +21,6 @@ export default function ProductDetailPage() {
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [reviewsRefresh, setReviewsRefresh] = useState(0);
   const { user } = useAuth();
@@ -35,10 +34,27 @@ export default function ProductDetailPage() {
     const loadProduct = async () => {
       setLoading(true);
       try {
-        const productData = await getProductBySlug(slug);
+        console.log('Loading product with identifier:', slug);
+        
+        // Check if the slug looks like a UUID (product ID)
+        const cleaned = slug?.startsWith('product-') ? slug.replace(/^product-/, '') : slug;
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleaned);
+        
+        let productData;
+        if (isUUID) {
+          console.log('Identifier looks like UUID, calling getProductById with', cleaned);
+          productData = await getProductById(cleaned);
+        } else {
+          console.log('Identifier looks like slug, calling getProductBySlug');
+          productData = await getProductBySlug(cleaned);
+        }
+        
         if (!productData) {
+          console.log('Product not found');
           notFound();
         }
+        
+        console.log('Product loaded successfully:', productData);
         setProduct(productData);
       } catch (error) {
         console.error("Failed to load product:", error);
@@ -53,11 +69,15 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (product) {
+      // Extract image URL from primaryImage or fallback to image field
+      const imageUrl = product.primaryImage?.imageUrl || 
+        (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || "";
+      
       addToCart({
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.image || "",
+        image: imageUrl,
         quantity,
       });
     }
@@ -97,7 +117,7 @@ export default function ProductDetailPage() {
   }
 
   const mockImages = [
-    product.image || "https://via.placeholder.com/600x600?text=Product+Image",
+    product.primaryImage?.imageUrl || product.image || "https://via.placeholder.com/600x600?text=Product+Image",
     "https://via.placeholder.com/600x600?text=Product+Image+2",
     "https://via.placeholder.com/600x600?text=Product+Image+3",
   ];
@@ -116,33 +136,22 @@ export default function ProductDetailPage() {
         {/* Product Images */}
         <div className="space-y-4">
           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-            <Image
-              src={mockImages[selectedImage]}
-              alt={product.name}
-              className="h-full w-full object-cover"
-              width={100}
-              height={100}
-            />
+            {product.primaryImage && product.primaryImage.imageUrl ? (
+              <Image
+                src={product.primaryImage.imageUrl}
+                alt={product.primaryImage.altText || product.name}
+                className="h-full w-full object-cover"
+                width={400}
+                height={400}
+                onError={() => console.error(`Failed to load image for ${product.name}`)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                No image available
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {mockImages.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(index)}
-                className={`aspect-square overflow-hidden rounded-lg border-2 ${
-                  selectedImage === index ? "border-primary" : "border-gray-200"
-                }`}
-              >
-                <Image
-                  src={image}
-                  alt={`${product.name} ${index + 1}`}
-                  className="h-full w-full object-cover"
-                  width={100}
-                  height={100}
-                />
-              </button>
-            ))}
-          </div>
+          {/* Product variants or additional images could go here */}
         </div>
 
         {/* Product Info */}
@@ -276,14 +285,16 @@ export default function ProductDetailPage() {
                     </div>
                     {variant.images && variant.images.length > 0 && (
                       <div className="flex gap-2 mt-2">
-                        {variant.images.map((image, index) => (
-                          <img
-                            key={index}
-                            src={image}
-                            alt={`Variant ${index + 1}`}
-                            className="w-12 h-12 object-cover rounded border"
-                          />
-                        ))}
+                        {variant.images
+                          .filter((image) => typeof image === 'string' && image.trim().length > 0)
+                          .map((image, index) => (
+                            <img
+                              key={index}
+                              src={image}
+                              alt={`Variant ${index + 1}`}
+                              className="w-12 h-12 object-cover rounded border"
+                            />
+                          ))}
                       </div>
                     )}
                   </div>

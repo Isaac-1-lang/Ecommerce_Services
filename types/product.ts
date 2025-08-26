@@ -15,7 +15,19 @@ export interface Product {
   category: string;
   subcategory?: string;
   brand: string;
-  image: string;
+  image?: string | {
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
   images?: string[];
   rating: number;
   reviewCount: number;

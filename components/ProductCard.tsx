@@ -48,11 +48,15 @@ export default function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // Extract image URL from primaryImage or fallback to image field
+    const imageUrl = product.primaryImage?.imageUrl || 
+      (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || "";
+    
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image || "",
+      image: imageUrl,
       quantity: quantity,
     });
   };
@@ -157,7 +161,15 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   // Ensure we have a valid product image
-  const productImage = product.image && !imageError ? product.image : getFallbackImage(product.category);
+  const getProductImage = () => {
+    if (imageError) return getFallbackImage(product.category);
+    if (product.primaryImage?.imageUrl) return product.primaryImage.imageUrl;
+    if (typeof product.image === 'string') return product.image;
+    if (product.image && typeof product.image === 'object' && product.image.imageUrl) return product.image.imageUrl;
+    return getFallbackImage(product.category);
+  };
+  
+  const productImage = getProductImage();
   const productCategory = product.category || 'General';
   const stockQuantity = product.stockQuantity || 10;
 
@@ -169,7 +181,7 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/products/${product.slug || product.id}`}>
           <Image
             src={productImage}
             alt={product.name}
@@ -252,7 +264,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Product Name */}
-        <Link href={`/products/${product.slug}`} className="cursor-pointer">
+        <Link href={`/products/${product.slug || product.id}`} className="cursor-pointer">
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
             {product.name}
           </h3>

@@ -6,7 +6,19 @@ import { productService } from '../../../services/productService';
 interface CatalogItem {
   id: string;
   name: string;
-  image?: string;
+  image?: string | {
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    sortOrder?: number;
+    primary?: boolean;
+  };
   category?: string;
 }
 
@@ -43,10 +55,15 @@ export default function EmployeeCatalogPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {items.map(item => (
           <div key={item.id} className="border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden bg-white dark:bg-neutral-800">
-            {item.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.image} alt={item.name} className="w-full h-40 object-cover" />
-            )}
+            {(() => {
+              const imageUrl = item.primaryImage?.imageUrl || 
+                (typeof item.image === 'string' ? item.image : item.image?.imageUrl);
+              
+              return imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imageUrl} alt={item.name} className="w-full h-40 object-cover" />
+              ) : null;
+            })()}
             <div className="p-3">
               <div className="font-medium text-neutral-800 dark:text-neutral-200 truncate">{item.name}</div>
               <div className="text-xs text-neutral-500">{item.category}</div>

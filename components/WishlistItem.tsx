@@ -23,18 +23,23 @@ export default function WishlistItem({
     <div className="group relative bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-soft hover:shadow-soft-lg transition-all duration-300 overflow-hidden">
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-700">
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <FiHeart className="h-8 w-8 text-neutral-400" />
-          </div>
-        )}
+        {(() => {
+          const imageUrl = product.primaryImage?.imageUrl || 
+            (typeof product.image === 'string' ? product.image : product.image?.imageUrl);
+          
+          return imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <FiHeart className="h-8 w-8 text-neutral-400" />
+            </div>
+          );
+        })()}
         
         {/* Remove Button - Top Right */}
         <button

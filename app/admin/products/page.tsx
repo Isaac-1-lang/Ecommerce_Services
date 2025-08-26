@@ -208,11 +208,16 @@ export default function ProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-12 w-12 rounded-lg bg-neutral-200 flex items-center justify-center overflow-hidden">
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="text-neutral-400 text-xs">No Image</span>
-                        )}
+                        {(() => {
+                          const imageUrl = product.primaryImage?.imageUrl || 
+                            (typeof product.image === 'string' ? product.image : product.image?.imageUrl);
+                          
+                          return imageUrl ? (
+                            <img src={imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-neutral-400 text-xs">No Image</span>
+                          );
+                        })()}
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-neutral-900">{product.name}</div>

@@ -24,22 +24,39 @@ export interface JavaProductResponse<T = any> {
 
 export interface JavaProduct {
   productId: string;
-  name: string;
-  description: string;
+  productName?: string; // For individual product responses
+  name?: string; // Fallback for older format
+  description?: string;
   shortDescription?: string;
-  brand?: string;
+  brand?: {
+    brandId: string;
+    brandName: string;
+  } | string; // Can be object or string
   tags?: string[];
   price: number;
   originalPrice?: number;
-  category?: string;
+  compareAtPrice?: number; // For sale pricing
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | string; // Can be object or string
   images?: string[];
+  primaryImage?: {
+    id: number;
+    imageUrl: string;
+    altText?: string;
+    sortOrder: number;
+    primary: boolean;
+  };
   rating?: number;
   reviewCount?: number;
   stockQuantity: number;
   isNew?: boolean;
   isOnSale?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  isFeatured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   slug?: string;
 }
 
@@ -69,23 +86,25 @@ export interface CreateProductData {
 const transformJavaProduct = (javaProduct: JavaProduct): Product => {
   return {
     id: javaProduct.productId,
-    slug: javaProduct.slug || `product-${javaProduct.productId}`,
-    name: javaProduct.name,
-    description: javaProduct.description,
-    shortDescription: javaProduct.shortDescription || javaProduct.description.substring(0, 100) + "...",
-    brand: javaProduct.brand || "Generic Brand",
+    // Prefer backend-provided slug; otherwise fall back to product ID for stable routing
+    slug: javaProduct.slug || javaProduct.productId,
+    name: javaProduct.productName || javaProduct.name || 'Unknown Product',
+    description: javaProduct.description || javaProduct.shortDescription || 'No description available',
+    shortDescription: javaProduct.shortDescription || javaProduct.description?.substring(0, 100) + "..." || 'No description available',
+    brand: typeof javaProduct.brand === 'object' ? javaProduct.brand.brandName : javaProduct.brand || "Generic Brand",
     tags: javaProduct.tags || [],
-    price: javaProduct.price,
-    originalPrice: javaProduct.originalPrice,
-    category: javaProduct.category || "Uncategorized",
-    image: javaProduct.images?.[0] || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center",
+    price: javaProduct.price || 0,
+    originalPrice: javaProduct.compareAtPrice || javaProduct.originalPrice,
+    category: typeof javaProduct.category === 'object' ? javaProduct.category.name : javaProduct.category || "Uncategorized",
+    image: javaProduct.primaryImage?.imageUrl || javaProduct.images?.[0] || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center",
     rating: javaProduct.rating || 0,
     reviewCount: javaProduct.reviewCount || 0,
-    stockQuantity: javaProduct.stockQuantity,
+    stockQuantity: javaProduct.stockQuantity || 0,
     isNew: javaProduct.isNew || false,
-    isOnSale: javaProduct.isOnSale || false,
-    createdAt: formatJavaDate(javaProduct.createdAt).toISOString(),
-    updatedAt: formatJavaDate(javaProduct.updatedAt).toISOString(),
+    isOnSale: javaProduct.isOnSale || (javaProduct.compareAtPrice ? javaProduct.compareAtPrice > javaProduct.price : false),
+    isFeatured: javaProduct.isFeatured || false,
+    createdAt: javaProduct.createdAt ? formatJavaDate(javaProduct.createdAt).toISOString() : new Date().toISOString(),
+    updatedAt: javaProduct.updatedAt ? formatJavaDate(javaProduct.updatedAt).toISOString() : new Date().toISOString(),
   };
 };
 
@@ -93,7 +112,8 @@ const transformJavaProduct = (javaProduct: JavaProduct): Product => {
 const transformManyProductsDtoToProduct = (dto: ManyProductsDto): Product => {
   return {
     id: dto.productId,
-    slug: `product-${dto.productId}`,
+    // Use ID as slug when no dedicated slug is available
+    slug: dto.productId,
     name: dto.productName,
     description: dto.shortDescription || '',
     shortDescription: dto.shortDescription || '',
@@ -173,15 +193,46 @@ export const productService = {
 
   async getById(id: string): Promise<Product | null> {
     try {
-      const response = await api.get<JavaProductResponse<JavaProduct>>(`/api/v1/products/${id}`);
+      console.log('Fetching product by ID:', id);
+      const response = await api.get<JavaProductResponse<JavaProduct> | JavaProduct>(`/api/v1/products/${id}`);
+      console.log('Raw API response:', response.data);
 
-      if (response.data.success && response.data.data) {
-        return transformJavaProduct(response.data.data);
+      // Handle both response formats:
+      // 1. Wrapped response: { success: true, data: {...} }
+      // 2. Direct response: { productId: "...", name: "...", ... }
+      
+      let productData: JavaProduct | undefined;
+      
+      if (response.data && typeof response.data === 'object') {
+        if ('success' in response.data && response.data.success && 'data' in response.data) {
+          // Wrapped response format
+          console.log('Wrapped response format detected');
+          productData = response.data.data;
+        } else if ('productId' in response.data) {
+          // Direct response format (your backend)
+          console.log('Direct response format detected');
+          productData = response.data as JavaProduct;
+        } else {
+          console.log('Unknown response format');
+          return null;
+        }
+      } else {
+        console.log('Invalid response data');
+        return null;
+      }
+
+      if (productData && productData.productId) {
+        console.log('Transforming product data:', productData);
+        const transformed = transformJavaProduct(productData);
+        console.log('Transformed product:', transformed);
+        return transformed;
       }
       
+      console.log('No valid product data found');
       return null;
     } catch (error: any) {
       if (error.response?.status === 404) {
+        console.log('Product not found (404)');
         return null;
       }
       console.error('Error fetching product by ID:', error);

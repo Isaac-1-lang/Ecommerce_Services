@@ -130,13 +130,14 @@ export default function CartPage() {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      width={80}
-                      height={80}
-                      className="rounded-lg object-cover"
-                    />
+                    <div className="relative w-20 h-20">
+                      <Image
+                        src={item.image || "https://via.placeholder.com/80x80?text=Item"}
+                        alt={item.name}
+                        fill
+                        className="rounded-lg object-cover"
+                      />
+                    </div>
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 dark:text-white truncate">

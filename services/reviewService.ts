@@ -82,6 +82,7 @@ const transformJavaReview = (javaReview: JavaReview): Review => {
 export const reviewService = {
   async getReviews(params?: ReviewSearchParams): Promise<Review[]> {
     try {
+      console.log('Fetching reviews with params:', params);
       const queryParams = new URLSearchParams();
       
       if (params?.productId) queryParams.append('productId', params.productId);
@@ -92,13 +93,16 @@ export const reviewService = {
 
       // Backend exposes specific endpoints for product and user reviews
       if (params?.productId) {
+        console.log('Fetching product reviews for:', params.productId);
         const resp = await api.get<JavaReviewResponse<JavaReview[]>>(`/api/v1/reviews/product/${params.productId}`, {
           params: { page: params.page ?? 0, size: params.size ?? 10, sortBy: 'createdAt', sortDirection: 'desc' }
         });
+        console.log('Product reviews response:', resp.data);
         if (resp.data.success && resp.data.data) return resp.data.data.map(transformJavaReview);
         return [];
       }
       // Search endpoint for broader queries
+      console.log(' Using search endpoint for reviews');
       const searchResp = await api.post<JavaReviewResponse<JavaReview[]>>('/api/v1/reviews/search', {
         productId: params?.productId,
         rating: params?.rating,
@@ -106,7 +110,8 @@ export const reviewService = {
         page: params?.page ?? 0,
         size: params?.size ?? 10,
       });
-      if (searchResp.data.success && searchResp.data.data) return searchResp.data.data.map(transformJavaReview);
+      console.log('Search response:', searchResp.data);
+      if (searchResp.data.data) return searchResp.data.data.map(transformJavaReview);
       return [];
     } catch (error: any) {
       console.error('Error fetching reviews:', error);
@@ -116,7 +121,9 @@ export const reviewService = {
 
   async getReviewById(reviewId: string): Promise<Review | null> {
     try {
+      console.log('Getting review by ID:', reviewId);
       const response = await api.get<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}`);
+      console.log('Get review response:', response.data);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -138,7 +145,9 @@ export const reviewService = {
 
   async createReview(reviewData: CreateReviewRequest): Promise<Review> {
     try {
+      console.log('Creating review:', reviewData);
       const response = await api.post<JavaReviewResponse<JavaReview>>('/api/v1/reviews/create', reviewData);
+      console.log('Create review response:', response.data);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -153,8 +162,10 @@ export const reviewService = {
 
   async updateReview(reviewId: string, reviewData: UpdateReviewRequest): Promise<Review> {
     try {
+      console.log('Updating review:', reviewId, reviewData);
       // Swagger shows PUT /api/v1/reviews/update accepting body
       const response = await api.put<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/update`, { reviewId, ...reviewData });
+      console.log('Update review response:', response.data);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -169,7 +180,9 @@ export const reviewService = {
 
   async deleteReview(reviewId: string): Promise<void> {
     try {
+      console.log('Deleting review:', reviewId);
       const response = await api.delete<JavaReviewResponse<void>>(`/api/v1/reviews/${reviewId}`);
+      console.log('Delete review response:', response.data);
 
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to delete review');
@@ -182,10 +195,12 @@ export const reviewService = {
 
   async markReviewHelpful(reviewId: string, helpful: boolean): Promise<Review> {
     try {
+      console.log('Marking review helpful:', reviewId, helpful);
       // Swagger shows POST /api/v1/reviews/{reviewId}/vote with payload
       const response = await api.post<JavaReviewResponse<JavaReview>>(`/api/v1/reviews/${reviewId}/vote`, {
         vote: helpful ? 'up' : 'down'
       });
+      console.log('Vote response:', response.data);
 
       if (response.data.success && response.data.data) {
         return transformJavaReview(response.data.data);
@@ -200,8 +215,10 @@ export const reviewService = {
 
   async getAverageRating(productId: string): Promise<{ averageRating: number; totalReviews: number }> {
     try {
+      console.log('Getting average rating for product:', productId);
       // Swagger shows GET /api/v1/reviews/product/{productId}/stats
       const response = await api.get<JavaReviewResponse<{ averageRating: number; totalReviews: number }>>(`/api/v1/reviews/product/${productId}/stats`);
+      console.log('Stats response:', response.data);
 
       if (response.data.success && response.data.data) {
         return response.data.data;
@@ -216,8 +233,10 @@ export const reviewService = {
 
   async getUserReviews(userId: string): Promise<Review[]> {
     try {
+      console.log('Getting user reviews for:', userId);
       // Backend exposes /api/v1/reviews/user for the authenticated user (no userId path segment)
       const response = await api.get<JavaReviewResponse<JavaReview[]>>(`/api/v1/reviews/user`);
+      console.log('User reviews response:', response.data);
 
       if (response.data.success && response.data.data) {
         return response.data.data.map(transformJavaReview);
