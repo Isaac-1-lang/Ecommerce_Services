@@ -6,11 +6,11 @@ import { AdminProtected } from '../../components/ProtectedRoute';
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex flex-col">
+      <div className="min-h-screen bg-light-bg-subtle dark:bg-neutral-900 flex flex-col">
         <AdminHeader />
         <div className="flex flex-1">
           <AdminSidebar />
-          <main className="flex-1 p-6 ml-64 bg-neutral-50 dark:bg-neutral-900">
+          <main className="flex-1 p-8 ml-64 bg-light-bg-subtle dark:bg-neutral-900">
             {children}
           </main>
         </div>

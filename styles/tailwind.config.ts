@@ -94,6 +94,74 @@ const config: Config = {
           900: '#1c1917',
           950: '#0c0a09',
         },
+        // Light Mode Specific Colors - Professional & Friendly
+        light: {
+          // Backgrounds - Soft, warm, professional
+          bg: {
+            primary: '#ffffff', // Pure white for main content
+            secondary: '#fefefe', // Slightly off-white for subtle contrast
+            tertiary: '#fafafa', // Very light gray for cards
+            quaternary: '#f8f9fa', // Light blue-gray for sections
+            elevated: '#ffffff', // White for elevated elements
+            subtle: '#f5f7fa', // Very light blue-gray for subtle backgrounds
+            warm: '#fefcf9', // Very light warm tint
+            cool: '#f8fafc', // Very light cool tint
+          },
+          // Surfaces - Cards, panels, containers
+          surface: {
+            primary: '#ffffff', // Main surface color
+            secondary: '#fefefe', // Secondary surface
+            tertiary: '#fafafa', // Tertiary surface
+            elevated: '#ffffff', // Elevated surface with shadow
+            card: '#ffffff', // Card background
+            panel: '#fefefe', // Panel background
+            modal: '#ffffff', // Modal background
+            sidebar: '#f8fafc', // Sidebar background
+          },
+          // Borders - Subtle, professional
+          border: {
+            primary: '#e5e7eb', // Main border color
+            secondary: '#f3f4f6', // Secondary border
+            tertiary: '#f9fafb', // Tertiary border
+            subtle: '#f1f5f9', // Very subtle border
+            accent: '#e0e7ff', // Accent border (blue tint)
+            success: '#d1fae5', // Success border
+            warning: '#fef3c7', // Warning border
+            error: '#fee2e2', // Error border
+          },
+          // Text - Professional, readable
+          text: {
+            primary: '#1f2937', // Main text - dark but not harsh
+            secondary: '#4b5563', // Secondary text
+            tertiary: '#6b7280', // Tertiary text
+            muted: '#9ca3af', // Muted text
+            subtle: '#d1d5db', // Very subtle text
+            inverse: '#ffffff', // Text on dark backgrounds
+            accent: '#3b82f6', // Accent text
+            success: '#059669', // Success text
+            warning: '#d97706', // Warning text
+            error: '#dc2626', // Error text
+          },
+          // Interactive elements
+          interactive: {
+            hover: '#f3f4f6', // Hover state
+            active: '#e5e7eb', // Active state
+            focus: '#dbeafe', // Focus state
+            selected: '#eff6ff', // Selected state
+            disabled: '#f9fafb', // Disabled state
+          },
+          // Shadows - Subtle, professional
+          shadow: {
+            sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+            soft: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.12)',
+            'soft-xl': '0 8px 32px rgba(0, 0, 0, 0.16)',
+          },
+        },
         // Ecommerce-specific colors - Refined and user-friendly
         'price': '#dc2626', // Muted red for prices (less aggressive)
         'deal': '#f59e0b', // Warm amber for deals

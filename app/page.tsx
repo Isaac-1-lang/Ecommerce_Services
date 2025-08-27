@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock, FiEye, FiShare2, FiMinus, FiPlus } from "react-icons/fi";
+import { FiArrowRight, FiStar, FiShoppingCart, FiHeart, FiImage, FiChevronLeft, FiChevronRight, FiTruck, FiShield, FiRefreshCw, FiClock, FiEye, FiShare2, FiMinus, FiPlus, FiPackage } from "react-icons/fi";
 import { getProducts } from "../services/productService";
 import { useCartStore } from "../features/cart/store";
 import { useWishlistStore } from "../features/wishlist/store";
@@ -238,11 +238,16 @@ function ProductCard({ product }: { product: Product }) {
   };
 
   // Ensure we have a valid product image
-  const productImage = !imageError && (product.primaryImage?.imageUrl || 
-    (typeof product.image === 'string' ? product.image : product.image?.imageUrl))
-    ? (product.primaryImage?.imageUrl || 
-        (typeof product.image === 'string' ? product.image : product.image?.imageUrl))
-    : getFallbackImage(product.category);
+  const getProductImage = (): string => {
+    if (!imageError && (product.primaryImage?.imageUrl || 
+        (typeof product.image === 'string' ? product.image : product.image?.imageUrl))) {
+      return (product.primaryImage?.imageUrl || 
+        (typeof product.image === 'string' ? product.image : product.image?.imageUrl)) || '';
+    }
+    return getFallbackImage(product.category || 'general');
+  };
+  
+  const productImage = getProductImage();
   const productCategory = product.category || 'General';
   const stockQuantity = product.stockQuantity || 10;
 
@@ -589,35 +594,38 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-16 bg-white dark:bg-gray-800">
+      <section className="py-20 bg-light-bg-subtle dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-light-text-primary dark:text-white mb-6">
               Featured Products
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Discover our handpicked selection of premium products
+            <p className="text-xl text-light-text-secondary dark:text-gray-400 max-w-3xl mx-auto">
+              Discover our handpicked selection of premium products that combine quality, style, and innovation
             </p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-80 animate-pulse" />
+                <div key={i} className="bg-light-interactive-disabled dark:bg-gray-700 rounded-2xl h-80 animate-pulse" />
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr">
               {featuredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">No featured products available</p>
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-light-interactive-disabled dark:bg-gray-700 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                <FiPackage className="h-10 w-10 text-light-text-muted dark:text-gray-400" />
+              </div>
+              <p className="text-lg text-light-text-secondary dark:text-gray-400 mb-6">No featured products available</p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-light-md hover:shadow-light-lg transform hover:scale-105"
               >
                 Browse All Products
                 <FiArrowRight className="h-5 w-5" />
@@ -626,10 +634,10 @@ export default function HomePage() {
           )}
           
           {featuredProducts.length > 0 && (
-            <div className="text-center mt-12">
+            <div className="text-center mt-16">
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary-600 text-white px-10 py-4 rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-light-md hover:shadow-light-lg transform hover:scale-105"
               >
                 View All Products
                 <FiArrowRight className="h-5 w-5" />
@@ -640,18 +648,18 @@ export default function HomePage() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-20 bg-light-bg-warm dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-light-text-primary dark:text-white mb-6">
               Shop by Category
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-light-text-secondary dark:text-gray-400 max-w-3xl mx-auto">
               Explore our wide range of categories and find exactly what you&apos;re looking for
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[
               { 
                 name: "Electronics", 
@@ -672,7 +680,7 @@ export default function HomePage() {
               <Link
                 key={category.name}
                 href={category.href}
-                className="group relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="group relative overflow-hidden rounded-2xl bg-light-surface-elevated dark:bg-gray-800 shadow-light-soft hover:shadow-light-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
               >
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <Image
@@ -680,12 +688,12 @@ export default function HomePage() {
                     alt={category.name}
                     width={600}
                     height={400}
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent group-hover:from-black/50 group-hover:via-black/30 transition-all duration-300"></div>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-3xl font-bold text-white drop-shadow-lg">
                     {category.name}
                   </h3>
                 </div>
@@ -696,7 +704,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-white dark:bg-gray-800">
+      <section className="py-20 bg-light-surface-primary dark:bg-gray-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">

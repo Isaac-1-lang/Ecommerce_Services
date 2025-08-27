@@ -33,45 +33,59 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-700 shadow-soft z-40">
+    <div className="fixed left-0 top-0 h-full w-64 bg-light-surface-sidebar dark:bg-neutral-900 border-r border-light-border-subtle dark:border-neutral-700 shadow-light-soft z-40">
       {/* Logo */}
-      <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
-        <Link href="/admin" className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <FiPackage className="h-5 w-5 text-white" />
+      <div className="p-8 border-b border-light-border-subtle dark:border-neutral-700">
+        <Link href="/admin" className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-2xl flex items-center justify-center shadow-light-md">
+            <FiPackage className="h-6 w-6 text-white" />
           </div>
-          <span className="text-xl font-bold text-neutral-800 dark:text-neutral-200">Admin Panel</span>
+          <div>
+            <span className="text-2xl font-bold text-light-text-primary dark:text-neutral-200 block">Admin Panel</span>
+            <span className="text-xs text-light-text-muted dark:text-neutral-400">Management Console</span>
+          </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2">
+      <nav className="p-6 space-y-3">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              className={`group flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary text-white shadow-soft'
-                  : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-800 dark:hover:text-neutral-200'
+                  ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-light-lg transform scale-105'
+                  : 'text-light-text-secondary dark:text-neutral-400 hover:bg-light-interactive-hover dark:hover:bg-neutral-800 hover:text-light-text-primary dark:hover:text-neutral-200 hover:shadow-light-sm'
               }`}
             >
-              <item.icon className="h-5 w-5" />
-              <span className="font-medium">{item.name}</span>
+              <div className={`p-2 rounded-lg transition-all duration-200 ${
+                isActive 
+                  ? 'bg-white/20' 
+                  : 'group-hover:bg-light-interactive-selected dark:group-hover:bg-neutral-700'
+              }`}>
+                <item.icon className={`h-5 w-5 ${
+                  isActive ? 'text-white' : 'text-light-text-tertiary dark:text-neutral-500'
+                }`} />
+              </div>
+              <span className="font-medium text-base">{item.name}</span>
             </Link>
           );
         })}
       </nav>
 
       {/* Quick Stats */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
+      <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-light-border-subtle dark:border-neutral-700 bg-light-surface-secondary dark:bg-neutral-800">
         <div className="text-center">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Store Status</p>
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-2 h-2 bg-success rounded-full"></div>
-            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Online</span>
+          <p className="text-xs text-light-text-muted dark:text-neutral-400 mb-2 font-medium">Store Status</p>
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-3 h-3 bg-success rounded-full shadow-light-sm"></div>
+            <span className="text-sm font-semibold text-light-text-primary dark:text-neutral-300">Online</span>
+          </div>
+          <div className="mt-2 text-xs text-light-text-muted dark:text-neutral-400">
+            Last updated: Just now
           </div>
         </div>
       </div>

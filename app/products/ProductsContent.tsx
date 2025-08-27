@@ -94,12 +94,12 @@ export default function ProductsContent() {
 
   if (loading) {
     return (
-      <div className="container-responsive py-6 lg:py-10">
+      <div className="container-responsive py-8 lg:py-12">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+          <div className="h-10 bg-light-interactive-disabled dark:bg-gray-700 rounded-xl w-1/4 mb-8"></div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-fr">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-80"></div>
+              <div key={i} className="bg-light-interactive-disabled dark:bg-gray-700 rounded-2xl h-80"></div>
             ))}
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function ProductsContent() {
   }
 
   return (
-    <div className="container-responsive py-6 lg:py-10">
+    <div className="container-responsive py-8 lg:py-12">
       <Breadcrumbs 
         items={[
           { label: "Home", href: "/" },
@@ -116,23 +116,23 @@ export default function ProductsContent() {
         ]} 
       />
       
-      <div className="mb-4 lg:mb-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">All Products</h1>
-        <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mt-1 lg:mt-2">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-3xl lg:text-4xl font-bold text-light-text-primary dark:text-white">All Products</h1>
+        <p className="text-base lg:text-lg text-light-text-secondary dark:text-gray-400 mt-2 lg:mt-3">
           Discover our collection of amazing products
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Mobile Filter Toggle */}
         <div className="lg:hidden">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mobile-touch-target"
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-light-surface-elevated dark:bg-gray-800 border border-light-border-subtle dark:border-gray-700 rounded-xl shadow-light-soft mobile-touch-target hover:shadow-light-md transition-all duration-200"
           >
-            <FiFilter className="h-4 w-4" />
-            <span className="text-sm font-medium">Filters</span>
-            <span className="text-xs text-gray-500">({getActiveFilterCount()})</span>
+            <FiFilter className="h-5 w-5 text-light-text-secondary dark:text-gray-400" />
+            <span className="text-base font-medium text-light-text-primary dark:text-white">Filters</span>
+            <span className="text-sm text-light-text-muted dark:text-gray-500">({getActiveFilterCount()})</span>
           </button>
         </div>
 
@@ -159,20 +159,22 @@ export default function ProductsContent() {
         </div>
 
         <main className="flex-1">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 lg:gap-4 mb-4 lg:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 lg:gap-6 mb-6 lg:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <CategoryFilter 
                 categories={categories}
                 selectedCategory={filters.category}
                 onCategoryChange={handleCategoryChange}
               />
-              <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
-                {products.length} products
-              </span>
+              <div className="flex items-center gap-2 px-3 py-2 bg-light-surface-secondary dark:bg-neutral-800 rounded-lg border border-light-border-subtle dark:border-neutral-700">
+                <span className="text-sm lg:text-base text-light-text-secondary dark:text-gray-400">
+                  {products.length} products
+                </span>
+              </div>
             </div>
             
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <span className="text-sm lg:text-base text-light-text-secondary dark:text-gray-400 font-medium">Sort by:</span>
               <SortDropdown 
                 value={sortBy}
                 onChange={handleSortChange}
@@ -181,16 +183,19 @@ export default function ProductsContent() {
           </div>
 
           {products.length === 0 ? (
-            <div className="text-center py-8 lg:py-12">
-              <h3 className="text-base lg:text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <div className="text-center py-12 lg:py-16">
+              <div className="w-20 h-20 bg-light-interactive-disabled dark:bg-gray-700 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                <FiFilter className="h-10 w-10 text-light-text-muted dark:text-gray-400" />
+              </div>
+              <h3 className="text-lg lg:text-xl font-semibold text-light-text-primary dark:text-white mb-3">
                 No products found
               </h3>
-              <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-base lg:text-lg text-light-text-secondary dark:text-gray-400 mb-6">
                 Try adjusting your filters or search terms
               </p>
               <button
                 onClick={clearFilters}
-                className="text-blue-600 hover:underline text-sm lg:text-base mobile-touch-target"
+                className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-600 transition-colors duration-200 font-medium mobile-touch-target"
               >
                 Clear all filters
               </button>

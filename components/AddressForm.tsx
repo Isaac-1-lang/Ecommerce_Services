@@ -150,235 +150,255 @@ export default function AddressForm({ data, onChange, onSubmit }: AddressFormPro
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-             <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 border border-gray-200 dark:border-gray-700">
-         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8">Shipping Information</h3>
-         
-         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          {/* First Name */}
-          <div>
-                       <label htmlFor="firstName" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             First Name *
-           </label>
-                         <input
-               type="text"
-               id="firstName"
-               value={formData.firstName}
-               onChange={(e) => handleInputChange('firstName', e.target.value)}
-               placeholder="John"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.firstName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={50}
-             />
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName}</p>
-            )}
-          </div>
-
-          {/* Last Name */}
-          <div>
-                       <label htmlFor="lastName" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             Last Name *
-           </label>
-                         <input
-               type="text"
-               id="lastName"
-               value={formData.lastName}
-               onChange={(e) => handleInputChange('lastName', e.target.value)}
-               placeholder="Doe"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.lastName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={50}
-             />
-            {errors.lastName && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-                       <label htmlFor="email" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             Email Address *
-           </label>
-                         <input
-               type="email"
-               id="email"
-               value={formData.email}
-               onChange={(e) => handleInputChange('email', e.target.value)}
-               placeholder="john.doe@example.com"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={100}
-             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Phone */}
-          <div>
-                       <label htmlFor="phone" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             Phone Number *
-           </label>
-                         <input
-               type="tel"
-               id="phone"
-               value={formData.phone}
-               onChange={(e) => handlePhoneChange(e.target.value)}
-               placeholder="+1234567890"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={15}
-             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Format: +1234567890 or 1234567890 (no spaces, dashes, or parentheses)
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {/* First Name */}
+        <div>
+          <label htmlFor="firstName" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            First Name *
+          </label>
+          <input
+            type="text"
+            id="firstName"
+            value={formData.firstName}
+            onChange={(e) => handleInputChange('firstName', e.target.value)}
+            placeholder="John"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.firstName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={50}
+          />
+          {errors.firstName && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.firstName}
             </p>
-            {errors.phone && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
-            )}
-          </div>
+          )}
+        </div>
 
-          {/* Address */}
-          <div className="sm:col-span-2">
-                       <label htmlFor="address" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             Street Address *
-           </label>
-                         <input
-               type="text"
-               id="address"
-               value={formData.address}
-               onChange={(e) => handleInputChange('address', e.target.value)}
-               placeholder="123 Main Street, Apt 4B"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.address ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={100}
-             />
-            {errors.address && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.address}</p>
-            )}
-          </div>
-
-          {/* City */}
-          <div>
-                       <label htmlFor="city" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             City *
-           </label>
-                         <input
-               type="text"
-               id="city"
-               value={formData.city}
-               onChange={(e) => handleInputChange('city', e.target.value)}
-               placeholder="New York"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.city ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={50}
-             />
-            {errors.city && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.city}</p>
-            )}
-          </div>
-
-          {/* State */}
-          <div>
-                       <label htmlFor="state" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             State/Province *
-           </label>
-                         <input
-               type="text"
-               id="state"
-               value={formData.state}
-               onChange={(e) => handleInputChange('state', e.target.value)}
-               placeholder="NY"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.state ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={50}
-             />
-            {errors.state && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.state}</p>
-            )}
-          </div>
-
-          {/* ZIP Code */}
-          <div>
-                       <label htmlFor="zipCode" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             ZIP/Postal Code *
-           </label>
-                         <input
-               type="text"
-               id="zipCode"
-               value={formData.zipCode}
-               onChange={(e) => handleZipCodeChange(e.target.value)}
-               placeholder="12345"
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.zipCode ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-               maxLength={10}
-             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Format: 12345 or 12345-6789
+        {/* Last Name */}
+        <div>
+          <label htmlFor="lastName" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Last Name *
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            value={formData.lastName}
+            onChange={(e) => handleInputChange('lastName', e.target.value)}
+            placeholder="Doe"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.lastName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={50}
+          />
+          {errors.lastName && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.lastName}
             </p>
-            {errors.zipCode && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.zipCode}</p>
-            )}
-          </div>
+          )}
+        </div>
 
-          {/* Country */}
-          <div>
-                       <label htmlFor="country" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
-             Country *
-           </label>
-                         <select
-               id="country"
-               value={formData.country}
-               onChange={(e) => handleInputChange('country', e.target.value)}
-               className={`mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
-                 errors.country ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
-               }`}
-             >
-              <option value="">Select a country</option>
-              <option value="United States">United States</option>
-              <option value="Canada">Canada</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="Germany">Germany</option>
-              <option value="France">France</option>
-              <option value="Australia">Australia</option>
-              <option value="Japan">Japan</option>
-              <option value="South Korea">South Korea</option>
-              <option value="Singapore">Singapore</option>
-              <option value="India">India</option>
-              <option value="Brazil">Brazil</option>
-              <option value="Mexico">Mexico</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.country && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.country}</p>
-            )}
-          </div>
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Email Address *
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="john.doe@example.com"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={100}
+          />
+          {errors.email && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.email}
+            </p>
+          )}
+        </div>
+
+        {/* Phone */}
+        <div>
+          <label htmlFor="phone" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Phone Number *
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            value={formData.phone}
+            onChange={(e) => handlePhoneChange(e.target.value)}
+            placeholder="+1234567890"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={15}
+          />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Format: +1234567890 or 1234567890 (no spaces, dashes, or parentheses)
+          </p>
+          {errors.phone && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.phone}
+            </p>
+          )}
+        </div>
+
+        {/* Address */}
+        <div className="sm:col-span-2">
+          <label htmlFor="address" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Street Address *
+          </label>
+          <input
+            type="text"
+            id="address"
+            value={formData.address}
+            onChange={(e) => handleInputChange('address', e.target.value)}
+            placeholder="123 Main Street, Apt 4B"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.address ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={100}
+          />
+          {errors.address && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.address}
+            </p>
+          )}
+        </div>
+
+        {/* City */}
+        <div>
+          <label htmlFor="city" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            City *
+          </label>
+          <input
+            type="text"
+            id="city"
+            value={formData.city}
+            onChange={(e) => handleInputChange('city', e.target.value)}
+            placeholder="New York"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.city ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={50}
+          />
+          {errors.city && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.city}
+            </p>
+          )}
+        </div>
+
+        {/* State */}
+        <div>
+          <label htmlFor="state" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            State/Province *
+          </label>
+          <input
+            type="text"
+            id="state"
+            value={formData.state}
+            onChange={(e) => handleInputChange('state', e.target.value)}
+            placeholder="NY"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.state ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={50}
+          />
+          {errors.state && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.state}
+            </p>
+          )}
+        </div>
+
+        {/* ZIP Code */}
+        <div>
+          <label htmlFor="zipCode" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            ZIP/Postal Code *
+          </label>
+          <input
+            type="text"
+            id="zipCode"
+            value={formData.zipCode}
+            onChange={(e) => handleZipCodeChange(e.target.value)}
+            placeholder="12345"
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.zipCode ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+            maxLength={10}
+          />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Format: 12345 or 12345-6789
+          </p>
+          {errors.zipCode && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.zipCode}
+            </p>
+          )}
+        </div>
+
+        {/* Country */}
+        <div>
+          <label htmlFor="country" className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            Country *
+          </label>
+          <select
+            id="country"
+            value={formData.country}
+            onChange={(e) => handleInputChange('country', e.target.value)}
+            className={`mt-1 block w-full rounded-xl border-2 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base px-4 py-3 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-all duration-200 ${
+              errors.country ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
+            }`}
+          >
+            <option value="">Select a country</option>
+            <option value="United States">United States</option>
+            <option value="Canada">Canada</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+            <option value="Australia">Australia</option>
+            <option value="Japan">Japan</option>
+            <option value="South Korea">South Korea</option>
+            <option value="Singapore">Singapore</option>
+            <option value="India">India</option>
+            <option value="Brazil">Brazil</option>
+            <option value="Mexico">Mexico</option>
+            <option value="Other">Other</option>
+          </select>
+          {errors.country && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+              {errors.country}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-xl shadow-lg text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02]"
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <div className="animate-spin -ml-1 mr-3 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
               Saving...
             </>
           ) : (
-            'Save Address'
+            'Save Address & Continue'
           )}
         </button>
       </div>
