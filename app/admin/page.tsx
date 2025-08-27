@@ -1,15 +1,72 @@
+"use client";
+
+import { useEffect, useState } from 'react';
 import { FiPackage, FiUsers, FiDollarSign, FiTrendingUp, FiAlertCircle, FiActivity, FiShield, FiCheckCircle } from 'react-icons/fi';
 import Link from 'next/link';
 import AdminTokenGenerator from '../../components/AdminTokenGenerator';
+import { productService } from '../../services/productService';
+import { orderService } from '../../services/orderService';
+
+type DashboardStats = {
+  totalProducts: number;
+  totalRevenue: number;
+  totalCustomers: number;
+  lowStockProducts: number;
+};
 
 export default function AdminDashboard() {
-  // Mock data - replace with real data from your backend
-  const stats = {
-    totalProducts: 5,
+  const [stats, setStats] = useState<DashboardStats>({
+    totalProducts: 0,
     totalRevenue: 0,
     totalCustomers: 0,
-    lowStockProducts: 0
-  };
+    lowStockProducts: 0,
+  });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [productsResult, ordersResult] = await Promise.allSettled([
+          productService.list(),
+          orderService.getOrders(),
+        ]);
+
+        const products = productsResult.status === 'fulfilled' ? productsResult.value : [];
+        const orders = ordersResult.status === 'fulfilled' ? ordersResult.value : [];
+
+        const totalProducts = products.length;
+        const lowStockProducts = products.filter((p: any) => (p?.stockQuantity ?? 0) < 10).length;
+        const totalRevenue = orders.reduce((sum: number, o: any) => sum + (Number(o?.total) || 0), 0);
+        // Customers endpoint not implemented yet; fallback to unique buyers inferred from orders
+        const uniqueCustomers = new Set<string>(
+          orders.map((o: any) => String(o?.userId || ''))
+        );
+
+        if (isMounted) {
+          setStats({
+            totalProducts,
+            totalRevenue,
+            totalCustomers: uniqueCustomers.has('') ? uniqueCustomers.size - 1 : uniqueCustomers.size,
+            lowStockProducts,
+          });
+        }
+      } catch (e: any) {
+        if (isMounted) setError(e?.message || 'Failed to load dashboard stats');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const quickActions = [
     { title: 'Add New Product', href: '/admin/products/new', icon: FiPackage, color: 'bg-gradient-to-br from-primary to-primary-600', description: 'Create new product listings' },
@@ -40,7 +97,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-light-text-secondary dark:text-neutral-400 mb-2">Total Products</p>
-              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">{stats.totalProducts}</p>
+              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">{loading ? '—' : stats.totalProducts}</p>
               <p className="text-xs text-light-text-muted dark:text-neutral-400 mt-1">Active listings</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -53,7 +110,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-light-text-secondary dark:text-neutral-400 mb-2">Total Revenue</p>
-              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">${stats.totalRevenue.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">{loading ? '—' : `$${stats.totalRevenue.toLocaleString()}`}</p>
               <p className="text-xs text-light-text-muted dark:text-neutral-400 mt-1">This month</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-success/10 to-success/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -66,7 +123,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-light-text-secondary dark:text-neutral-400 mb-2">Total Customers</p>
-              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">{stats.totalCustomers}</p>
+              <p className="text-3xl font-bold text-light-text-primary dark:text-neutral-200">{loading ? '—' : stats.totalCustomers}</p>
               <p className="text-xs text-light-text-muted dark:text-neutral-400 mt-1">Registered users</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-warning/10 to-warning/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -83,7 +140,7 @@ export default function AdminDashboard() {
                 <div className="w-3 h-3 bg-success rounded-full"></div>
                 <span className="text-lg font-bold text-success">Online</span>
               </div>
-              <p className="text-xs text-light-text-muted dark:text-neutral-400 mt-1">All systems operational</p>
+              <p className="text-xs text-light-text-muted dark:text-neutral-400 mt-1">{loading ? 'Loading stats…' : 'All systems operational'}</p>
             </div>
             <div className="p-4 bg-gradient-to-br from-success/10 to-success/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
               <FiCheckCircle className="h-8 w-8 text-success" />
@@ -141,7 +198,15 @@ export default function AdminDashboard() {
             <div className="w-1 h-8 bg-gradient-to-b from-warning to-transparent rounded-full"></div>
           </div>
           <div className="space-y-4">
-            {stats.lowStockProducts > 0 ? (
+            {loading ? (
+              <div className="text-center py-12 text-light-text-muted dark:text-neutral-400">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <FiActivity className="h-8 w-8 text-primary animate-pulse" />
+                </div>
+                <p className="font-semibold text-lg text-light-text-primary dark:text-neutral-200 mb-2">Loading system stats…</p>
+                <p className="text-sm">Fetching latest metrics</p>
+              </div>
+            ) : stats.lowStockProducts > 0 ? (
               <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-warning/10 to-warning/5 border border-warning/20 rounded-xl">
                 <div className="p-3 bg-warning/20 rounded-xl">
                   <FiAlertCircle className="h-6 w-6 text-warning" />
