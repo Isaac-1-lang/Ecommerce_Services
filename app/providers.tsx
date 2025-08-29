@@ -16,7 +16,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, [initializeAuthStore]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         <NotificationProvider>
           <AuthProvider>

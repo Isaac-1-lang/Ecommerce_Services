@@ -20,10 +20,24 @@ export const mediaService = {
   },
 
   async uploadImages(files: File[]): Promise<FileUploadResponseDTO[]> {
-    const fd = new FormData();
-    files.forEach(f => fd.append("files", f));
-    const resp = await api.post(`/api/v1/media/upload/images`, fd, { headers: { "Content-Type": "multipart/form-data" } });
-    return resp.data as FileUploadResponseDTO[];
+    try {
+      const fd = new FormData();
+      files.forEach(f => fd.append("files", f));
+      const resp = await api.post(`/api/v1/media/upload/images`, fd, { headers: { "Content-Type": "multipart/form-data" } });
+      return resp.data as FileUploadResponseDTO[];
+    } catch (error) {
+      // Fallback: upload one-by-one using single-file endpoint
+      const results: FileUploadResponseDTO[] = [];
+      for (const file of files) {
+        try {
+          const single = await this.uploadImage(file);
+          results.push(single);
+        } catch (e) {
+          results.push({ error: 'upload_failed', errorMessage: (e as any)?.message });
+        }
+      }
+      return results;
+    }
   },
 
   async uploadVideo(file: File): Promise<FileUploadResponseDTO> {

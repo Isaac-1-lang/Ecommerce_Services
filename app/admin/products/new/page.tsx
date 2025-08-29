@@ -5,13 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiArrowLeft, FiUpload, FiX, FiSave, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { productService, CreateProductData } from '../../../../services/productService';
+import { mediaService } from '../../../../services/mediaService';
 
 export default function NewProductPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [creationStartTime, setCreationStartTime] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [categories, setCategories] = useState<Array<{id: number, name: string, slug: string}>>([]);
   const [warehouses, setWarehouses] = useState<Array<{id: number, name: string, location: string}>>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -87,32 +92,95 @@ export default function NewProductPage() {
 
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Load categories on component mount
   useEffect(() => {
     const loadData = async () => {
+      setIsLoadingData(true);
+      setDataError(null);
+      
       try {
+        console.log('Loading categories and warehouses...');
+        
         const [categoriesData, warehousesData] = await Promise.all([
           productService.getCategories(),
           productService.getWarehouses()
         ]);
+        
+        console.log('Categories loaded:', categoriesData);
+        console.log('Warehouses loaded:', warehousesData);
+        
         setCategories(categoriesData);
         setWarehouses(warehousesData);
+        
+        // If no categories loaded, set some defaults
+        if (!categoriesData || categoriesData.length === 0) {
+          console.warn('No categories loaded from API, setting defaults');
+          setCategories([
+            { id: 1, name: 'Electronics', slug: 'electronics' },
+            { id: 2, name: 'Fashion', slug: 'fashion' },
+            { id: 3, name: 'Home & Garden', slug: 'home-garden' },
+            { id: 4, name: 'Sports & Outdoors', slug: 'sports-outdoors' },
+            { id: 5, name: 'Beauty & Health', slug: 'beauty-health' }
+          ]);
+        }
+        
       } catch (error) {
         console.error('Failed to load data:', error);
+        setDataError('Failed to load categories and warehouses from server');
+        
+        // Set default categories on error
+        console.warn('Setting default categories due to API error');
+        setCategories([
+          { id: 1, name: 'Electronics', slug: 'electronics' },
+          { id: 2, name: 'Fashion', slug: 'fashion' },
+          { id: 3, name: 'Home & Garden', slug: 'home-garden' },
+          { id: 4, name: 'Sports & Outdoors', slug: 'sports-outdoors' },
+          { id: 5, name: 'Beauty & Health', slug: 'beauty-health' }
+        ]);
+      } finally {
+        setIsLoadingData(false);
       }
     };
     
     loadData();
   }, []);
 
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'name':
+        return !value || value.trim() === '' ? 'Product name is required' : '';
+      case 'sku':
+        if (!value || value.trim() === '') return 'SKU is required';
+        if (value.trim().length < 3) return 'SKU must be at least 3 characters long';
+        return '';
+      case 'basePrice':
+        if (!value || value.trim() === '') return 'Base price is required';
+        if (parseFloat(value) <= 0) return 'Base price must be greater than 0';
+        return '';
+      case 'category':
+        return !value || value.trim() === '' ? 'Category is required' : '';
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
+      
+      // Validate field and update errors
+      const error = validateField(name, value);
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: error
+      }));
     }
   };
 
@@ -139,39 +207,65 @@ export default function NewProductPage() {
     return `${namePart}-${timestamp}`;
   };
 
-  // Get category ID from selected category
-  const getCategoryId = (categorySlug: string): number => {
-    const category = categories.find(cat => cat.slug === categorySlug);
-    if (!category) {
-      console.error('Category not found for slug:', categorySlug);
-      console.log('Available categories:', categories);
-      throw new Error(`Category not found: ${categorySlug}`);
-    }
-    return category.id;
-  };
+        // Get category ID from selected category
+      const getCategoryId = (categorySlug: string): number => {
+        if (!categorySlug || categorySlug.trim() === '') {
+          throw new Error('Category is required');
+        }
+        
+        const category = categories.find(cat => cat.slug === categorySlug);
+        if (!category) {
+          console.error('Category not found for slug:', categorySlug);
+          console.log('Available categories:', categories);
+          throw new Error(`Category not found: ${categorySlug}`);
+        }
+        return category.id;
+      };
 
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsCreating(true);
     setMessage(null);
 
     try {
-      // Validate required fields
-      if (!formData.name || !formData.basePrice || !formData.category) {
-        throw new Error('Please fill in all required fields: Name, Base Price, and Category');
+      // Validate required fields using helper function
+      const validationErrors = validateFormData();
+      if (validationErrors.length > 0) {
+        throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
       }
 
       // Set default values for optional fields
       const defaultStockQuantity = formData.stockQuantity ? parseInt(formData.stockQuantity) : 0;
       const defaultDescription = formData.description || `${formData.name} - Product description coming soon`;
 
-      // Prepare product data
+      // Note: productData will be created after images are processed
+
+      // 1) Upload media first to get URLs
+      let uploadedImages: any[] = [];
+      try {
+        uploadedImages = images.length > 0 ? await mediaService.uploadImages(images) : [];
+      } catch (e) {
+        console.error('Bulk upload failed:', e);
+        uploadedImages = [];
+      }
+
+      // Process uploaded images for multipart endpoint
+      const processedImages = uploadedImages
+        .map((resp, index) => ({
+          url: (resp?.secureUrl || resp?.url || ''),
+          altText: `${formData.name} - Image ${index + 1}`,
+          isPrimary: index === 0,
+          sortOrder: index
+        }))
+        .filter(img => !!img.url);
+
+      // Prepare product data after images are processed
       const productData: CreateProductData = {
         name: formData.name,
         description: defaultDescription,
-        sku: formData.sku || generateSKU(formData.name),
+        sku: formData.sku.trim(), // Ensure SKU is a string and trimmed
         basePrice: parseFloat(formData.basePrice),
         salePrice: formData.salePrice ? parseFloat(formData.salePrice) : undefined,
         costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
@@ -203,22 +297,6 @@ export default function NewProductPage() {
         barcode: formData.barcode || undefined,
         discountId: formData.discountId || undefined,
         model: formData.model || undefined,
-        warehouseStock: formData.warehouseStock.length > 0 ? formData.warehouseStock.map(ws => ({
-          warehouseId: parseInt(ws.warehouseId),
-          stockQuantity: parseInt(ws.stockQuantity),
-          lowStockThreshold: parseInt(ws.lowStockThreshold),
-          reorderPoint: parseInt(ws.reorderPoint),
-          warehousePrice: parseFloat(formData.basePrice),
-          warehouseCostPrice: formData.costPrice ? parseFloat(formData.costPrice) : parseFloat(formData.basePrice) * 0.7,
-          isAvailable: true,
-          notes: `Stock assigned from ${formData.name} creation`
-        })) : undefined,
-        productImages: images.length > 0 ? images : undefined,
-        imageMetadata: images.map((_, index) => ({
-          altText: `${formData.name} - Image ${index + 1}`,
-          isPrimary: index === 0,
-          sortOrder: index
-        })),
         variants: formData.variants.length > 0 ? formData.variants.map((variant, index) => ({
           variantSku: variant.variantSku || `${formData.sku || generateSKU(formData.name)}-VAR-${index + 1}`,
           price: variant.price ? parseFloat(variant.price) : parseFloat(formData.basePrice),
@@ -241,26 +319,54 @@ export default function NewProductPage() {
           isInStock: true,
           isBackorderable: false
         })) : undefined,
+        // Add images as File objects for multipart endpoint
+        productImages: images,
+        imageMetadata: processedImages.map(img => ({
+          altText: img.altText,
+          isPrimary: img.isPrimary,
+          sortOrder: img.sortOrder
+        })),
+        // videos and video metadata handled by separate upload flow
         productVideos: formData.productVideos ? [formData.productVideos] : undefined,
-        videoMetadata: formData.videoMetadata || undefined
+        videoMetadata: formData.productVideos || undefined
       };
+
+      // Validate critical data types before sending
+      console.log('Validating product data types...');
+      if (typeof productData.categoryId !== 'number' || isNaN(productData.categoryId)) {
+        throw new Error(`Invalid categoryId: ${productData.categoryId} (expected number)`);
+      }
+      if (typeof productData.basePrice !== 'number' || isNaN(productData.basePrice)) {
+        throw new Error(`Invalid basePrice: ${productData.basePrice} (expected number)`);
+      }
+      if (typeof productData.stockQuantity !== 'number' || isNaN(productData.stockQuantity)) {
+        throw new Error(`Invalid stockQuantity: ${productData.stockQuantity} (expected number)`);
+      }
+      if (typeof productData.sku !== 'string' || productData.sku.trim() === '') {
+        throw new Error(`Invalid SKU: ${productData.sku} (expected non-empty string)`);
+      }
+      console.log('✅ Product data validation passed');
 
       // Debug logging - show exactly what we're sending
       console.log('=== PRODUCT CREATION DEBUG ===');
       console.log('Form Data:', formData);
       console.log('Processed Product Data:', productData);
       console.log('Images:', images);
+      console.log('Uploaded Images:', uploadedImages);
+      console.log('Processed Images:', processedImages);
       console.log('Warehouse Stock:', formData.warehouseStock);
       console.log('Variants:', formData.variants);
       console.log('=== END DEBUG ===');
 
-      // Create product
-      const createdProduct = await productService.createProduct(productData);
+      // Note: We're now using the multipart endpoint which handles the data structure automatically
+
+      // 3) Create product via multipart endpoint (correct for backend API)
+      const created = await productService.createProduct(productData);
 
       // Show success message
       setMessage({
         type: 'success',
-        text: `Product "${createdProduct.name}" created successfully! Redirecting to products list...`
+        text: `Product "${formData.name}" created successfully! Redirecting to products list...`
       });
 
       // Redirect after 2 seconds
@@ -275,8 +381,38 @@ export default function NewProductPage() {
         text: error.message || 'Failed to create product. Please try again.'
       });
     } finally {
-      setIsLoading(false);
+      setIsCreating(false);
     }
+  };
+
+  // Helper function to validate form data
+  const validateFormData = () => {
+    const errors: string[] = [];
+    
+    if (!formData.name || formData.name.trim() === '') {
+      errors.push('Product name is required');
+    }
+    
+    if (!formData.basePrice || parseFloat(formData.basePrice) <= 0) {
+      errors.push('Base price is required and must be greater than 0');
+    }
+    
+    if (!formData.category || formData.category.trim() === '') {
+      errors.push('Category is required');
+    }
+    
+    if (!formData.sku || formData.sku.trim() === '') {
+      errors.push('SKU is required');
+    } else if (formData.sku.trim().length < 3) {
+      errors.push('SKU must be at least 3 characters long');
+    }
+    
+    return errors;
+  };
+
+  // Check if form is valid for submission
+  const isFormValid = () => {
+    return validateFormData().length === 0;
   };
 
   const selectedCategory = categories.find(cat => cat.slug === formData.category);
@@ -315,6 +451,14 @@ export default function NewProductPage() {
         </div>
       )}
 
+      {/* Progress Message */}
+      {isCreating && (
+        <div className="p-4 rounded-lg bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="font-medium">Creating product... This may take a few moments. Please don't close this page.</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <div className="bg-white p-6 rounded-xl shadow-soft border border-neutral-200">
@@ -330,9 +474,14 @@ export default function NewProductPage() {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                  fieldErrors.name ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-primary'
+                }`}
                 placeholder="Enter product name"
               />
+              {fieldErrors.name && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -400,29 +549,78 @@ export default function NewProductPage() {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                disabled={isLoadingData}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                  fieldErrors.category ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-primary'
+                } ${isLoadingData ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <option value="">Select category</option>
+                <option value="">
+                  {isLoadingData ? 'Loading categories...' : 'Select category'}
+                </option>
                 {categories.map(category => (
                   <option key={category.id} value={category.slug}>
                     {category.name}
                   </option>
                 ))}
               </select>
+              {fieldErrors.category && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.category}</p>
+              )}
+              {dataError && (
+                <div className="mt-2">
+                  <p className="text-amber-600 text-sm mb-2">
+                    ⚠️ {dataError} - Using default categories
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLoadingData(true);
+                      setDataError(null);
+                      // Reload data
+                      const loadData = async () => {
+                        try {
+                          const [categoriesData, warehousesData] = await Promise.all([
+                            productService.getCategories(),
+                            productService.getWarehouses()
+                          ]);
+                          setCategories(categoriesData);
+                          setWarehouses(warehousesData);
+                        } catch (error) {
+                          console.error('Retry failed:', error);
+                          setDataError('Retry failed - still using default categories');
+                        } finally {
+                          setIsLoadingData(false);
+                        }
+                      };
+                      loadData();
+                    }}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    disabled={isLoadingData}
+                  >
+                    {isLoadingData ? 'Retrying...' : 'Retry loading categories'}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                SKU (optional)
+                SKU *
               </label>
               <input
                 type="text"
                 name="sku"
                 value={formData.sku}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="Auto-generated if left empty"
+                required
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                  fieldErrors.sku ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-primary'
+                }`}
+                placeholder="Enter unique product SKU"
               />
+              {fieldErrors.sku && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.sku}</p>
+              )}
             </div>
 
             <div>
@@ -437,9 +635,14 @@ export default function NewProductPage() {
                 required
                 step="0.01"
                 min="0"
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                  fieldErrors.basePrice ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-primary'
+                }`}
                 placeholder="0.00"
               />
+              {fieldErrors.basePrice && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.basePrice}</p>
+              )}
             </div>
 
             <div>
@@ -1268,22 +1471,44 @@ export default function NewProductPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-4">
-          <Link
-            href="/admin/products"
-            className="px-6 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
-          >
-            Cancel
-          </Link>
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-neutral-600">
+            {!isFormValid() && (
+              <div className="flex items-center gap-2 text-amber-600">
+                <FiAlertCircle className="h-4 w-4" />
+                <span>Please fill in all required fields to continue</span>
+              </div>
+            )}
+            {isFormValid() && (
+              <div className="flex items-center gap-2 text-green-600">
+                <FiCheckCircle className="h-4 w-4" />
+                <span>All required fields are filled</span>
+              </div>
+            )}
+            {isFormValid() && (
+              <div className="flex items-center gap-2 text-blue-600 mt-2">
+                <FiAlertCircle className="h-4 w-4" />
+                <span>Note: Product creation may take up to 60 seconds</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/products"
+              className="px-6 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+            >
+              Cancel
+            </Link>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isCreating || !isFormValid()}
             className="bg-primary hover:bg-primary-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
           >
-            {isLoading ? (
+            {isCreating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Creating...
+                Creating Product...
               </>
             ) : (
               <>
@@ -1293,6 +1518,7 @@ export default function NewProductPage() {
             )}
           </button>
         </div>
+      </div>
       </form>
     </div>
   );

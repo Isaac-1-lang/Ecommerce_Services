@@ -1,20 +1,8 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { FiStar, FiHeart, FiShoppingCart, FiSearch, FiGrid, FiList, FiFilter } from 'react-icons/fi';
-
-interface Brand {
-  id: string;
-  name: string;
-  logo: string;
-  description: string;
-  productCount: number;
-  rating: number;
-  reviewCount: number;
-  featured: boolean;
-  category: string;
-}
+import { brandService, type Brand } from '../../services/brandService';
 
 interface BrandProduct {
   id: string;
@@ -39,144 +27,20 @@ interface BrandProduct {
   discount?: number;
 }
 
-const mockBrands: Brand[] = [
-  {
-    id: '1',
-    name: 'Apple',
-    logo: '/api/placeholder/100/100',
-    description: 'Think Different. Premium technology and innovation.',
-    productCount: 45,
-    rating: 4.8,
-    reviewCount: 1250,
-    featured: true,
-    category: 'Electronics'
-  },
-  {
-    id: '2',
-    name: 'Nike',
-    logo: '/api/placeholder/100/100',
-    description: 'Just Do It. Athletic footwear and apparel.',
-    productCount: 89,
-    rating: 4.6,
-    reviewCount: 2100,
-    featured: true,
-    category: 'Fashion'
-  },
-  {
-    id: '3',
-    name: 'Samsung',
-    logo: '/api/placeholder/100/100',
-    description: 'Innovation for everyone. Smart technology solutions.',
-    productCount: 67,
-    rating: 4.5,
-    reviewCount: 980,
-    featured: true,
-    category: 'Electronics'
-  },
-  {
-    id: '4',
-    name: 'Adidas',
-    logo: '/api/placeholder/100/100',
-    description: 'Impossible is nothing. Sportswear and lifestyle.',
-    productCount: 72,
-    rating: 4.4,
-    reviewCount: 1650,
-    featured: false,
-    category: 'Fashion'
-  },
-  {
-    id: '5',
-    name: 'Sony',
-    logo: '/api/placeholder/100/100',
-    description: 'Make.Believe. Premium audio and visual technology.',
-    productCount: 34,
-    rating: 4.7,
-    reviewCount: 720,
-    featured: false,
-    category: 'Electronics'
-  },
-  {
-    id: '6',
-    name: 'Levi\'s',
-    logo: '/api/placeholder/100/100',
-    description: 'Quality never goes out of style. Denim and casual wear.',
-    productCount: 56,
-    rating: 4.3,
-    reviewCount: 890,
-    featured: false,
-    category: 'Fashion'
-  },
-  {
-    id: '7',
-    name: 'Dyson',
-    logo: '/api/placeholder/100/100',
-    description: 'Solve the seemingly unsolvable. Home technology.',
-    productCount: 23,
-    rating: 4.6,
-    reviewCount: 450,
-    featured: false,
-    category: 'Home & Garden'
-  },
-  {
-    id: '8',
-    name: 'Canon',
-    logo: '/api/placeholder/100/100',
-    description: 'Delighting you always. Photography and imaging.',
-    productCount: 28,
-    rating: 4.5,
-    reviewCount: 380,
-    featured: false,
-    category: 'Electronics'
-  }
-];
 
-const mockBrandProducts: BrandProduct[] = [
-  {
-    id: '1',
-    name: 'Apple iPhone 15 Pro',
-    price: 1199.99,
-    originalPrice: 1299.99,
-    image: '/api/placeholder/300/300',
-    rating: 4.8,
-    reviewCount: 156,
-    discount: 8
-  },
-  {
-    id: '2',
-    name: 'Nike Air Max 270',
-    price: 129.99,
-    image: '/api/placeholder/300/300',
-    rating: 4.6,
-    reviewCount: 234
-  },
-  {
-    id: '3',
-    name: 'Samsung Galaxy S24',
-    price: 999.99,
-    image: '/api/placeholder/300/300',
-    rating: 4.7,
-    reviewCount: 89
-  },
-  {
-    id: '4',
-    name: 'Adidas Ultraboost 22',
-    price: 189.99,
-    originalPrice: 219.99,
-    image: '/api/placeholder/300/300',
-    rating: 4.5,
-    reviewCount: 178,
-    discount: 14
-  }
-];
 
 export default function BrandsPage() {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandProducts, setBrandProducts] = useState<BrandProduct[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredBrands = mockBrands.filter(brand => {
+  const filteredBrands = brands.filter(brand => {
     const matchesSearch = brand.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || brand.category.toLowerCase() === categoryFilter.toLowerCase();
     return matchesSearch && matchesCategory;
@@ -188,7 +52,40 @@ export default function BrandsPage() {
     return b.rating - a.rating;
   });
 
-  const categories = [...new Set(mockBrands.map(brand => brand.category))];
+  const categories = [...new Set(brands.map(brand => brand.category))];
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBrands = async () => {
+      try {
+        setLoading(true);
+        const data = await brandService.list();
+        if (isMounted) setBrands(data);
+      } catch (e) {
+        if (isMounted) setError('Failed to load brands');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchBrands();
+    return () => { isMounted = false; };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
+        <div className="text-center text-neutral-600 dark:text-neutral-300">Loading brands...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
+        <div className="text-center text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
@@ -344,14 +241,19 @@ export default function BrandsPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {mockBrandProducts.map((product) => (
+              {brandProducts.length === 0 ? (
+                <div className="col-span-full text-center text-neutral-600 dark:text-neutral-300 py-8">
+                  No products found for this brand yet.
+                </div>
+              ) : (
+              brandProducts.map((product) => (
                 <div key={product.id} className="bg-neutral-50 dark:bg-neutral-700 rounded-lg overflow-hidden group">
                   <div className="relative">
                                          <img
-                       src={product.primaryImage?.imageUrl || (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || ''}
-                       alt={product.name}
-                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                     />
+                      src={product.primaryImage?.imageUrl || (typeof product.image === 'string' ? product.image : product.image?.imageUrl) || ''}
+                      alt={product.name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                     {product.discount && (
                       <div className="absolute top-3 right-3">
                         <span className="bg-danger text-white px-2 py-1 text-xs font-semibold rounded-full">
@@ -394,7 +296,8 @@ export default function BrandsPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { Product } from "../types/product";
-import api from "../lib/api";
+import api, { productApi } from "../lib/api";
 import { JavaPaginationResponse, formatJavaDate } from "../lib/javaIntegration";
 import { ManyProductsDto } from "../types/product"; // Added import for ManyProductsDto
 
@@ -155,6 +155,85 @@ export interface CreateProductData {
     }>;
   }>;
   dimensionsCm?: string;
+}
+
+// JSON payload schema for backend product creation
+export interface BackendProductImage {
+  imageId?: number;
+  url: string;
+  altText?: string;
+  isPrimary?: boolean;
+  sortOrder?: number;
+}
+
+export interface BackendProductVideo {
+  videoId?: number;
+  url: string;
+  title?: string;
+  description?: string;
+  sortOrder?: number;
+  durationSeconds?: number;
+}
+
+export interface BackendVariantAttribute {
+  attributeValueId?: number;
+  attributeValue: string;
+  attributeTypeId?: number;
+  attributeType: string;
+}
+
+export interface BackendProductVariant {
+  variantId?: number;
+  variantSku: string;
+  variantName?: string;
+  variantBarcode?: string;
+  price: number;
+  salePrice?: number;
+  costPrice?: number;
+  stockQuantity: number;
+  isActive?: boolean;
+  isInStock?: boolean;
+  isLowStock?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  images?: BackendProductImage[];
+  attributes?: BackendVariantAttribute[];
+}
+
+export interface BackendProductPayload {
+  productId?: string;
+  name: string;
+  description: string;
+  sku: string;
+  barcode?: string;
+  basePrice: number;
+  salePrice?: number;
+  discountedPrice?: number;
+  stockQuantity: number;
+  categoryId: number;
+  categoryName?: string;
+  brandId?: string;
+  brandName?: string;
+  model?: string;
+  slug?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  isBestseller?: boolean;
+  isNewArrival?: boolean;
+  isOnSale?: boolean;
+  averageRating?: number;
+  reviewCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  images?: BackendProductImage[];
+  videos?: BackendProductVideo[];
+  variants?: BackendProductVariant[];
+  fullDescription?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  dimensionsCm?: string;
+  weightKg?: number;
 }
 
 // Transform Java product to frontend product format
@@ -460,36 +539,47 @@ export const productService = {
     try {
       const formData = new FormData();
       
-      // Add basic product data
+      // Add basic product data - ensure correct data types for backend
       formData.append('name', productData.name);
       formData.append('description', productData.description);
       formData.append('sku', productData.sku);
       if (productData.barcode) formData.append('barcode', productData.barcode);
+      
+      // Numbers should be sent as strings but ensure they're valid numbers
       formData.append('basePrice', productData.basePrice.toString());
       if (productData.salePrice) formData.append('salePrice', productData.salePrice.toString());
       if (productData.costPrice) formData.append('costPrice', productData.costPrice.toString());
       formData.append('stockQuantity', productData.stockQuantity.toString());
       if (productData.lowStockThreshold) formData.append('lowStockThreshold', productData.lowStockThreshold.toString());
+      
+      // Integer should be sent as string
       formData.append('categoryId', productData.categoryId.toString());
+      
       if (productData.brandId) formData.append('brandId', productData.brandId);
       if (productData.discountId) formData.append('discountId', productData.discountId);
       if (productData.model) formData.append('model', productData.model);
       if (productData.slug) formData.append('slug', productData.slug);
+      
+      // Booleans should be sent as strings "true"/"false" for backend parsing
       if (productData.isActive !== undefined) formData.append('isActive', productData.isActive.toString());
       if (productData.isFeatured !== undefined) formData.append('isFeatured', productData.isFeatured.toString());
       if (productData.isBestseller !== undefined) formData.append('isBestseller', productData.isBestseller.toString());
       if (productData.isNewArrival !== undefined) formData.append('isNewArrival', productData.isNewArrival.toString());
       if (productData.isOnSale !== undefined) formData.append('isOnSale', productData.isOnSale.toString());
+      
       if (productData.salePercentage) formData.append('salePercentage', productData.salePercentage.toString());
       if (productData.fullDescription) formData.append('fullDescription', productData.fullDescription);
       if (productData.metaTitle) formData.append('metaTitle', productData.metaTitle);
       if (productData.metaDescription) formData.append('metaDescription', productData.metaDescription);
       if (productData.metaKeywords) formData.append('metaKeywords', productData.metaKeywords);
       if (productData.searchKeywords) formData.append('searchKeywords', productData.searchKeywords);
+      
+      // Numbers should be sent as strings
       if (productData.heightCm) formData.append('heightCm', productData.heightCm.toString());
       if (productData.widthCm) formData.append('widthCm', productData.widthCm.toString());
       if (productData.lengthCm) formData.append('lengthCm', productData.lengthCm.toString());
       if (productData.weightKg) formData.append('weightKg', productData.weightKg.toString());
+      
       if (productData.material) formData.append('material', productData.material);
       if (productData.careInstructions) formData.append('careInstructions', productData.careInstructions);
       if (productData.warrantyInfo) formData.append('warrantyInfo', productData.warrantyInfo);
@@ -588,6 +678,151 @@ export const productService = {
         variantsCount: productData.variants?.length || 0
       });
 
+      // Log the actual FormData contents
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: ${value} (type: ${typeof value})`);
+      }
+      
+      // NEW: Enhanced FormData logging with detailed breakdown
+      console.log('🔍 === FORM DATA BREAKDOWN ===');
+      console.log('📋 BASIC PRODUCT FIELDS:');
+      const basicFields = ['name', 'description', 'sku', 'barcode', 'basePrice', 'salePrice', 'costPrice', 'stockQuantity', 'lowStockThreshold', 'categoryId', 'brandId', 'discountId', 'model', 'slug'];
+      basicFields.forEach(field => {
+        const value = formData.get(field);
+        if (value !== null) {
+          console.log(`  ✅ ${field}: ${value} (${typeof value})`);
+        }
+      });
+      
+      console.log('📋 BOOLEAN FIELDS:');
+      const booleanFields = ['isActive', 'isFeatured', 'isBestseller', 'isNewArrival', 'isOnSale'];
+      booleanFields.forEach(field => {
+        const value = formData.get(field);
+        if (value !== null) {
+          console.log(`  ✅ ${field}: ${value} (${typeof value})`);
+        }
+      });
+      
+      console.log('📋 NUMERIC FIELDS:');
+      const numericFields = ['salePercentage', 'heightCm', 'widthCm', 'lengthCm', 'weightKg'];
+      numericFields.forEach(field => {
+        const value = formData.get(field);
+        if (value !== null) {
+          console.log(`  ✅ ${field}: ${value} (${typeof value})`);
+        }
+      });
+      
+      console.log('📋 TEXT FIELDS:');
+      const textFields = ['fullDescription', 'metaTitle', 'metaDescription', 'metaKeywords', 'searchKeywords', 'material', 'careInstructions', 'warrantyInfo', 'shippingInfo', 'returnPolicy'];
+      textFields.forEach(field => {
+        const value = formData.get(field);
+        if (value !== null) {
+          console.log(`  ✅ ${field}: ${value} (${typeof value})`);
+        }
+      });
+      
+      console.log('📋 WAREHOUSE STOCK FIELDS:');
+      const warehouseStockEntries = Array.from(formData.entries()).filter(([key]) => key.startsWith('warehouseStock'));
+      if (warehouseStockEntries.length > 0) {
+        warehouseStockEntries.forEach(([key, value]) => {
+          console.log(`  🔸 ${key}: ${value} (${typeof value})`);
+        });
+      } else {
+        console.log('  🔸 No warehouse stock data');
+      }
+      
+      console.log('📋 VARIANT FIELDS:');
+      const variantEntries = Array.from(formData.entries()).filter(([key]) => key.startsWith('variants'));
+      if (variantEntries.length > 0) {
+        variantEntries.forEach(([key, value]) => {
+          console.log(`  🔸 ${key}: ${value} (${typeof value})`);
+        });
+      } else {
+        console.log('  🔸 No variant data');
+      }
+      
+      console.log('📋 IMAGE FIELDS:');
+      const imageEntries = Array.from(formData.entries()).filter(([key]) => key.startsWith('productImages') || key.startsWith('imageMetadata'));
+      if (imageEntries.length > 0) {
+        imageEntries.forEach(([key, value]) => {
+          if (value instanceof File) {
+            console.log(`  🔸 ${key}: File - ${value.name} (${(value.size / 1024 / 1024).toFixed(2)}MB, ${value.type})`);
+          } else {
+            console.log(`  🔸 ${key}: ${value} (${typeof value})`);
+          }
+        });
+      } else {
+        console.log('  🔸 No image data');
+      }
+      
+      console.log('📋 TOTAL FORM DATA ENTRIES:', Array.from(formData.entries()).length);
+      console.log('🔍 === END FORM DATA BREAKDOWN ===');
+      
+      // Also log the expected backend fields for comparison
+      console.log('Expected backend fields:');
+      console.log('  - name (string)');
+      console.log('  - description (string)');
+      console.log('  - sku (string)');
+      console.log('  - basePrice (number)');
+      console.log('  - stockQuantity (integer)');
+      console.log('  - categoryId (integer)');
+      console.log('  - isActive (boolean)');
+      console.log('  - isFeatured (boolean)');
+      console.log('  - isBestseller (boolean)');
+      console.log('  - isNewArrival (boolean)');
+      console.log('  - isOnSale (boolean)');
+
+      // NEW: Backend field comparison and validation
+      console.log('🔍 === BACKEND FIELD COMPARISON ===');
+      console.log('📋 REQUIRED FIELDS CHECK:');
+      const requiredFields = ['name', 'description', 'sku', 'basePrice', 'stockQuantity', 'categoryId'];
+      const missingFields = requiredFields.filter(field => !formData.get(field));
+      if (missingFields.length === 0) {
+        console.log('  ✅ All required fields are present');
+      } else {
+        console.log('  ❌ Missing required fields:', missingFields);
+      }
+      
+      console.log('📋 FIELD TYPE VALIDATION:');
+      const fieldValidations = [
+        { field: 'name', expected: 'string', actual: typeof formData.get('name') },
+        { field: 'description', expected: 'string', actual: typeof formData.get('description') },
+        { field: 'sku', expected: 'string', actual: typeof formData.get('sku') },
+        { field: 'basePrice', expected: 'string (number)', actual: typeof formData.get('basePrice') },
+        { field: 'stockQuantity', expected: 'string (number)', actual: typeof formData.get('stockQuantity') },
+        { field: 'categoryId', expected: 'string (number)', actual: typeof formData.get('categoryId') }
+      ];
+      
+      fieldValidations.forEach(validation => {
+        const isValid = validation.expected.includes(validation.actual);
+        console.log(`  ${isValid ? '✅' : '❌'} ${validation.field}: expected ${validation.expected}, got ${validation.actual}`);
+      });
+      
+      console.log('📋 COMPLEX DATA STRUCTURE CHECK:');
+      console.log('  🔸 Warehouse Stock Format:');
+      const warehouseFields = Array.from(formData.entries()).filter(([key]) => key.startsWith('warehouseStock'));
+      if (warehouseFields.length > 0) {
+        console.log('    - Format: warehouseStock[index].fieldName');
+        console.log('    - Example keys:', warehouseFields.slice(0, 3).map(([key]) => key));
+      }
+      
+      console.log('  🔸 Variants Format:');
+      const variantFields = Array.from(formData.entries()).filter(([key]) => key.startsWith('variants'));
+      if (variantFields.length > 0) {
+        console.log('    - Format: variants[index].fieldName');
+        console.log('    - Example keys:', variantFields.slice(0, 3).map(([key]) => key));
+      }
+      
+      console.log('  🔸 Images Format:');
+      const imageFields = Array.from(formData.entries()).filter(([key]) => key.startsWith('productImages'));
+      if (imageFields.length > 0) {
+        console.log('    - Format: productImages (File objects)');
+        console.log('    - Count:', imageFields.length);
+      }
+      
+      console.log('🔍 === END BACKEND FIELD COMPARISON ===');
+      
       // Add images
       if (productData.productImages && productData.productImages.length > 0) {
         productData.productImages.forEach((image, index) => {
@@ -614,11 +849,27 @@ export const productService = {
         headers.Authorization = `Bearer ${token}`;
       }
 
-      const response = await api.post<JavaProductResponse<JavaProduct> | JavaProduct>('/api/v1/products', formData, {
+      // Add request progress tracking
+      console.log('🚀 Starting product creation request...');
+      const startTime = Date.now();
+      
+      const response = await productApi.post<JavaProductResponse<JavaProduct> | JavaProduct>('/api/v1/products', formData, {
         headers,
         // Prevent axios from setting Content-Type automatically for FormData
         transformRequest: (data) => data,
+        // Add progress tracking
+        onUploadProgress: (progressEvent) => {
+          const elapsed = Date.now() - startTime;
+          console.log(`📤 Upload progress: ${Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))}% (${elapsed}ms elapsed)`);
+        },
+        onDownloadProgress: (progressEvent) => {
+          const elapsed = Date.now() - startTime;
+          console.log(`📥 Download progress: ${Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))}% (${elapsed}ms elapsed)`);
+        },
       });
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`✅ Product creation completed in ${totalTime}ms`);
 
       // Handle different response formats
       if (response.data && typeof response.data === 'object') {
@@ -641,6 +892,37 @@ export const productService = {
       throw new Error('Invalid response format from server');
     } catch (error: any) {
       console.error('Error creating product:', error);
+      
+      // Handle specific error types
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error('Request timed out. The server is taking too long to respond. Please try again or contact support if the issue persists.');
+      }
+      
+      if (error.response?.status === 500) {
+        throw new Error('Server error (500). The backend encountered an error processing your request. Please check the data and try again.');
+      }
+      
+      if (error.response?.status === 413) {
+        throw new Error('Request too large. The product data or images are too big. Please reduce image sizes and try again.');
+      }
+      
+      if (error.response?.status === 400) {
+        throw new Error(`Bad request: ${error.response?.data?.message || 'Invalid data format'}. Please check all required fields.`);
+      }
+      
+      throw new Error(error.response?.data?.message || error.message || 'Failed to create product');
+    }
+  }
+  ,
+  async createProductJson(payload: BackendProductPayload): Promise<any> {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const response = await api.post('/api/v1/products', payload, { headers });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error creating product (JSON):', error);
       throw new Error(error.response?.data?.message || error.message || 'Failed to create product');
     }
   }
