@@ -10,20 +10,20 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [message, setMessage] = useState("");
   
-  const { forgotPassword, loading, error, clearError } = useAuthStore();
+  // // const { forgotPassword, loading, error, clearError } = useAuthStore();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    clearError();
+  // async function handleSubmit(e: React.FormEvent) {
+  //   e.preventDefault();
+  //   clearError();
     
-    try {
-      const result = await forgotPassword(email);
-      setMessage(result.message);
-      setSent(true);
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  //   try {
+  //     const result = await forgotPassword(email);
+  //     setMessage(result.message);
+  //     setSent(true);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {error && (
+        {/* {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
             <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
           </div>
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
               {loading ? "Sending..." : "Send reset link"}
             </button>
           </form>
-        )}
+        )} */}
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">

@@ -13,7 +13,9 @@ import {
   FiBarChart,
   FiPieChart,
   FiFileText,
-  FiFilter
+  FiFilter,
+  FiAlertCircle,
+  FiX
 } from 'react-icons/fi';
 
 export default function ReportsPage() {
@@ -170,7 +172,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100">Total Revenue</p>
-                    <p className="text-2xl font-bold">${currentData.totalRevenue.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">${'totalRevenue' in currentData ? currentData.totalRevenue.toLocaleString() : 'N/A'}</p>
                   </div>
                   <FiDollarSign className="h-8 w-8 text-blue-200" />
                 </div>
@@ -179,7 +181,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100">Total Orders</p>
-                    <p className="text-2xl font-bold">{currentData.totalOrders}</p>
+                    <p className="text-2xl font-bold">{'totalOrders' in currentData ? currentData.totalOrders : 'N/A'}</p>
                   </div>
                   <FiShoppingCart className="h-8 w-8 text-green-200" />
                 </div>
@@ -188,17 +190,14 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-100">Avg Order Value</p>
-                    <p className="text-2xl font-bold">${currentData.averageOrderValue}</p>
+                    <p className="text-2xl font-bold">${'averageOrderValue' in currentData ? currentData.averageOrderValue : 'N/A'}</p>
                   </div>
                   <FiTrendingUp className="h-8 w-8 text-purple-200" />
                 </div>
               </div>
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-lg">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100">Growth Rate</p>
-                    <p className="text-2xl font-bold">{currentData.growthRate}%</p>
-                  </div>
+                  
                   <FiTrendingUp className="h-8 w-8 text-orange-200" />
                 </div>
               </div>
@@ -216,15 +215,15 @@ export default function ReportsPage() {
                       <th className="text-right py-3 px-4">Revenue</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {currentData.topProducts.map((product, index) => (
+                  {/* <tbody>
+                      {currentData.topProducts.map((product, index) => (
                       <tr key={index} className="border-b border-neutral-100 dark:border-neutral-800">
                         <td className="py-3 px-4">{product.name}</td>
                         <td className="text-right py-3 px-4">{product.sales}</td>
                         <td className="text-right py-3 px-4">${product.revenue.toLocaleString()}</td>
                       </tr>
                     ))}
-                  </tbody>
+                  </tbody> */}
                 </table>
               </div>
             </div>
@@ -237,10 +236,10 @@ export default function ReportsPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
                 <div className="flex items-center justify-between">
-                  <div>
+                  {/* <div>
                     <p className="text-blue-100">Total Customers</p>
                     <p className="text-2xl font-bold">{currentData.totalCustomers}</p>
-                  </div>
+                  </div> */}
                   <FiUsers className="h-8 w-8 text-blue-200" />
                 </div>
               </div>
@@ -248,16 +247,16 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100">New Customers</p>
-                    <p className="text-2xl font-bold">{currentData.newCustomers}</p>
+                    {/* <p className="text-2xl font-bold">{currentData.newCustomers}</p> */}
                   </div>
-                  <FiUser className="h-8 w-8 text-green-200" />
+                  {/* <FiUser className="h-8 w-8 text-green-200" /> */}
                 </div>
               </div>
               <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-100">Repeat Customers</p>
-                    <p className="text-2xl font-bold">{currentData.repeatCustomers}</p>
+                    {/* <p className="text-2xl font-bold">{currentData.repeatCustomers}</p> */}
                   </div>
                   <FiUsers className="h-8 w-8 text-purple-200" />
                 </div>
@@ -266,7 +265,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-orange-100">Avg LTV</p>
-                    <p className="text-2xl font-bold">${currentData.averageLifetimeValue}</p>
+                    {/* <p className="text-2xl font-bold">${currentData.averageLifetimeValue}</p> */}
                   </div>
                   <FiDollarSign className="h-8 w-8 text-orange-200" />
                 </div>
@@ -287,14 +286,14 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentData.topCustomers.map((customer, index) => (
+                    {/* {currentData.topCustomers.map((customer, index) => (
                       <tr key={index} className="border-b border-neutral-100 dark:border-neutral-800">
                         <td className="py-3 px-4">{customer.name}</td>
                         <td className="py-3 px-4">{customer.email}</td>
                         <td className="text-right py-3 px-4">${customer.totalSpent.toLocaleString()}</td>
                         <td className="text-right py-3 px-4">{customer.orders}</td>
                       </tr>
-                    ))}
+                    ))} */}
                   </tbody>
                 </table>
               </div>
@@ -310,7 +309,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100">Total Products</p>
-                    <p className="text-2xl font-bold">{currentData.totalProducts}</p>
+                    {/* <p className="text-2xl font-bold">{currentData.totalProducts}</p> */}
                   </div>
                   <FiPackage className="h-8 w-8 text-blue-200" />
                 </div>
@@ -319,7 +318,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-yellow-100">Low Stock</p>
-                    <p className="text-2xl font-bold">{currentData.lowStockProducts}</p>
+                    {/* <p className="text-2xl font-bold">{currentData.lowStockProducts}</p> */}
                   </div>
                   <FiAlertCircle className="h-8 w-8 text-yellow-200" />
                 </div>
@@ -328,7 +327,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-red-100">Out of Stock</p>
-                    <p className="text-2xl font-bold">{currentData.outOfStockProducts}</p>
+                    {/* <p className="text-2xl font-bold">{currentData.outOfStockProducts}</p> */}
                   </div>
                   <FiX className="h-8 w-8 text-red-200" />
                 </div>
@@ -337,7 +336,7 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100">Total Value</p>
-                    <p className="text-2xl font-bold">${currentData.totalValue.toLocaleString()}</p>
+                    {/* <p className="text-2xl font-bold">${currentData.totalValue.toLocaleString()}</p> */}
                   </div>
                   <FiDollarSign className="h-8 w-8 text-green-200" />
                 </div>
@@ -357,13 +356,13 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentData.categoryBreakdown.map((category, index) => (
+                    {/* {currentData.categoryBreakdown.map((category, index) => (
                       <tr key={index} className="border-b border-neutral-100 dark:border-neutral-800">
                         <td className="py-3 px-4">{category.category}</td>
                         <td className="text-right py-3 px-4">{category.count}</td>
                         <td className="text-right py-3 px-4">${category.value.toLocaleString()}</td>
                       </tr>
-                    ))}
+                    ))} */} 
                   </tbody>
                 </table>
               </div>

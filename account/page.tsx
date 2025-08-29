@@ -16,7 +16,7 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="mb-6 text-2xl font-bold">Hello, {user.name}</h1>
+      <h1 className="mb-6 text-2xl font-bold">Hello, {user.firstName} {user.lastName}</h1>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Link href="/account/orders" className="rounded-md border p-4 hover:bg-gray-50 dark:hover:bg-gray-900">Orders</Link>
         <Link href="/account/addresses" className="rounded-md border p-4 hover:bg-gray-50 dark:hover:bg-gray-900">Addresses</Link>

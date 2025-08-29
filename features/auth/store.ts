@@ -7,16 +7,22 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isInitialized: boolean;
+  loading: boolean;
+  error: string | null;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   logout: () => void;
   initialize: () => void;
+  forgotPassword: (email: string) => Promise<{ message: string }>;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isInitialized: false,
+  loading: false,
+  error: null,
   
   setUser: (user) => set({ user }),
   setToken: (token) => set({ token }),
@@ -47,4 +53,21 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isInitialized: true });
     }
   },
+  
+  forgotPassword: async (email: string) => {
+    set({ loading: true, error: null });
+    try {
+      const result = await authService.forgotPassword({ email });
+      set({ loading: false });
+      return result;
+    } catch (error: any) {
+      set({ 
+        loading: false, 
+        error: error.message || 'Failed to send password reset email' 
+      });
+      throw error;
+    }
+  },
+  
+  clearError: () => set({ error: null }),
 }));
